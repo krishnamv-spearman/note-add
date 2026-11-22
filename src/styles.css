@@ -1,0 +1,267 @@
+:root {
+  color-scheme: light;
+  --ink: #363a27;
+  --ink-2: #4a4d3a;
+  --bg: #fafaf7;
+  --paper: #fff4a3;
+  --rule: #e8d96b;
+  --error: #8a1c1c;
+  --focus: #1f5fbf;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+input {
+  font-size: 16px; /* EDT-16: iPhone does not zoom on focus */
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+  padding: 0;
+  margin: -1px;
+}
+
+.app {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 0 1rem 6rem;
+}
+
+.app-bar {
+  display: flex;
+  align-items: center;
+  min-height: 3rem;
+}
+
+.brand {
+  font-weight: 700;
+}
+
+.loading,
+.no-storage {
+  padding: 2rem 0;
+}
+
+.banner {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  margin: 0.5rem 0;
+  border: 1px solid var(--ink-2);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.banner-error {
+  border-color: var(--error);
+  color: var(--error);
+}
+
+.button,
+.banner button,
+.editing-bar button,
+.icon-button,
+.nav-link {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 1rem;
+  border: 1px solid var(--ink-2);
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.icon-button,
+.nav-link {
+  padding: 0;
+}
+
+span.nav-link {
+  border-color: transparent;
+  background: transparent;
+}
+
+.editor-header .notebook-name {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.page-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.page-nav h1 {
+  font-size: 1.25rem;
+  margin: 0.5rem 0;
+}
+
+.header-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.date-field,
+.title-field {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.date-field label,
+.title-field label {
+  width: 100%;
+  font-size: 0.875rem;
+  color: var(--ink-2);
+}
+
+.date-input {
+  width: 8.5rem;
+}
+
+.date-field input,
+.title-field input {
+  min-height: 44px;
+  padding: 0 0.5rem;
+  border: 1px solid var(--ink-2);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.save-status {
+  min-height: 1.25rem;
+  margin: 0.25rem 0;
+  font-size: 0.875rem;
+  color: var(--ink-2);
+}
+
+.slip {
+  background: var(--paper);
+  box-shadow: 0 6px 16px rgb(0 0 0 / 0.12);
+  padding: 0.75rem 1rem;
+  margin: 0.75rem 0;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr minmax(7.5rem, 40%);
+  gap: 0.5rem;
+  align-items: center;
+  min-height: 44px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.line input {
+  min-height: 44px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0 0.25rem;
+}
+
+.amount {
+  text-align: right;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.amount-cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.flag {
+  position: absolute;
+  left: -0.25rem;
+  font-size: 0.6rem;
+  color: var(--ink-2);
+}
+
+.field-message {
+  grid-column: 1 / -1;
+  margin: 0 0 0.25rem;
+  font-size: 0.875rem;
+  color: var(--error);
+}
+
+.bf-row,
+.total-row {
+  font-weight: 600;
+}
+
+.total-row {
+  border-top: 2px solid var(--ink-2);
+  border-bottom: 0;
+}
+
+.hint {
+  color: var(--ink-2);
+}
+
+.editor-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.editing-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: #f0efe8;
+  border-top: 1px solid var(--ink-2);
+  z-index: 10;
+}

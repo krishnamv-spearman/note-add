@@ -9,7 +9,7 @@ Run started 22/11/2026. Owner decisions of 22/11/2026 applied to the docs first:
 |---|---|---|---|
 | 0 Harness | ✅ done | 3 | 3 |
 | 1 Engine | ✅ done | 224 | 3 |
-| 2 Editor | not started | | |
+| 2 Editor | ✅ done | 291 | 23 (+4 skipped) |
 | 3 Library | not started | | |
 | 4 Look | not started | | |
 | 5 Export | not started | | |
@@ -63,6 +63,28 @@ Run started 22/11/2026. Owner decisions of 22/11/2026 applied to the docs first:
 
 ---
 
+## Phase 2 — Page editor and storage
+
+**Built**
+- `src/db/`: Dexie schema version 1 exactly as arch §4.2, single `db`, `resetDb()`, `versionchange` → close + "Note-Add was updated — reload" banner (MTB-04); injected clock (`setClock`, `now`, `today`) read on every call (DAT-03); `newId()` with a fallback when `crypto.randomUUID` is unavailable (STO-08).
+- `mutatePages` (arch §6.1): one `rw` transaction; load → change → renumber → `recalculateChain` → abort on error (a `Refusal` or chain error writes nothing) → write only changed pages → bump `notebook.updatedAt` → append activity (trimmed to 200).
+- Operations: `createNotebook` (with page 1), `updateLines`/`updateLine` (per-line writes), `updatePageHeader` (date validated, title trimmed/capped at 60, cleared → null), `appendPage` (always at the end); Final pages refuse line and header edits at the repository (LIF-14). Defensive reads: `normalisePage` pads to 10 lines without dropping content; `verifyNotebook` re-runs the chain and corrects stale totals, logging in development (CHN-09/10).
+- Editor (`src/features/editor/`): `EditorSession` (plain class, subscribed with `useSyncExternalStore`) holds local text, the last valid value per line, 400 ms debounced autosave of only dirty lines, flush on blur / route change / `visibilitychange` / `pagehide`, "Saving…"/"Saved", error banner with Retry (SAV-04) or the chain message naming the page (SAV-05), and per-line conflict handling with "This page was changed in another window" (MTB-02, SAV-07).
+- `PageEditor`: header (notebook name, "Page N of M" with previous/next links, DD/MM/YYYY text date field with a picker button, title with "Page N" placeholder), read-only brought-forward row, 10 lines, live total row; amounts right-aligned with tabular figures; formatted on blur, raw on focus; subtle flag with the label "Not a number, counted as zero"; rejected messages under the field; screen-reader text "minus … rupees"; throttled `aria-live` total; "Page N started, brought forward …" announcement.
+- Keyboard model by focus index; Enter on line 10 flushes, appends, opens and focuses line 1, or goes to the existing next page; empty page shows "Add a line before starting a new page"; in-flight guard; IME composition ignored; **New page** button.
+- Phone **editing bar** (± and Next ↵) above the on-screen keyboard via `visualViewport`.
+- `navigator.storage.persist()` requested once after the first save (`platform/storage.ts`); `BroadcastChannel('note-add')` listener that reloads on a restore message (`platform/broadcast.ts`); full-screen "This browser can't store notes…" when IndexedDB is missing (STO-01).
+- Routes: `/` temporary start screen (opens the latest notebook or creates "My notebook"), `/n/:notebookId/p/:pageNumber`; malformed or missing page numbers redirect to the last page with a notice; missing notebooks redirect home.
+
+**Tests:** 291 unit tests (22 repository, 24 `EditorSession`, 20 editor component, 2 app boot, engine as before). E2E: 23 passed + 4 skipped (the two chromium-only two-tab tests on the phone projects): `editor.spec.ts` (6 tests × 3 projects), `two-tabs.spec.ts` (2, chromium), `smoke.spec.ts` (× 3).
+
+**Exit criteria**
+- ✅ A user can fill three pages by keyboard alone: `editor.spec.ts` passes on chromium-desktop (Enter), pixel-7 (Enter) and iphone-14 WebKit (the editing bar's Next on amounts). Real-device checks → manual tests M2.1–M2.2.
+- ✅ Data survives a reload (same test reloads and checks descriptions, amounts and totals).
+- ✅ Editing page 1 updates pages 2 and 3 immediately without a reload (`editor.spec.ts`, `two-tabs.spec.ts`).
+
+---
+
 ## Decisions to review
 
 | # | Phase | Decision | Why |
@@ -81,6 +103,14 @@ Run started 22/11/2026. Owner decisions of 22/11/2026 applied to the docs first:
 | D12 | 1 | Search removes only Latin combining accents (U+0300–036F), not all combining marks. | Removing all marks would strip Hindi vowel signs and create false matches (SRC-07). |
 | D13 | 1 | `+-5`, `₹₹50`, `,100`, `100,`, `()` and `/-` alone are invalid; `450 /-` (space before the suffix) is accepted. | Consistent with "money fields are strict" while honouring the `/-` decision. |
 | D14 | 1 | `recalculateChain` processes pages in the order given (the repository sorts by number); it does not sort. | Keeps the function simple and lets `renumber` define the order after deletes. |
+| D15 | 2 | **Focusing an amount that shows a formatted value (`1,280.75`) selects the raw text (`1280.75`)**, so typing replaces it. A second tap places the caret as usual. | Swapping formatted → raw on focus otherwise loses the selection and appends text (found by e2e: `100` became `100-100`). Common behaviour for amount fields. |
+| D16 | 2 | "Last valid value" (arch §5.2) means the last value that parsed while typing, not the last saved one: typing `450.50` then a third decimal keeps ₹450.50; a paste of `450.505` over `450` keeps ₹450.00. While an amount is focused and not a number (`-`, `.`, `(`), the total uses that last valid value and nothing is saved for that amount until the field is left (EDT-04). | Matches "the last valid value stays in the database and the total". |
+| D17 | 2 | The editing bar shows while an amount is focused when an on-screen keyboard is detected (`visualViewport` shrinks) **or** the primary pointer is coarse (touch). | Lets the iPhone e2e test use it (emulation has no keyboard) and covers phones whose keyboard does not resize the visual viewport. A tablet with a physical keyboard may still show it (KBD-12 is a manual check). |
+| D18 | 2 | Amount fields have no hard `maxLength`; text over 20 characters is kept and marked invalid with "Too long (20 characters at most)" (PST-12). Descriptions are cut at 120 with "Cut to 120 characters". Title uses `maxLength=60`. | PST-12 says never cut a pasted amount silently. |
+| D19 | 2 | Shift+Enter does nothing (focus stays); Tab follows the natural order (KBD-08). | One reading of "does nothing special". |
+| D20 | 2 | Activity entries are written for notebook creation and page creation now; lifecycle entries come in phase 3. `appendActivity` already trims to 200. | Activity kinds include `page-created`. |
+| D21 | 2 | Previous/next page links were added to the editor header. | Needed to move between pages before the phase 3 pages list, and for "no browser back button" in installed mode (PWA-05). |
+| D22 | 2 | A test-only shim in `tests/setup/dom.ts` drops `AbortSignal` from `Request` because jsdom's signal is rejected by Node's `Request` in React Router data routers. | Test environment only; no app code affected. |
 
 ---
 
@@ -91,3 +121,6 @@ Run started 22/11/2026. Owner decisions of 22/11/2026 applied to the docs first:
 | M0.1 | 0 | Create the GitHub repo `note-add`, add it as `origin`, create `main` from this branch when ready, push, and confirm CI is green (including the two time-zone jobs). |
 | M0.2 | 0 | Link the repo in Vercel (framework Vite, output `dist/`); open the preview URL; DevTools → Network → document → Response headers shows `Content-Security-Policy`. Record the `*.vercel.app` address in the README. |
 | M0.3 | 0 | (Optional) On your machine, `git commit` with a failing test is blocked by the hook. |
+| M2.1 | 2 | Real Android phone (Chrome, Gboard and the maker's keyboard): fill three pages using only the keyboard's Next key; the minus key or ± enters a refund; Hindi input: confirming a word with Enter does not jump fields (test-plan §10.3 M1–M8, §10.4 K1–K5). |
+| M2.2 | 2 | Real iPhone (Safari): the editing bar sits just above the decimal keypad, ± and Next ↵ work, the page does not jump or zoom when the keyboard opens, the focused line stays visible (EDT-15, EDT-16, K2). |
+| M2.3 | 2 | Tablet with a physical keyboard: note whether the editing bar appears (see D17, KBD-12). |

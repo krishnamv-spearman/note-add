@@ -75,7 +75,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | PST-01 | Leading or trailing spaces, including non-breaking space (U+00A0), thin space (U+2009) and narrow no-break space (U+202F) | Trimmed; parsed normally | P1.2 | U | ✅ |
 | PST-02 | Invisible characters copied from WhatsApp or web pages: zero-width space (U+200B), left-to-right mark (U+200E), byte-order mark (U+FEFF) | Removed before parsing | P1.2 | U | ✅ |
 | PST-03 | Trailing newline or tab (one cell copied from Excel or Google Sheets) | Removed; parsed normally | P1.2 | U | ✅ |
-| PST-04 | Several cells or lines pasted into one amount (`450\t300`, `450\n300`) | Invalid, flagged; nothing is summed or split automatically | P1.2, P2.14 | U, C | ➕ |
+| PST-04 | Several cells or lines pasted into one amount (`450\t300`, `450\n300`) | Invalid, flagged; nothing is summed or split automatically | P1.2, P2.14 | U, C | ✅ |
 | PST-05 | Accounting negative with symbol `(₹1,280.75)` or `₹(1,280.75)` | −128075 | P1.2 | U | ✅ |
 | PST-06 | Symbol after the minus `-₹300`, `Rs.-300`, `₹-300` | −30000 | P1.2 | U | ✅ |
 | PST-07 | Indian "only" suffix `450/-` or `₹ 450/-` (common on bills and in messages) | Suffix stripped: 45000. Decided 22/11/2026 | P1.2 | U | ✅ decided |
@@ -83,8 +83,8 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | PST-09 | Bank SMS style with trailing `Dr`/`Cr` (`1,280.75 Dr`) | Invalid; the user types the sign. Guessing debit/credit could flip a sign | P1.2 | U | ✅ |
 | PST-10 | Number with Western grouping and 3 decimals from a foreign invoice `1,234.567` | Rejected: too-many-decimals | P1.2 | U | ✅ |
 | PST-11 | European style `1.234,56` | Invalid (would otherwise read as ₹1.23456 or ₹123,456) | P1.2 | U | ✅ |
-| PST-12 | Paste of more than 20 characters into the amount field | Pasted text kept (not cut silently, which could drop digits), field marked invalid with "Too long" | P2.14 | C | ➕ |
-| PST-13 | Description pasted with an amount in it (`Taxi 450`) | Stays a description; amount not split out | P2.14 | C | ❓ |
+| PST-12 | Paste of more than 20 characters into the amount field | Pasted text kept (not cut silently, which could drop digits), field marked invalid with "Too long" | P2.14 | C | ✅ |
+| PST-13 | Description pasted with an amount in it (`Taxi 450`) | Stays a description; amount not split out | P2.14 | C | ✅ |
 | PST-14 | Value copied from the app's own total row (`1,00,000.00` or `(300.00)`) pasted into a line | Parses back exactly | P1.2 | U | ✅ |
 
 ## 2. Formatting and display (phase 1, `formatPaise`)
@@ -97,7 +97,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | FMT-04 | Minus style | `-300.00` | P1.3 | U | ✅ |
 | FMT-05 | Output identical in every browser and Node | String-built, not `Intl`; `Intl` only a test cross-check | P1.3 | U | ✅ |
 | FMT-06 | Field shows formatted value on blur, raw text on focus | `1280.75` typed → `1,280.75` shown after blur → `1280.75` when focused again | P2.7 | C | ✅ |
-| FMT-07 | Negative page total | Total row shows brackets, same ink colour, no red | P2.5 | C | ➕ |
+| FMT-07 | Negative page total | Total row shows brackets, same ink colour, no red | P2.5 | C | ✅ |
 | FMT-08 | Widest values fit at 320 px screen width (iPhone SE), with brackets, in the widest font (Atkinson) | No overflow or clipping in amount column or total row | P4.5 | E (320 px viewport) | ➕ |
 
 ## 3. Totals and limits
@@ -106,7 +106,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 |---|---|---|---|---|---|
 | TOT-01 | All lines empty | Total = brought forward | P1.5 | U | ✅ |
 | TOT-02 | Mix of valid, empty and invalid amounts | Invalid and empty count as 0; only invalid ones are flagged | P1.5 | U | ✅ |
-| TOT-03 | Description with no amount; amount with no description | Both allowed, neither flagged | P1.5, P2.7 | U, C | ✅ (second case ➕) |
+| TOT-03 | Description with no amount; amount with no description | Both allowed, neither flagged | P1.5, P2.7 | U, C | ✅ |
 | TOT-04 | Each amount within limit but the page total over limit (10 × ₹99 crore) | Edit rejected with "This would make the page total more than ₹99.99 crore" | P1.6, P2.8 | U, C | ✅ |
 | TOT-05 | Total exactly at the limit | Allowed | P1.6 | U | ✅ |
 | TOT-06 | Negative total below −₹99.99 crore | Rejected the same way | P1.6 | U | ✅ |
@@ -140,17 +140,17 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | CHN-06 | Edit that does not change any total (for example, editing a description) | No later page rewritten; `changedIds` contains only the edited page | P1.6 | U | ✅ |
 | CHN-07 | Editing an amount to the same value (retyping `450` as `450.00`) | No later page rewritten; no `totalUpdatedOn` set on Final pages | P1.6 | U | ✅ |
 | CHN-08 | Reopen a Final page that has "Total updated…" | Note cleared on reopen and on re-finalising (the user has now reviewed it) | P3.3 | R | ❓ |
-| CHN-09 | Cached totals in the database disagree with a recomputation (bug or manual tampering) | Dev mode logs the mismatch; on load the chain is recomputed and corrected, with no silent change to amounts | arch §4.3 | R | ➕ |
-| CHN-10 | Stored page has the wrong number of lines (corrupt record) | Normalised on read to exactly 10 (pad with empty lines); never drop a line with content; log it | P2.16 | R | ➕ |
+| CHN-09 | Cached totals in the database disagree with a recomputation (bug or manual tampering) | Dev mode logs the mismatch; on load the chain is recomputed and corrected, with no silent change to amounts | arch §4.3 | R | ✅ |
+| CHN-10 | Stored page has the wrong number of lines (corrupt record) | Normalised on read to exactly 10 (pad with empty lines); never drop a line with content; log it | P2.16 | R | ✅ |
 
 ### 4.1 Edits to early pages
 
 | ID | Scenario | Expected | Task | Test | Status |
 |---|---|---|---|---|---|
-| CHN-11 | Page 1 edited in one tab while page 50 is open in another | Page 50's brought forward and total update live, without reload | P2.15 | E | ➕ |
+| CHN-11 | Page 1 edited in one tab while page 50 is open in another | Page 50's brought forward and total update live, without reload | P2.15 | E | ✅ |
 | CHN-12 | Sign flipped on page 1 (`300` → `-300`) | Every later total drops by exactly 600.00 | P1.6 | U | ✅ |
 | CHN-13 | Amount on page 1 changed from valid to invalid text (`450` → `45o`) | Counts as 0 from then on; every later page drops by 450.00; the line is flagged | P1.6, P2.7 | U, C | ✅ |
-| CHN-14 | Amount on page 1 changed to a rejected value (`450.505`) | Nothing changes anywhere; last valid value kept | P2.7 | C | ➕ |
+| CHN-14 | Amount on page 1 changed to a rejected value (`450.505`) | Nothing changes anywhere; last valid value kept | P2.7 | C | ✅ |
 | CHN-15 | Fast typing on page 1 of a 200-page notebook | One recalculation per save (debounced), not per keystroke; each save within the 50 ms budget | P2.8, P7.8 | R | ➕ |
 | CHN-16 | Edit page 1 when later pages are a mix: Draft, Final, Draft, Final | Every page updates; only the Final ones get "Total updated…" | P1.6 | U | ✅ |
 | CHN-17 | Edit an early page, then delete a page between it and the end | Chain correct after both; renumbered pages keep their own lines | P1.7 | U | ✅ |
@@ -177,30 +177,30 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | LIF-14 | Any code path tries to change a Final page's lines, date, title or colour (`updateLine`, `updatePageHeader`, a stale autosave arriving after Mark Final) | Repository refuses; only the chain may change its brought forward and total | P3.3 | R | ➕ |
 | LIF-15 | Final page whose total was updated by an earlier page, then exported | Export shows the new total and the "Total updated…" note | P5.2 | U | ➕ |
 | LIF-16 | Final page in a backup | Restores as Final with `finalisedOn`, `reopenedOn` and `totalUpdatedOn` intact | P6.4 | R | ➕ |
-| LIF-17 | Final page sits last, user presses New page | New Draft page appended with BF = the Final page's total | P2.10 | E | ➕ |
+| LIF-17 | Final page sits last, user presses New page | New Draft page appended with BF = the Final page's total | P2.10 | E | ✅ |
 | LIF-18 | Mark Final on a page with flagged (invalid) amounts | **Refused** (decided 22/11/2026): "2 amounts are not numbers. Fix them before marking this page Final." Enforced in the UI and in the repository | P3.3, P3.8 | R, C, E | ✅ decided |
 
 ## 6. Page editor: layout, input and header fields
 
 | ID | Scenario | Expected | Task | Test | Status |
 |---|---|---|---|---|---|
-| EDT-01 | Amount input type | `type="text"` with `inputmode="decimal"`, never `type="number"` (which accepts `e`, changes with the mouse wheel and arrow keys, and hides invalid input from JavaScript) | P2.5 | C | ➕ |
+| EDT-01 | Amount input type | `type="text"` with `inputmode="decimal"`, never `type="number"` (which accepts `e`, changes with the mouse wheel and arrow keys, and hides invalid input from JavaScript) | P2.5 | C | ✅ |
 | EDT-02 | Rejected value, then the user presses Enter | Focus stays; message stays | P2.9 | C | ✅ |
-| EDT-03 | Rejected value, then the user taps elsewhere or navigates away | Field reverts to the last valid value, with a brief "Not saved: …" message | P2.7 | C | ❓ |
-| EDT-04 | Intermediate states while typing: `-`, `.`, `450.`, `(` | Not flagged until blur; total uses the last valid value meanwhile | P2.7 | C | ➕ |
-| EDT-05 | Description longer than 120 characters (typed or pasted) | Cut at 120 with a short notice | P2.5 | C | ➕ |
-| EDT-06 | Pasting multi-line or tab-separated text (from a spreadsheet) into a description | Newlines and tabs become single spaces | P2.5 | C | ➕ |
-| EDT-07 | Description with only spaces | Trimmed to empty on save | P2.8 | C | ➕ |
+| EDT-03 | Rejected value, then the user taps elsewhere or navigates away | Field reverts to the last valid value, with a brief "Not saved: …" message | P2.7 | C | ✅ |
+| EDT-04 | Intermediate states while typing: `-`, `.`, `450.`, `(` | Not flagged until blur; total uses the last valid value meanwhile | P2.7 | C | ✅ |
+| EDT-05 | Description longer than 120 characters (typed or pasted) | Cut at 120 with a short notice | P2.5 | C | ✅ |
+| EDT-06 | Pasting multi-line or tab-separated text (from a spreadsheet) into a description | Newlines and tabs become single spaces | P2.5 | C | ✅ |
+| EDT-07 | Description with only spaces | Trimmed to empty on save | P2.8 | C | ✅ |
 | EDT-08 | Emoji, Hindi, Tamil, Urdu or Arabic text in a description | Displayed with system font fallback; right-to-left text uses `dir="auto"` | P2.5, P4.3 | E | ➕ |
-| EDT-09 | Date field format | Shown and typed as DD/MM/YYYY on every device. A native `<input type="date">` shows the device's locale format (MM/DD/YYYY on US-English phones), so use a text field with a DD/MM/YYYY mask plus an optional picker button | P2.5 | E | ➕ (arch §7 change) |
-| EDT-10 | Invalid date typed (`31/02/2026`, `00/01/2026`, `1/1/26`) | Message under the field; previous date kept | P2.5 | C | ➕ |
-| EDT-11 | Date cleared | Reverts to the previous date (a page always has a date) | P2.5 | C | ➕ |
+| EDT-09 | Date field format | Shown and typed as DD/MM/YYYY on every device. A native `<input type="date">` shows the device's locale format (MM/DD/YYYY on US-English phones), so use a text field with a DD/MM/YYYY mask plus an optional picker button | P2.5 | E | ✅ |
+| EDT-10 | Invalid date typed (`31/02/2026`, `00/01/2026`, `1/1/26`) | Message under the field; previous date kept | P2.5 | C | ✅ |
+| EDT-11 | Date cleared | Reverts to the previous date (a page always has a date) | P2.5 | C | ✅ |
 | EDT-12 | Year far in the past or future (`01/01/1850`, `01/01/2300`) | Accepted range 01/01/1900 to 31/12/2099 | P1.8 | U | ✅ |
 | EDT-13 | Title cleared | Saved as `null`; shown as "Page N" | P2.3 | C | ✅ |
-| EDT-14 | Title longer than 60 characters | Cut at 60 | P2.5 | C | ➕ |
+| EDT-14 | Title longer than 60 characters | Cut at 60 | P2.5 | C | ✅ |
 | EDT-15 | Phone keyboard covers the focused line or the total row | Focused field scrolled into view above the keyboard and editing bar | P2.11 | M | ➕ |
-| EDT-16 | iPhone zooms in when an input is focused | All inputs use a font size of at least 16 px | P2.5 | M | ➕ |
-| EDT-17 | Browser autofill suggests values in amount fields | `autocomplete="off"`; no autocorrect or autocapitalise on amounts | P2.5 | C | ➕ |
+| EDT-16 | iPhone zooms in when an input is focused | All inputs use a font size of at least 16 px | P2.5 | M | ✅ |
+| EDT-17 | Browser autofill suggests values in amount fields | `autocomplete="off"`; no autocorrect or autocapitalise on amounts | P2.5 | C | ✅ |
 | EDT-18 | Page colour overridden, then notebook colour changed | Page keeps its override | P4.7 | R | ➕ |
 | EDT-19 | Final page | Inputs `readOnly` (text selectable, read by screen readers); Reopen visible; no editing bar | P3.8 | C | ✅ |
 
@@ -212,13 +212,13 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | KBD-02 | Enter on amount k (k < 10) | Focus moves to description k+1 | P2.9 | C | ✅ |
 | KBD-03 | Enter on amount 10, last page | Flush save, create page, open it, focus line 1 | P2.9 | C, E | ✅ |
 | KBD-04 | Enter on amount 10, a later page exists | Go to the next page, line 1; no page inserted | P2.9 | C | ✅ |
-| KBD-05 | Enter on amount 10 of a page with no entries at all | No new page created (avoids accidental empty pages); short hint "Add a line before starting a new page" | P2.9 | C | ❓ |
-| KBD-06 | Enter pressed twice quickly on line 10, or New page tapped twice | Exactly one new page (in-flight guard) | P2.9, P2.10 | C, E | ➕ |
-| KBD-07 | Enter during IME composition (Hindi or other input methods, or Android predictive text) | Composition is committed; focus does not move (`event.isComposing` / keyCode 229 ignored) | P2.9 | C, M | ➕ |
-| KBD-08 | Shift+Enter, Tab, Shift+Tab | Tab follows natural order; Shift+Enter does nothing special | P2.9 | C | ➕ |
-| KBD-09 | Enter on line 10 of a Final page | Goes to the next page if one exists; never creates a page | P2.9 | C | ➕ |
+| KBD-05 | Enter on amount 10 of a page with no entries at all | No new page created (avoids accidental empty pages); short hint "Add a line before starting a new page" | P2.9 | C | ✅ |
+| KBD-06 | Enter pressed twice quickly on line 10, or New page tapped twice | Exactly one new page (in-flight guard) | P2.9, P2.10 | C, E | ✅ |
+| KBD-07 | Enter during IME composition (Hindi or other input methods, or Android predictive text) | Composition is committed; focus does not move (`event.isComposing` / keyCode 229 ignored) | P2.9 | C, M | ✅ |
+| KBD-08 | Shift+Enter, Tab, Shift+Tab | Tab follows natural order; Shift+Enter does nothing special | P2.9 | C | ✅ |
+| KBD-09 | Enter on line 10 of a Final page | Goes to the next page if one exists; never creates a page | P2.9 | C | ✅ |
 | KBD-10 | Editing bar on iPhone decimal keypad (no minus, no Next) | ± toggles sign; Next ↵ behaves exactly like Enter | P2.11 | E, M | ✅ |
-| KBD-11 | ± on an empty or invalid amount | Empty: inserts `-` and waits for digits. Invalid: no change | P2.11 | C | ➕ |
+| KBD-11 | ± on an empty or invalid amount | Empty: inserts `-` and waits for digits. Invalid: no change | P2.11 | C | ✅ |
 | KBD-12 | Physical keyboard on a tablet | Editing bar hidden (no visual viewport shrink) | P2.11 | M | ✅ |
 | KBD-13 | Android keyboard without a minus key | ± on the editing bar | P2.11 | M | ✅ |
 
@@ -228,11 +228,11 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 |---|---|---|---|---|---|
 | SAV-01 | Typing quickly | One write per 400 ms pause; indicator "Saving…" then "Saved" | P2.8 | C | ✅ |
 | SAV-02 | Navigate away, background the app, or close the tab during the debounce | Flushed on blur, route change, `visibilitychange`, `pagehide` | P2.8 | E | ✅ |
-| SAV-03 | Browser killed by the OS within the 400 ms window | At most the last unsaved keystrokes are lost; documented, accepted | P2.8 | — | ➕ (note) |
-| SAV-04 | Save fails (storage full, database closed) | "Couldn't save — your typing is kept on screen" with Retry; local state kept | P2.8 | C | ✅ (quota case ➕) |
+| SAV-03 | Browser killed by the OS within the 400 ms window | At most the last unsaved keystrokes are lost; documented, accepted | P2.8 | — | ✅ |
+| SAV-04 | Save fails (storage full, database closed) | "Couldn't save — your typing is kept on screen" with Retry; local state kept | P2.8 | C | ✅ |
 | SAV-05 | Save rejected by the chain (over-limit) | Message names the page; local state kept for correction | P2.8 | C | ✅ |
 | SAV-06 | Export or Mark Final with a pending save | Flush first, then act | P5.9, P3.8 | C | ➕ |
-| SAV-07 | Database changes underneath the open editor (another tab, restore, recalculation from an edit elsewhere) | Brought forward updates live. Line fields take the new values only when the user has no unsaved edits on that page; otherwise see MTB-02 | P2.6 | C | ➕ |
+| SAV-07 | Database changes underneath the open editor (another tab, restore, recalculation from an edit elsewhere) | Brought forward updates live. Line fields take the new values only when the user has no unsaved edits on that page; otherwise see MTB-02 | P2.6 | C | ✅ |
 
 ## 9. Dates and time
 
@@ -240,7 +240,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 |---|---|---|---|---|---|
 | DAT-01 | Leap years: `29/02/2028` valid, `29/02/2027` and `29/02/2100` invalid | As stated (2100 is not a leap year) | P1.8 | U | ✅ |
 | DAT-02 | New page created just after midnight | Gets the new day's date | P1.8 | U | ✅ |
-| DAT-03 | App left open across midnight | New pages use the current date, not one cached at start-up | P2.3 | U | ➕ |
+| DAT-03 | App left open across midnight | New pages use the current date, not one cached at start-up | P2.3 | U | ✅ |
 | DAT-04 | User travels or changes time zone | Stored dates (`YYYY-MM-DD`) never shift | P1.8 | U (TZ set) | ✅ |
 | DAT-05 | Device clock wrong or moved backwards | Nothing crashes; reminder maths with a negative gap shows no banner | P6.7 | U | ➕ |
 | DAT-06 | Pages dated out of order (page 3 dated before page 2) | Allowed; order is by page number, never by date | P3.7 | — | ➕ (note) |
@@ -259,8 +259,8 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | NB-06 | "New page" when the last opened notebook has been deleted | Falls back to the most recently updated notebook; if none, the create dialog | P3.4 | C | ➕ |
 | NB-07 | Delete a notebook that has Final pages | Second explicit confirmation naming the number of Final pages | P3.1 | E | ✅ |
 | NB-08 | Many notebooks (100+) or a notebook with 1000 pages | Library and pages list stay responsive; pages list renders lazily or in batches | P3.5, P3.7 | E (seeded) | ➕ |
-| NB-09 | Deep link to a deleted notebook or a page number that no longer exists | Redirect to the library or the last page, with a short notice | P2.4 | E | ✅ (notebook case ➕) |
-| NB-10 | Malformed URL (`/n/xyz/p/abc`, `/n/…/p/0`, `/n/…/p/-1`) | Redirect, no crash | P2.4 | E | ➕ |
+| NB-09 | Deep link to a deleted notebook or a page number that no longer exists | Redirect to the library or the last page, with a short notice | P2.4 | E | ✅ |
+| NB-10 | Malformed URL (`/n/xyz/p/abc`, `/n/…/p/0`, `/n/…/p/-1`) | Redirect, no crash | P2.4 | E | ✅ |
 | SRC-01 | Empty or whitespace-only query | Shows all notebooks (normal library) | P3.6 | C | ➕ |
 | SRC-02 | Case and accents (`cafe` finds `Café`) | Match | P1.9 | U | ✅ |
 | SRC-03 | Special characters `(`, `.`, `*`, `\` | Literal text match (no regular expressions) | P1.9 | U | ✅ |
@@ -269,7 +269,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | SRC-06 | Matches on Archived (Final) pages | Included, with a Final badge | P3.6 | E | ➕ |
 | SRC-07 | Hindi or other non-Latin text | Matches after Unicode normalisation | P1.9 | U | ✅ |
 | ACT-01 | Fewer than 5 entries, or none | Shows what exists; none → section hidden | P3.5 | C | ➕ |
-| ACT-02 | Line edits | Do not create activity entries (only lifecycle events) | P3.2 | R | ➕ |
+| ACT-02 | Line edits | Do not create activity entries (only lifecycle events) | P3.2 | R | ✅ |
 | ACT-03 | Notebook renamed after an entry was written | Old entry keeps the old name (pre-rendered text) | P3.2 | R | ✅ |
 | ACT-04 | Entry refers to a deleted notebook or page | Shown as plain text, not a link | P3.5 | C | ➕ |
 | ACT-05 | More than 200 entries | Oldest trimmed | P3.2 | R | ✅ |
@@ -375,18 +375,18 @@ A backup made today may be restored years from now by a much newer app. arch §9
 
 | ID | Scenario | Expected | Task | Test | Status |
 |---|---|---|---|---|---|
-| STO-01 | IndexedDB unavailable or blocked (some private modes, locked-down browsers) | Full-screen message "This browser can't store notes. Open Note-Add in a normal Chrome or Safari window." | P2.1 | E (mocked) | ➕ |
+| STO-01 | IndexedDB unavailable or blocked (some private modes, locked-down browsers) | Full-screen message "This browser can't store notes. Open Note-Add in a normal Chrome or Safari window." | P2.1 | E (mocked) | ✅ |
 | STO-02 | Private or incognito window (storage wiped when closed) | Best-effort banner: "Notes in a private window are deleted when it closes" | P7.5 | M | ➕ |
-| STO-03 | Storage quota exceeded on write | See SAV-04 | P2.8 | R | ➕ |
+| STO-03 | Storage quota exceeded on write | See SAV-04 | P2.8 | R | ✅ |
 | STO-04 | `navigator.storage.persist()` denied or unsupported | Information only (Settings shows "may be cleared"); no nagging | P7.4 | U | ✅ |
 | STO-05 | **iPhone: notes typed in Safari do not appear after installing to the home screen** (installed web apps get separate storage) | Install hint shown early, before data is entered; if Safari already has data, the hint says "Back up first, then restore inside the installed app" | P7.5 | M | ➕ |
 | STO-06 | iPhone home-screen app removed | Its data is deleted; README warns; backup reminder covers it | P8.4 | — | ➕ (doc) |
 | STO-07 | User clears browser site data | Notes gone; README and About section say backups are the only protection | P8.4 | — | ➕ (doc) |
-| STO-08 | `crypto.randomUUID` or the service worker unavailable because the app is opened over plain `http://` on a LAN IP during phone testing | Test on phones through the Vercel preview (HTTPS) only; add a fallback ID generator anyway | P0.16, P2.3 | U | ➕ |
-| MTB-01 | Same notebook open in two tabs or windows | Edits in one appear in the other through live queries | P2.6 | E | ➕ |
-| MTB-02 | Same page edited in two tabs at once | Last write wins per line. The tab that loses shows "This page was changed in another window" and takes the new values when the user leaves the field. Never a blind overwrite of the whole page | P2.6 | E | ❓ |
+| STO-08 | `crypto.randomUUID` or the service worker unavailable because the app is opened over plain `http://` on a LAN IP during phone testing | Test on phones through the Vercel preview (HTTPS) only; add a fallback ID generator anyway | P0.16, P2.3 | U | ✅ |
+| MTB-01 | Same notebook open in two tabs or windows | Edits in one appear in the other through live queries | P2.6 | E | ✅ |
+| MTB-02 | Same page edited in two tabs at once | Last write wins per line. The tab that loses shows "This page was changed in another window" and takes the new values when the user leaves the field. Never a blind overwrite of the whole page | P2.6 | E | ✅ |
 | MTB-03 | Restore, undo or database upgrade in one tab while another is open | `BroadcastChannel` tells other tabs to flush and reload | P6.4, P7.1 | E | ➕ |
-| MTB-04 | A new app version upgrades the database schema while an old tab is open | Old tab closes its connection on Dexie's `versionchange` and shows "Note-Add was updated — reload"; the upgrade is not blocked | P2.1 | R | ➕ |
+| MTB-04 | A new app version upgrades the database schema while an old tab is open | Old tab closes its connection on Dexie's `versionchange` and shows "Note-Add was updated — reload"; the upgrade is not blocked | P2.1 | R | ✅ |
 
 ## 16. PWA, offline, updates and accessibility
 
@@ -402,9 +402,9 @@ A backup made today may be restored years from now by a much newer app. arch §9
 | PWA-08 | iPad reports itself as a Mac | Detected through touch support as well as the user agent | P7.5 | U | ✅ |
 | PWA-09 | Hosted under `/note-add/` instead of a subdomain | Manifest scope, start URL, service worker scope and router base all follow `VITE_BASE`; e2e run once with the base set | P7.3 | E | ➕ |
 | PWA-10 | Service worker install fails (storage full) | App still works online; no error shown to the user | P7.1 | — | ➕ (note) |
-| A11Y-01 | Screen reader reads `(300.00)` | Accessible label "minus 300 rupees" | P2.12 | C | ➕ |
+| A11Y-01 | Screen reader reads `(300.00)` | Accessible label "minus 300 rupees" | P2.12 | C | ✅ |
 | A11Y-02 | Live total | Announced politely, throttled (not on every keystroke) | P2.12 | C | ✅ |
-| A11Y-03 | New page created by Enter | Announced: "Page 4 started, brought forward 1,280.75" | P2.12 | C | ➕ |
+| A11Y-03 | New page created by Enter | Announced: "Page 4 started, brought forward 1,280.75" | P2.12 | C | ✅ |
 | A11Y-04 | Invalid-amount flag | Has a text label, not just a dot | P2.7 | C | ✅ |
 | A11Y-05 | Dialogs | Focus moves in, is trapped, and returns to the trigger | P3.9 | E | ✅ |
 | A11Y-06 | Reduced motion | No slide or stack animations | P7.7 | E | ✅ |
@@ -440,13 +440,13 @@ All proposed defaults below were **accepted by the owner on 22/11/2026**, with t
 |---|---|---|
 | MON-25 | Accept Devanagari and full-width digits? | ✅ |
 | PST-07 | Accept the Indian "only" suffix `450/-`? | ✅ |
-| PST-13 | Split a pasted "Taxi 450" into description and amount? | No; stays a description |
+| PST-13 | Split a pasted "Taxi 450" into description and amount? | ✅ |
 | LIF-18 | Mark Final on a page with flagged amounts? | **Refused** until every amount is valid or empty |
 | CHN-05 | Final page total changes then changes back: keep the note? | ✅ |
 | CHN-08 | Clear "Total updated…" on Reopen / re-Final? | Yes |
 | LIF-10 | Delete the only page of a notebook? | Not allowed; suggest deleting the notebook |
-| EDT-03 | Rejected amount, then the user leaves the field | Revert to the last valid value, with a short message |
-| KBD-05 | Enter on line 10 of a completely empty page | Do not create a page; show a hint |
+| EDT-03 | Rejected amount, then the user leaves the field | ✅ |
+| KBD-05 | Enter on line 10 of a completely empty page | ✅ |
 | DAT-07 | Meaning of "newest first" | Highest page number first |
 | SRC-04 | Search amounts? | No (as spec); say so in the empty state |
 | LOOK-04 | Dark mode | Light only in v1 |
@@ -455,7 +455,7 @@ All proposed defaults below were **accepted by the owner on 22/11/2026**, with t
 | BAK-01 | Backup with no data | Disabled with a reason |
 | RES-14 | Undo creates its own safety backup? | Yes (undo is undoable) |
 | RES-15 | `lastBackupAt` after restore | Set to the file's `exportedAt`; excluded from the round-trip equality check |
-| MTB-02 | Same page edited in two tabs | Last write wins per line, with a notice |
+| MTB-02 | Same page edited in two tabs | ✅ |
 
 ### 18.2 Changes this file implied for the architecture document
 

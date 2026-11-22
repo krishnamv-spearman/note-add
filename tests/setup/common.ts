@@ -1,3 +1,4 @@
+import 'fake-indexeddb/auto';
 import fc from 'fast-check';
 
 // test-plan §2: 100 property runs in the hook, 1,000 in CI (FC_RUNS=1000), 10,000 on main.

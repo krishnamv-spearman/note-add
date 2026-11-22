@@ -180,25 +180,25 @@ Phase 6 can be built in parallel with phase 5 once phase 4's Settings screen exi
 
 ### Tasks
 
-- [ ] **P2.1 Dexie schema** (`db/schema.ts`, `db/types.ts`), version 1 exactly as arch §4.2. A single `db` instance and a `resetDb()` helper for tests.
-- [ ] **P2.2 `mutatePages`** (`db/repo/pages.ts`, arch §6.1): one `rw` transaction; load → change → renumber → `recalculateChain` → abort on error → `bulkPut` only changed pages → bump `notebook.updatedAt`. Uses fake-indexeddb tests:
+- [x] **P2.1 Dexie schema** (`db/schema.ts`, `db/types.ts`), version 1 exactly as arch §4.2. A single `db` instance and a `resetDb()` helper for tests.
+- [x] **P2.2 `mutatePages`** (`db/repo/pages.ts`, arch §6.1): one `rw` transaction; load → change → renumber → `recalculateChain` → abort on error → `bulkPut` only changed pages → bump `notebook.updatedAt`. Uses fake-indexeddb tests:
   - A failing chain (over-limit) writes nothing.
   - Editing page 1 of a 50-page notebook updates all later pages in one transaction.
-- [ ] **P2.3 Page operations:** `createNotebook` (with page 1), `updateLine`, `updatePageHeader`, `appendPage`. Each new page has 10 empty lines, today's date, `title: null`, `status: 'draft'`.
-- [ ] **P2.4 Routing** (`routes.tsx`): `/n/:notebookId/p/:pageNumber` for the editor, temporary `/` start screen; unknown page number redirects to the last page.
-- [ ] **P2.5 Editor layout** (`features/editor/PageEditor.tsx`): header (date in DD/MM/YYYY, title placeholder "Page N", "Page 3 of 7"), read-only brought-forward row, 10 lines (description + amount), fixed total row. Amount cells right-aligned with tabular figures.
-- [ ] **P2.6 Local editor state and live total:** typing updates local state; total = BF from DB + `pageSum(local lines)`, recomputed on each keystroke with the engine.
-- [ ] **P2.7 Amount input behaviour** (arch §5.2): `invalid` saves with `amountPaise: null` and shows the subtle flag; `rejected` shows the message under the field and keeps the last valid value. The field shows formatted value on blur (`1,280.75`) and the raw text on focus.
-- [ ] **P2.8 Autosave** (arch §7.2): 400 ms debounce per page; flush on blur, route change, `visibilitychange` and `pagehide`; "Saving…" / "Saved" indicator; a chain error from the repository shows a message and keeps local state so nothing typed is lost.
-- [ ] **P2.9 Keyboard navigation** (arch §7.3): focus index model; Enter on description → amount; amount → next line's description; line 10 amount → flush, `appendPage`, navigate, focus line 1 (or go to the next existing page). `enterkeyhint="next"`, `inputmode="decimal"` on amounts.
-- [ ] **P2.10 New page button**: same as Enter on line 10, always appends at the end.
-- [ ] **P2.11 Phone editing bar** (arch §7.3): pinned above the on-screen keyboard using `visualViewport`, shown while an amount is focused, with **±** and **Next ↵**. Hidden on devices with a physical keyboard (no `visualViewport` resize).
-- [ ] **P2.12 Accessibility basics:** each input labelled ("Line 3 description", "Line 3 amount"); total announced via an `aria-live="polite"` region (throttled, so it does not chatter on every keystroke).
-- [ ] **P2.13 Storage persistence request:** call `navigator.storage.persist()` once after the first save (`platform/storage.ts`). Full status display comes in phase 7.
-- [ ] **P2.14 Input details** (arch §7.3): amount `type="text"`, 20-character cap; description 120-character cap with newlines and tabs turned into spaces, `dir="auto"`; DD/MM/YYYY text date field with picker (not a native date input); IME composition ignored on Enter; in-flight guard on page creation; inputs ≥ 16 px.
-- [ ] **P2.15 Several tabs** (arch §6.5): per-line last write wins with the "changed in another window" notice; `versionchange` handling; `BroadcastChannel` listener (used by restore in phase 6).
-- [ ] **P2.16 Defensive reads** (arch §6.6): pad malformed pages, correct cached totals that disagree with the engine; log in development.
-- [ ] **P2.17 No-IndexedDB screen** (STO-01).
+- [x] **P2.3 Page operations:** `createNotebook` (with page 1), `updateLine`, `updatePageHeader`, `appendPage`. Each new page has 10 empty lines, today's date, `title: null`, `status: 'draft'`.
+- [x] **P2.4 Routing** (`routes.tsx`): `/n/:notebookId/p/:pageNumber` for the editor, temporary `/` start screen; unknown page number redirects to the last page.
+- [x] **P2.5 Editor layout** (`features/editor/PageEditor.tsx`): header (date in DD/MM/YYYY, title placeholder "Page N", "Page 3 of 7"), read-only brought-forward row, 10 lines (description + amount), fixed total row. Amount cells right-aligned with tabular figures.
+- [x] **P2.6 Local editor state and live total:** typing updates local state; total = BF from DB + `pageSum(local lines)`, recomputed on each keystroke with the engine.
+- [x] **P2.7 Amount input behaviour** (arch §5.2): `invalid` saves with `amountPaise: null` and shows the subtle flag; `rejected` shows the message under the field and keeps the last valid value. The field shows formatted value on blur (`1,280.75`) and the raw text on focus.
+- [x] **P2.8 Autosave** (arch §7.2): 400 ms debounce per page; flush on blur, route change, `visibilitychange` and `pagehide`; "Saving…" / "Saved" indicator; a chain error from the repository shows a message and keeps local state so nothing typed is lost.
+- [x] **P2.9 Keyboard navigation** (arch §7.3): focus index model; Enter on description → amount; amount → next line's description; line 10 amount → flush, `appendPage`, navigate, focus line 1 (or go to the next existing page). `enterkeyhint="next"`, `inputmode="decimal"` on amounts.
+- [x] **P2.10 New page button**: same as Enter on line 10, always appends at the end.
+- [x] **P2.11 Phone editing bar** (arch §7.3): pinned above the on-screen keyboard using `visualViewport`, shown while an amount is focused, with **±** and **Next ↵**. Hidden on devices with a physical keyboard (no `visualViewport` resize).
+- [x] **P2.12 Accessibility basics:** each input labelled ("Line 3 description", "Line 3 amount"); total announced via an `aria-live="polite"` region (throttled, so it does not chatter on every keystroke).
+- [x] **P2.13 Storage persistence request:** call `navigator.storage.persist()` once after the first save (`platform/storage.ts`). Full status display comes in phase 7.
+- [x] **P2.14 Input details** (arch §7.3): amount `type="text"`, 20-character cap; description 120-character cap with newlines and tabs turned into spaces, `dir="auto"`; DD/MM/YYYY text date field with picker (not a native date input); IME composition ignored on Enter; in-flight guard on page creation; inputs ≥ 16 px.
+- [x] **P2.15 Several tabs** (arch §6.5): per-line last write wins with the "changed in another window" notice; `versionchange` handling; `BroadcastChannel` listener (used by restore in phase 6).
+- [x] **P2.16 Defensive reads** (arch §6.6): pad malformed pages, correct cached totals that disagree with the engine; log in development.
+- [x] **P2.17 No-IndexedDB screen** (STO-01).
 
 ### Tests
 
