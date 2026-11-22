@@ -326,16 +326,16 @@ Phase 6 can be built in parallel with phase 5 once phase 4's Settings screen exi
 
 ### Tasks
 
-- [ ] **P6.1 Backup format + Zod schema** (`db/repo/backup.ts`, arch §9.1): `format`, `version: 1`, `appVersion`, `exportedAt`, `summary`, `data`.
-- [ ] **P6.2 `createBackup()`**: reads all tables except `safetyBackups` in one read transaction; returns the JSON document. File name `note-add-backup-<DD-MM-YYYY>.json`; uses `shareOrDownload`; sets `lastBackupAt` and logs a `backup` activity entry on success (not on cancel).
-- [ ] **P6.3 `inspectBackup(file)`**: steps 2–5 of arch §9.2: JSON parse, format check, version check (newer → clear message; older → `migrateBackup`), Zod validation, recompute every chain and refuse mismatches. Returns the summary or a user-facing error.
-- [ ] **P6.4 `restoreBackup(doc)`**: write a safety backup of current data (keep latest 3), then clear and bulk-insert in **one transaction**; log a `restore` entry.
-- [ ] **P6.5 Undo last restore**: in Settings while a safety backup exists; restores it through the same pipeline; also offers "Download this safety copy".
-- [ ] **P6.6 Settings UI**: Backup button with "Last backup: DD/MM/YYYY" (or "Never"); Restore flow with file picker → summary ("3 notebooks, 21 pages, last changed 20/11/2026") → confirmation that current data will be replaced → done message.
-- [ ] **P6.7 Backup reminder banner** on the library (arch §9.5): shown when there is data and no backup for 30 days; dismissible for 30 days; its button starts a backup.
-- [ ] **P6.8 Fixtures** (`tests/fixtures/backups/`): valid v1 backup (3 notebooks, 21 pages, negatives, Final pages, reopened pages, overridden colours, non-default font), invalid JSON, wrong format, future version, tampered totals, missing notebook reference, decimal and string amounts, duplicate IDs, byte-order mark, oversized strings.
-- [ ] **P6.9 Old-backup policy** (arch §9.4, edge-cases.md §14.1 `OLD-*`): `migrateBackup` chain with one test per version step; the **v1 fixture made by the real v1.0 app is committed and must restore in every later release** (a permanent regression test); a property test that migration never changes an amount, line, page number or status.
-- [ ] **P6.10 Restore hygiene:** 0-byte and 20 MB checks, byte-order mark stripping, strict money vs forgiving cosmetic fields, `lastBackupAt` set to the file's `exportedAt`, `BroadcastChannel` reload of other tabs, undo takes its own safety backup.
+- [x] **P6.1 Backup format + Zod schema** (`db/repo/backup.ts`, arch §9.1): `format`, `version: 1`, `appVersion`, `exportedAt`, `summary`, `data`.
+- [x] **P6.2 `createBackup()`**: reads all tables except `safetyBackups` in one read transaction; returns the JSON document. File name `note-add-backup-<DD-MM-YYYY>.json`; uses `shareOrDownload`; sets `lastBackupAt` and logs a `backup` activity entry on success (not on cancel).
+- [x] **P6.3 `inspectBackup(file)`**: steps 2–5 of arch §9.2: JSON parse, format check, version check (newer → clear message; older → `migrateBackup`), Zod validation, recompute every chain and refuse mismatches. Returns the summary or a user-facing error.
+- [x] **P6.4 `restoreBackup(doc)`**: write a safety backup of current data (keep latest 3), then clear and bulk-insert in **one transaction**; log a `restore` entry.
+- [x] **P6.5 Undo last restore**: in Settings while a safety backup exists; restores it through the same pipeline; also offers "Download this safety copy".
+- [x] **P6.6 Settings UI**: Backup button with "Last backup: DD/MM/YYYY" (or "Never"); Restore flow with file picker → summary ("3 notebooks, 21 pages, last changed 20/11/2026") → confirmation that current data will be replaced → done message.
+- [x] **P6.7 Backup reminder banner** on the library (arch §9.5): shown when there is data and no backup for 30 days; dismissible for 30 days; its button starts a backup.
+- [x] **P6.8 Fixtures** (`tests/fixtures/backups/`): valid v1 backup (3 notebooks, 21 pages, negatives, Final pages, reopened pages, overridden colours, non-default font), invalid JSON, wrong format, future version, tampered totals, missing notebook reference, decimal and string amounts, duplicate IDs, byte-order mark, oversized strings.
+- [x] **P6.9 Old-backup policy** (arch §9.4, edge-cases.md §14.1 `OLD-*`): `migrateBackup` chain with one test per version step; the **v1 fixture made by the real v1.0 app is committed and must restore in every later release** (a permanent regression test); a property test that migration never changes an amount, line, page number or status.
+- [x] **P6.10 Restore hygiene:** 0-byte and 20 MB checks, byte-order mark stripping, strict money vs forgiving cosmetic fields, `lastBackupAt` set to the file's `exportedAt`, `BroadcastChannel` reload of other tabs, undo takes its own safety backup.
 
 ### Tests
 

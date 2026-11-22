@@ -731,3 +731,25 @@ span.nav-link {
 .settings section {
   margin-bottom: 1.5rem;
 }
+
+.file-button {
+  cursor: pointer;
+}
+
+/* Keyboard users focus the real input; the label is the visible 44 px target. */
+.visually-hidden-file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.restore:focus-within .file-button {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.reminder {
+  flex-direction: column;
+  align-items: stretch;
+}

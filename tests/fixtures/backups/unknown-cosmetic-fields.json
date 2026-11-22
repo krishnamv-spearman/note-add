@@ -1,0 +1,1602 @@
+{
+  "format": "note-add-backup",
+  "version": 1,
+  "appVersion": "1.0.0",
+  "exportedAt": "2026-11-03T03:30:00.000Z",
+  "summary": {
+    "notebooks": 3,
+    "pages": 21,
+    "lastChanged": "2026-11-03"
+  },
+  "data": {
+    "notebooks": [
+      {
+        "id": "92d91c9b-235c-4278-9bf7-35c9e040b7fb",
+        "name": "Pune trip claims",
+        "colour": "neon",
+        "createdAt": 1793503800000,
+        "updatedAt": 1793575800000
+      },
+      {
+        "id": "a04b2303-5bbf-48db-ae33-0edd286c9978",
+        "name": "Office petty cash",
+        "colour": "canary",
+        "createdAt": 1793575800000,
+        "updatedAt": 1793633400000
+      },
+      {
+        "id": "a2e2a1a4-1a98-4950-a5c6-a00d46347d29",
+        "name": "Groceries",
+        "colour": "peach",
+        "createdAt": 1793633400000,
+        "updatedAt": 1793676600000
+      }
+    ],
+    "pages": [
+      {
+        "id": "043d6126-3b98-4825-b70e-3b2a3fa2f47f",
+        "notebookId": "92d91c9b-235c-4278-9bf7-35c9e040b7fb",
+        "number": 6,
+        "date": "2026-11-01",
+        "title": null,
+        "colour": null,
+        "lines": [
+          {
+            "description": "Item 6",
+            "amountText": "105.50",
+            "amountPaise": 10550
+          },
+          {
+            "description": "Hotel",
+            "amountText": "1,280.75",
+            "amountPaise": 128075
+          },
+          {
+            "description": "Unclear receipt",
+            "amountText": "12a",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "draft",
+        "finalisedOn": null,
+        "reopenedOn": [],
+        "totalUpdatedOn": null,
+        "broughtForwardPaise": 411425,
+        "totalPaise": 550050,
+        "createdAt": 1793521800000,
+        "updatedAt": 1793575800000,
+        "sparkles": true
+      },
+      {
+        "id": "05ed0b06-d5c8-46fb-8890-d921a780e5e2",
+        "notebookId": "92d91c9b-235c-4278-9bf7-35c9e040b7fb",
+        "number": 5,
+        "date": "2026-11-01",
+        "title": null,
+        "colour": null,
+        "lines": [
+          {
+            "description": "Item 5",
+            "amountText": "104.50",
+            "amountPaise": 10450
+          },
+          {
+            "description": "Hotel",
+            "amountText": "1,280.75",
+            "amountPaise": 128075
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "draft",
+        "finalisedOn": null,
+        "reopenedOn": [],
+        "totalUpdatedOn": null,
+        "broughtForwardPaise": 272900,
+        "totalPaise": 411425,
+        "createdAt": 1793518200000,
+        "updatedAt": 1793575800000
+      },
+      {
+        "id": "060432b9-d0b4-46c0-9852-c038f05d0e8a",
+        "notebookId": "92d91c9b-235c-4278-9bf7-35c9e040b7fb",
+        "number": 3,
+        "date": "2026-11-01",
+        "title": null,
+        "colour": "lavender",
+        "lines": [
+          {
+            "description": "Item 3",
+            "amountText": "102.50",
+            "amountPaise": 10250
+          },
+          {
+            "description": "Hotel",
+            "amountText": "1,280.75",
+            "amountPaise": 128075
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "final",
+        "finalisedOn": "2026-11-02",
+        "reopenedOn": [
+          "2026-11-02"
+        ],
+        "totalUpdatedOn": "2026-11-02",
+        "broughtForwardPaise": 136750,
+        "totalPaise": 275075,
+        "createdAt": 1793511000000,
+        "updatedAt": 1793575800000
+      },
+      {
+        "id": "064c33b6-784a-48e9-a8b0-d748367ee1d0",
+        "notebookId": "92d91c9b-235c-4278-9bf7-35c9e040b7fb",
+        "number": 4,
+        "date": "2026-11-01",
+        "title": null,
+        "colour": null,
+        "lines": [
+          {
+            "description": "Item 4",
+            "amountText": "103.50",
+            "amountPaise": 10350
+          },
+          {
+            "description": "Refund",
+            "amountText": "-125.25",
+            "amountPaise": -12525
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "draft",
+        "finalisedOn": null,
+        "reopenedOn": [],
+        "totalUpdatedOn": null,
+        "broughtForwardPaise": 275075,
+        "totalPaise": 272900,
+        "createdAt": 1793514600000,
+        "updatedAt": 1793575800000
+      },
+      {
+        "id": "10afd8c4-75cd-41a9-a4b9-d0f5920fe0bd",
+        "notebookId": "92d91c9b-235c-4278-9bf7-35c9e040b7fb",
+        "number": 9,
+        "date": "2026-11-01",
+        "title": null,
+        "colour": null,
+        "lines": [
+          {
+            "description": "Item 9",
+            "amountText": "108.50",
+            "amountPaise": 10850
+          },
+          {
+            "description": "Hotel",
+            "amountText": "1,280.75",
+            "amountPaise": 128075
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "draft",
+        "finalisedOn": null,
+        "reopenedOn": [],
+        "totalUpdatedOn": null,
+        "broughtForwardPaise": 687000,
+        "totalPaise": 825925,
+        "createdAt": 1793532600000,
+        "updatedAt": 1793575800000
+      },
+      {
+        "id": "1f8edc5d-d45a-4f88-9934-521352e16300",
+        "notebookId": "92d91c9b-235c-4278-9bf7-35c9e040b7fb",
+        "number": 2,
+        "date": "2026-11-01",
+        "title": null,
+        "colour": null,
+        "lines": [
+          {
+            "description": "Item 2",
+            "amountText": "101.50",
+            "amountPaise": 10150
+          },
+          {
+            "description": "Hotel",
+            "amountText": "1,280.75",
+            "amountPaise": 128075
+          },
+          {
+            "description": "Unclear receipt",
+            "amountText": "12a",
+            "amountPaise": null
+          },
+          {
+            "description": "Late tip",
+            "amountText": "10",
+            "amountPaise": 1000
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "draft",
+        "finalisedOn": null,
+        "reopenedOn": [],
+        "totalUpdatedOn": null,
+        "broughtForwardPaise": -2475,
+        "totalPaise": 136750,
+        "createdAt": 1793507400000,
+        "updatedAt": 1793575800000
+      },
+      {
+        "id": "4f8238eb-d3d8-4e38-9ddb-f5f3b69467c6",
+        "notebookId": "a04b2303-5bbf-48db-ae33-0edd286c9978",
+        "number": 3,
+        "date": "2026-11-02",
+        "title": null,
+        "colour": "lavender",
+        "lines": [
+          {
+            "description": "Item 3",
+            "amountText": "202.50",
+            "amountPaise": 20250
+          },
+          {
+            "description": "Hotel",
+            "amountText": "1,280.75",
+            "amountPaise": 128075
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "final",
+        "finalisedOn": "2026-11-02",
+        "reopenedOn": [
+          "2026-11-02"
+        ],
+        "totalUpdatedOn": "2026-11-02",
+        "broughtForwardPaise": 156750,
+        "totalPaise": 305075,
+        "createdAt": 1793583000000,
+        "updatedAt": 1793633400000
+      },
+      {
+        "id": "59329d11-4ac1-4850-84a3-cd6c3ee7df20",
+        "notebookId": "a04b2303-5bbf-48db-ae33-0edd286c9978",
+        "number": 4,
+        "date": "2026-11-02",
+        "title": null,
+        "colour": null,
+        "lines": [
+          {
+            "description": "Item 4",
+            "amountText": "203.50",
+            "amountPaise": 20350
+          },
+          {
+            "description": "Refund",
+            "amountText": "-125.25",
+            "amountPaise": -12525
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "draft",
+        "finalisedOn": null,
+        "reopenedOn": [],
+        "totalUpdatedOn": null,
+        "broughtForwardPaise": 305075,
+        "totalPaise": 312900,
+        "createdAt": 1793586600000,
+        "updatedAt": 1793633400000
+      },
+      {
+        "id": "5ca84ce6-140b-42a4-b0e9-9d8671c6f8ba",
+        "notebookId": "a04b2303-5bbf-48db-ae33-0edd286c9978",
+        "number": 7,
+        "date": "2026-11-02",
+        "title": null,
+        "colour": null,
+        "lines": [
+          {
+            "description": "Item 7",
+            "amountText": "206.50",
+            "amountPaise": 20650
+          },
+          {
+            "description": "Refund",
+            "amountText": "-125.25",
+            "amountPaise": -12525
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "draft",
+        "finalisedOn": null,
+        "reopenedOn": [],
+        "totalUpdatedOn": null,
+        "broughtForwardPaise": 610050,
+        "totalPaise": 618175,
+        "createdAt": 1793597400000,
+        "updatedAt": 1793633400000
+      },
+      {
+        "id": "5f3059a0-259c-4658-8104-a31b985feb87",
+        "notebookId": "92d91c9b-235c-4278-9bf7-35c9e040b7fb",
+        "number": 1,
+        "date": "2026-11-01",
+        "title": "Pune trip claims — start",
+        "colour": null,
+        "lines": [
+          {
+            "description": "Item 1",
+            "amountText": "100.50",
+            "amountPaise": 10050
+          },
+          {
+            "description": "Refund",
+            "amountText": "-125.25",
+            "amountPaise": -12525
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "final",
+        "finalisedOn": "2026-11-02",
+        "reopenedOn": [],
+        "totalUpdatedOn": null,
+        "broughtForwardPaise": 0,
+        "totalPaise": -2475,
+        "createdAt": 1793503800000,
+        "updatedAt": 1793568600000
+      },
+      {
+        "id": "73b7168e-8bf5-4c40-8437-ffb6b145c377",
+        "notebookId": "a04b2303-5bbf-48db-ae33-0edd286c9978",
+        "number": 6,
+        "date": "2026-11-02",
+        "title": null,
+        "colour": null,
+        "lines": [
+          {
+            "description": "Item 6",
+            "amountText": "205.50",
+            "amountPaise": 20550
+          },
+          {
+            "description": "Hotel",
+            "amountText": "1,280.75",
+            "amountPaise": 128075
+          },
+          {
+            "description": "Unclear receipt",
+            "amountText": "12a",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "draft",
+        "finalisedOn": null,
+        "reopenedOn": [],
+        "totalUpdatedOn": null,
+        "broughtForwardPaise": 461425,
+        "totalPaise": 610050,
+        "createdAt": 1793593800000,
+        "updatedAt": 1793633400000
+      },
+      {
+        "id": "802c3d4a-6d9d-476c-b963-f58308502c6b",
+        "notebookId": "a2e2a1a4-1a98-4950-a5c6-a00d46347d29",
+        "number": 3,
+        "date": "2026-11-02",
+        "title": null,
+        "colour": "lavender",
+        "lines": [
+          {
+            "description": "Item 3",
+            "amountText": "302.50",
+            "amountPaise": 30250
+          },
+          {
+            "description": "Hotel",
+            "amountText": "1,280.75",
+            "amountPaise": 128075
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "final",
+        "finalisedOn": "2026-11-03",
+        "reopenedOn": [
+          "2026-11-03"
+        ],
+        "totalUpdatedOn": "2026-11-03",
+        "broughtForwardPaise": 176750,
+        "totalPaise": 335075,
+        "createdAt": 1793640600000,
+        "updatedAt": 1793676600000
+      },
+      {
+        "id": "89557718-3712-466e-92a1-5cb5de4ca04f",
+        "notebookId": "92d91c9b-235c-4278-9bf7-35c9e040b7fb",
+        "number": 7,
+        "date": "2026-11-01",
+        "title": null,
+        "colour": null,
+        "lines": [
+          {
+            "description": "Item 7",
+            "amountText": "106.50",
+            "amountPaise": 10650
+          },
+          {
+            "description": "Refund",
+            "amountText": "-125.25",
+            "amountPaise": -12525
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "draft",
+        "finalisedOn": null,
+        "reopenedOn": [],
+        "totalUpdatedOn": null,
+        "broughtForwardPaise": 550050,
+        "totalPaise": 548175,
+        "createdAt": 1793525400000,
+        "updatedAt": 1793575800000
+      },
+      {
+        "id": "8abaa8b3-641a-4428-9286-1f17e5f5e805",
+        "notebookId": "a2e2a1a4-1a98-4950-a5c6-a00d46347d29",
+        "number": 1,
+        "date": "2026-11-02",
+        "title": "Groceries — start",
+        "colour": null,
+        "lines": [
+          {
+            "description": "Item 1",
+            "amountText": "300.50",
+            "amountPaise": 30050
+          },
+          {
+            "description": "Refund",
+            "amountText": "-125.25",
+            "amountPaise": -12525
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "final",
+        "finalisedOn": "2026-11-03",
+        "reopenedOn": [],
+        "totalUpdatedOn": null,
+        "broughtForwardPaise": 0,
+        "totalPaise": 17525,
+        "createdAt": 1793633400000,
+        "updatedAt": 1793669400000
+      },
+      {
+        "id": "92129541-c9af-4402-8efd-f08e52535d06",
+        "notebookId": "a2e2a1a4-1a98-4950-a5c6-a00d46347d29",
+        "number": 5,
+        "date": "2026-11-03",
+        "title": null,
+        "colour": null,
+        "lines": [
+          {
+            "description": "Item 5",
+            "amountText": "304.50",
+            "amountPaise": 30450
+          },
+          {
+            "description": "Hotel",
+            "amountText": "1,280.75",
+            "amountPaise": 128075
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "draft",
+        "finalisedOn": null,
+        "reopenedOn": [],
+        "totalUpdatedOn": null,
+        "broughtForwardPaise": 352900,
+        "totalPaise": 511425,
+        "createdAt": 1793647800000,
+        "updatedAt": 1793676600000
+      },
+      {
+        "id": "a6b359be-f2ab-463d-8f57-94277f8c8809",
+        "notebookId": "a2e2a1a4-1a98-4950-a5c6-a00d46347d29",
+        "number": 4,
+        "date": "2026-11-03",
+        "title": null,
+        "colour": null,
+        "lines": [
+          {
+            "description": "Item 4",
+            "amountText": "303.50",
+            "amountPaise": 30350
+          },
+          {
+            "description": "Refund",
+            "amountText": "-125.25",
+            "amountPaise": -12525
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "draft",
+        "finalisedOn": null,
+        "reopenedOn": [],
+        "totalUpdatedOn": null,
+        "broughtForwardPaise": 335075,
+        "totalPaise": 352900,
+        "createdAt": 1793644200000,
+        "updatedAt": 1793676600000
+      },
+      {
+        "id": "bfcc282e-ec69-4dfa-beb6-83750dc30656",
+        "notebookId": "a04b2303-5bbf-48db-ae33-0edd286c9978",
+        "number": 1,
+        "date": "2026-11-02",
+        "title": "Office petty cash — start",
+        "colour": null,
+        "lines": [
+          {
+            "description": "Item 1",
+            "amountText": "200.50",
+            "amountPaise": 20050
+          },
+          {
+            "description": "Refund",
+            "amountText": "-125.25",
+            "amountPaise": -12525
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "final",
+        "finalisedOn": "2026-11-02",
+        "reopenedOn": [],
+        "totalUpdatedOn": null,
+        "broughtForwardPaise": 0,
+        "totalPaise": 7525,
+        "createdAt": 1793575800000,
+        "updatedAt": 1793626200000
+      },
+      {
+        "id": "cbfa717e-be76-4a1f-a917-bd23aaa220e9",
+        "notebookId": "a2e2a1a4-1a98-4950-a5c6-a00d46347d29",
+        "number": 2,
+        "date": "2026-11-02",
+        "title": null,
+        "colour": null,
+        "lines": [
+          {
+            "description": "Item 2",
+            "amountText": "301.50",
+            "amountPaise": 30150
+          },
+          {
+            "description": "Hotel",
+            "amountText": "1,280.75",
+            "amountPaise": 128075
+          },
+          {
+            "description": "Unclear receipt",
+            "amountText": "12a",
+            "amountPaise": null
+          },
+          {
+            "description": "Late tip",
+            "amountText": "10",
+            "amountPaise": 1000
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "draft",
+        "finalisedOn": null,
+        "reopenedOn": [],
+        "totalUpdatedOn": null,
+        "broughtForwardPaise": 17525,
+        "totalPaise": 176750,
+        "createdAt": 1793637000000,
+        "updatedAt": 1793676600000
+      },
+      {
+        "id": "d1c51223-bde1-4777-a566-0a4c78c1cb57",
+        "notebookId": "a04b2303-5bbf-48db-ae33-0edd286c9978",
+        "number": 5,
+        "date": "2026-11-02",
+        "title": null,
+        "colour": null,
+        "lines": [
+          {
+            "description": "Item 5",
+            "amountText": "204.50",
+            "amountPaise": 20450
+          },
+          {
+            "description": "Hotel",
+            "amountText": "1,280.75",
+            "amountPaise": 128075
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "draft",
+        "finalisedOn": null,
+        "reopenedOn": [],
+        "totalUpdatedOn": null,
+        "broughtForwardPaise": 312900,
+        "totalPaise": 461425,
+        "createdAt": 1793590200000,
+        "updatedAt": 1793633400000
+      },
+      {
+        "id": "d3079ccd-cb43-4a0e-bea2-9c1985003e86",
+        "notebookId": "92d91c9b-235c-4278-9bf7-35c9e040b7fb",
+        "number": 8,
+        "date": "2026-11-01",
+        "title": null,
+        "colour": null,
+        "lines": [
+          {
+            "description": "Item 8",
+            "amountText": "107.50",
+            "amountPaise": 10750
+          },
+          {
+            "description": "Hotel",
+            "amountText": "1,280.75",
+            "amountPaise": 128075
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "draft",
+        "finalisedOn": null,
+        "reopenedOn": [],
+        "totalUpdatedOn": null,
+        "broughtForwardPaise": 548175,
+        "totalPaise": 687000,
+        "createdAt": 1793529000000,
+        "updatedAt": 1793575800000
+      },
+      {
+        "id": "de221c15-3037-4e3b-be9f-1f4972bc8916",
+        "notebookId": "a04b2303-5bbf-48db-ae33-0edd286c9978",
+        "number": 2,
+        "date": "2026-11-02",
+        "title": null,
+        "colour": null,
+        "lines": [
+          {
+            "description": "Item 2",
+            "amountText": "201.50",
+            "amountPaise": 20150
+          },
+          {
+            "description": "Hotel",
+            "amountText": "1,280.75",
+            "amountPaise": 128075
+          },
+          {
+            "description": "Unclear receipt",
+            "amountText": "12a",
+            "amountPaise": null
+          },
+          {
+            "description": "Late tip",
+            "amountText": "10",
+            "amountPaise": 1000
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          },
+          {
+            "description": "",
+            "amountText": "",
+            "amountPaise": null
+          }
+        ],
+        "status": "draft",
+        "finalisedOn": null,
+        "reopenedOn": [],
+        "totalUpdatedOn": null,
+        "broughtForwardPaise": 7525,
+        "totalPaise": 156750,
+        "createdAt": 1793579400000,
+        "updatedAt": 1793633400000
+      }
+    ],
+    "activity": [
+      {
+        "kind": "notebook-created",
+        "notebookId": "92d91c9b-235c-4278-9bf7-35c9e040b7fb",
+        "pageId": null,
+        "text": "Notebook Pune trip claims created",
+        "at": 1793503800000,
+        "id": 1
+      },
+      {
+        "kind": "page-finalised",
+        "notebookId": "92d91c9b-235c-4278-9bf7-35c9e040b7fb",
+        "pageId": "5f3059a0-259c-4658-8104-a31b985feb87",
+        "text": "Page 1 of Pune trip claims marked Final, 02/11/2026",
+        "at": 1793568600000,
+        "id": 2
+      },
+      {
+        "kind": "page-finalised",
+        "notebookId": "92d91c9b-235c-4278-9bf7-35c9e040b7fb",
+        "pageId": "060432b9-d0b4-46c0-9852-c038f05d0e8a",
+        "text": "Page 3 of Pune trip claims marked Final, 02/11/2026",
+        "at": 1793568600000,
+        "id": 3
+      },
+      {
+        "kind": "page-reopened",
+        "notebookId": "92d91c9b-235c-4278-9bf7-35c9e040b7fb",
+        "pageId": "060432b9-d0b4-46c0-9852-c038f05d0e8a",
+        "text": "Page 3 of Pune trip claims reopened, 02/11/2026",
+        "at": 1793572200000,
+        "id": 4
+      },
+      {
+        "kind": "page-finalised",
+        "notebookId": "92d91c9b-235c-4278-9bf7-35c9e040b7fb",
+        "pageId": "060432b9-d0b4-46c0-9852-c038f05d0e8a",
+        "text": "Page 3 of Pune trip claims marked Final, 02/11/2026",
+        "at": 1793572200000,
+        "id": 5
+      },
+      {
+        "kind": "notebook-created",
+        "notebookId": "a04b2303-5bbf-48db-ae33-0edd286c9978",
+        "pageId": null,
+        "text": "Notebook Office petty cash created",
+        "at": 1793575800000,
+        "id": 6
+      },
+      {
+        "kind": "page-finalised",
+        "notebookId": "a04b2303-5bbf-48db-ae33-0edd286c9978",
+        "pageId": "bfcc282e-ec69-4dfa-beb6-83750dc30656",
+        "text": "Page 1 of Office petty cash marked Final, 02/11/2026",
+        "at": 1793626200000,
+        "id": 7
+      },
+      {
+        "kind": "page-finalised",
+        "notebookId": "a04b2303-5bbf-48db-ae33-0edd286c9978",
+        "pageId": "4f8238eb-d3d8-4e38-9ddb-f5f3b69467c6",
+        "text": "Page 3 of Office petty cash marked Final, 02/11/2026",
+        "at": 1793626200000,
+        "id": 8
+      },
+      {
+        "kind": "page-reopened",
+        "notebookId": "a04b2303-5bbf-48db-ae33-0edd286c9978",
+        "pageId": "4f8238eb-d3d8-4e38-9ddb-f5f3b69467c6",
+        "text": "Page 3 of Office petty cash reopened, 02/11/2026",
+        "at": 1793629800000,
+        "id": 9
+      },
+      {
+        "kind": "page-finalised",
+        "notebookId": "a04b2303-5bbf-48db-ae33-0edd286c9978",
+        "pageId": "4f8238eb-d3d8-4e38-9ddb-f5f3b69467c6",
+        "text": "Page 3 of Office petty cash marked Final, 02/11/2026",
+        "at": 1793629800000,
+        "id": 10
+      },
+      {
+        "kind": "notebook-created",
+        "notebookId": "a2e2a1a4-1a98-4950-a5c6-a00d46347d29",
+        "pageId": null,
+        "text": "Notebook Groceries created",
+        "at": 1793633400000,
+        "id": 11
+      },
+      {
+        "kind": "page-finalised",
+        "notebookId": "a2e2a1a4-1a98-4950-a5c6-a00d46347d29",
+        "pageId": "8abaa8b3-641a-4428-9286-1f17e5f5e805",
+        "text": "Page 1 of Groceries marked Final, 03/11/2026",
+        "at": 1793669400000,
+        "id": 12
+      },
+      {
+        "kind": "page-finalised",
+        "notebookId": "a2e2a1a4-1a98-4950-a5c6-a00d46347d29",
+        "pageId": "802c3d4a-6d9d-476c-b963-f58308502c6b",
+        "text": "Page 3 of Groceries marked Final, 03/11/2026",
+        "at": 1793669400000,
+        "id": 13
+      },
+      {
+        "kind": "page-reopened",
+        "notebookId": "a2e2a1a4-1a98-4950-a5c6-a00d46347d29",
+        "pageId": "802c3d4a-6d9d-476c-b963-f58308502c6b",
+        "text": "Page 3 of Groceries reopened, 03/11/2026",
+        "at": 1793673000000,
+        "id": 14
+      },
+      {
+        "kind": "page-finalised",
+        "notebookId": "a2e2a1a4-1a98-4950-a5c6-a00d46347d29",
+        "pageId": "802c3d4a-6d9d-476c-b963-f58308502c6b",
+        "text": "Page 3 of Groceries marked Final, 03/11/2026",
+        "at": 1793673000000,
+        "id": 15
+      }
+    ],
+    "settings": {
+      "font": "comic-sans",
+      "lastBackupAt": null,
+      "backupReminderDismissedAt": null,
+      "installHintDismissedAt": null,
+      "lastOpenedNotebookId": null
+    }
+  }
+}

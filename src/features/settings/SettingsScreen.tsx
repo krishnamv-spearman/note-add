@@ -5,6 +5,7 @@ import { addPaise, formatPaise, type Paise, parseAmount, ZERO } from '@/engine';
 import { type FontId, getSettings, updateSettings } from '@/db';
 import { SLIP_FONTS, slipFont } from '@/theme/fonts';
 import { Slip } from '@/ui/Slip';
+import { BackupSection } from '../backup/BackupSection';
 
 export const PRIVACY_STATEMENT =
   'Note-Add stores your notes only on your device. Nothing is sent to Spearman or anyone else. Backups and exports go only where you choose to send them.';
@@ -94,10 +95,7 @@ export function SettingsScreen() {
         <FontPreview fontId={current} />
       </section>
 
-      <section aria-labelledby="backup-heading">
-        <h2 id="backup-heading">Backup and restore</h2>
-        <p className="hint">Backup and restore arrive in a later phase of this build.</p>
-      </section>
+      <BackupSection />
 
       <section aria-labelledby="about-heading">
         <h2 id="about-heading">About and privacy</h2>

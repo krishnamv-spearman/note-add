@@ -176,7 +176,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | LIF-13 | Finalising every page | Draft section shows an empty state plus the "Add a new page" card; Archive expanded hint | P3.7 | C | ✅ |
 | LIF-14 | Any code path tries to change a Final page's lines, date, title or colour (`updateLine`, `updatePageHeader`, a stale autosave arriving after Mark Final) | Repository refuses; only the chain may change its brought forward and total | P3.3 | R | ✅ |
 | LIF-15 | Final page whose total was updated by an earlier page, then exported | Export shows the new total and the "Total updated…" note | P5.2 | U | ✅ |
-| LIF-16 | Final page in a backup | Restores as Final with `finalisedOn`, `reopenedOn` and `totalUpdatedOn` intact | P6.4 | R | ➕ |
+| LIF-16 | Final page in a backup | Restores as Final with `finalisedOn`, `reopenedOn` and `totalUpdatedOn` intact | P6.4 | R | ✅ |
 | LIF-17 | Final page sits last, user presses New page | New Draft page appended with BF = the Final page's total | P2.10 | E | ✅ |
 | LIF-18 | Mark Final on a page with flagged (invalid) amounts | **Refused** (decided 22/11/2026): "2 amounts are not numbers. Fix them before marking this page Final." Enforced in the UI and in the repository | P3.3, P3.8 | R, C, E | ✅ decided |
 
@@ -242,7 +242,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | DAT-02 | New page created just after midnight | Gets the new day's date | P1.8 | U | ✅ |
 | DAT-03 | App left open across midnight | New pages use the current date, not one cached at start-up | P2.3 | U | ✅ |
 | DAT-04 | User travels or changes time zone | Stored dates (`YYYY-MM-DD`) never shift | P1.8 | U (TZ set) | ✅ |
-| DAT-05 | Device clock wrong or moved backwards | Nothing crashes; reminder maths with a negative gap shows no banner | P6.7 | U | ➕ |
+| DAT-05 | Device clock wrong or moved backwards | Nothing crashes; reminder maths with a negative gap shows no banner | P6.7 | U | ✅ |
 | DAT-06 | Pages dated out of order (page 3 dated before page 2) | Allowed; order is by page number, never by date | P3.7 | — | ✅ |
 | DAT-07 | "Newest first" in the pages list | Means highest page number first, not latest date | P3.7 | E | ✅ |
 | DAT-08 | Date tests on Windows dev machines | Time zone set through the Vitest config (`env: { TZ }`), not by changing `process.env.TZ` mid-test | P1.8 | U | ✅ |
@@ -325,30 +325,30 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 
 | ID | Scenario | Expected | Task | Test | Status |
 |---|---|---|---|---|---|
-| BAK-01 | Backup with no notebooks | Button disabled with "Nothing to back up yet" | P6.6 | C | ❓ |
+| BAK-01 | Backup with no notebooks | Button disabled with "Nothing to back up yet" | P6.6 | C | ✅ |
 | BAK-02 | Backup share cancelled | `lastBackupAt` not updated | P6.2 | U | ✅ |
-| BAK-03 | Backup by download (no share) | Counted as done when the download starts (the app cannot know whether it was kept) | P6.2 | U | ➕ |
+| BAK-03 | Backup by download (no share) | Counted as done when the download starts (the app cannot know whether it was kept) | P6.2 | U | ✅ |
 | BAK-04 | Large data (1000 pages) | File of a few MB; created without freezing the screen | P6.2 | R | ➕ |
 | BAK-05 | Safety backups | Never included in a backup file | P6.2 | R | ✅ |
-| RES-01 | File is not JSON (PDF, image), empty (0 bytes) or very large | Rejected before parsing; size cap 20 MB; "This is not a Note-Add backup file" | P6.3 | U | ✅ (size cap and 0 bytes ➕) |
-| RES-02 | JSON with a byte-order mark (file opened and saved in Notepad) | BOM stripped; restores normally | P6.3 | U | ➕ |
+| RES-01 | File is not JSON (PDF, image), empty (0 bytes) or very large | Rejected before parsing; size cap 20 MB; "This is not a Note-Add backup file" | P6.3 | U | ✅ |
+| RES-02 | JSON with a byte-order mark (file opened and saved in Notepad) | BOM stripped; restores normally | P6.3 | U | ✅ |
 | RES-03 | Valid JSON, wrong `format` | Rejected with the same message | P6.3 | U | ✅ |
 | RES-04 | Newer `version` | "Made by a newer version of Note-Add. Update the app and try again." | P6.3 | U | ✅ |
 | RES-05 | Older `version` | Migrated, then validated | P6.3 | U | ✅ |
 | RES-06 | Tampered totals | Refused (money is never silently "fixed") | P6.3 | U | ✅ |
-| RES-07 | Amount as a decimal (`450.5`) or as a string (`"45050"`) | Refused (money fields are strict) | P6.3 | U | ➕ |
-| RES-08 | Duplicate IDs, gaps in page numbers, a page whose notebook is missing, lines ≠ 10 | Refused, with a specific message | P6.3 | U | ✅ (duplicate IDs ➕) |
-| RES-09 | Unknown colour or font ID, unknown extra fields | Cosmetic fields fall back to defaults; extra fields dropped; restore continues with a note in the summary | P6.3 | U | ➕ |
-| RES-10 | Oversized strings (a 10 MB description) or very deep nesting | Refused by schema length limits | P6.3 | U | ➕ |
-| RES-11 | Keys such as `__proto__` or `constructor` in the file | Ignored; schema builds fresh objects | P6.3 | U | ➕ |
+| RES-07 | Amount as a decimal (`450.5`) or as a string (`"45050"`) | Refused (money fields are strict) | P6.3 | U | ✅ |
+| RES-08 | Duplicate IDs, gaps in page numbers, a page whose notebook is missing, lines ≠ 10 | Refused, with a specific message | P6.3 | U | ✅ |
+| RES-09 | Unknown colour or font ID, unknown extra fields | Cosmetic fields fall back to defaults; extra fields dropped; restore continues with a note in the summary | P6.3 | U | ✅ |
+| RES-10 | Oversized strings (a 10 MB description) or very deep nesting | Refused by schema length limits | P6.3 | U | ✅ |
+| RES-11 | Keys such as `__proto__` or `constructor` in the file | Ignored; schema builds fresh objects | P6.3 | U | ✅ |
 | RES-12 | Restore fails part-way (forced error, storage full) | Transaction rolls back; current data untouched; message | P6.4 | R | ✅ |
-| RES-13 | Restore when current data is empty | Safety backup still taken (cheap; keeps the undo path uniform) | P6.4 | R | ➕ |
-| RES-14 | Undo last restore | Current (restored) data is saved as a safety backup first, so the undo can itself be undone; latest 3 kept | P6.5 | R | ❓ |
-| RES-15 | `lastBackupAt` after a restore | The restored settings hold an older `lastBackupAt` (the value before that backup was made). Proposed: set it to the file's `exportedAt`. The round-trip test then compares everything except this field | P6.4 | R | ❓ |
-| RES-16 | Same file restored twice | Works; two safety backups | P6.4 | R | ➕ |
-| RES-17 | Restore while the editor is open in another tab | Other tabs are told to reload (see MTB-03) before any pending autosave can write into the restored data | P6.4 | E | ➕ |
+| RES-13 | Restore when current data is empty | Safety backup still taken (cheap; keeps the undo path uniform) | P6.4 | R | ✅ |
+| RES-14 | Undo last restore | Current (restored) data is saved as a safety backup first, so the undo can itself be undone; latest 3 kept | P6.5 | R | ✅ |
+| RES-15 | `lastBackupAt` after a restore | The restored settings hold an older `lastBackupAt` (the value before that backup was made). Proposed: set it to the file's `exportedAt`. The round-trip test then compares everything except this field | P6.4 | R | ✅ |
+| RES-16 | Same file restored twice | Works; two safety backups | P6.4 | R | ✅ |
+| RES-17 | Restore while the editor is open in another tab | Other tabs are told to reload (see MTB-03) before any pending autosave can write into the restored data | P6.4 | E | ✅ |
 | REM-01 | Has data, never backed up | Reminder after 30 days from the first data | P6.7 | U | ✅ |
-| REM-02 | Data means at least one line with content (an empty notebook does not count) | As stated | P6.7 | U | ➕ |
+| REM-02 | Data means at least one line with content (an empty notebook does not count) | As stated | P6.7 | U | ✅ |
 | REM-03 | Dismissed | Hidden for 30 days | P6.7 | U | ✅ |
 
 ### 14.1 Old backups
@@ -357,19 +357,19 @@ A backup made today may be restored years from now by a much newer app. arch §9
 
 | ID | Scenario | Expected | Task | Test | Status |
 |---|---|---|---|---|---|
-| OLD-01 | Format v1 backup made by the real v1.0 app | Committed fixture; restores in every later release (permanent regression test) | P6.9 | R | ➕ |
-| OLD-02 | Backup from a later app version that still writes format v1 (for example 1.3) | Same v1 path; restores normally | P6.9 | R | ➕ |
+| OLD-01 | Format v1 backup made by the real v1.0 app | Committed fixture; restores in every later release (permanent regression test) | P6.9 | R | ✅ |
+| OLD-02 | Backup from a later app version that still writes format v1 (for example 1.3) | Same v1 path; restores normally | P6.9 | R | ✅ |
 | OLD-03 | Format v1 restored after v2 exists | Migrated v1 → v2; fields added in v2 get their defaults | P6.9 | R | ➕ (when v2 exists) |
-| OLD-04 | Migration and money | No migration changes any amount, line text, page number or status (property test over random v1 documents) | P6.9 | U (property) | ➕ |
-| OLD-05 | Migrated chain | Recomputed after migration; must equal the totals in the file, or the restore is refused | P6.9 | R | ➕ |
-| OLD-06 | Old backup missing a field the current schema expects (for example `totalUpdatedOn`, `reopenedOn`) | Filled with the default (`null`, `[]`) by the migration, not by the validator | P6.9 | U | ➕ |
-| OLD-07 | Old backup with a font or colour ID that was later renamed or removed | Mapped to the new ID, or the default, with a note in the summary | P6.9 | U | ➕ |
+| OLD-04 | Migration and money | No migration changes any amount, line text, page number or status (property test over random v1 documents) | P6.9 | U (property) | ✅ |
+| OLD-05 | Migrated chain | Recomputed after migration; must equal the totals in the file, or the restore is refused | P6.9 | R | ✅ |
+| OLD-06 | Old backup missing a field the current schema expects (for example `totalUpdatedOn`, `reopenedOn`) | Filled with the default (`null`, `[]`) by the migration, not by the validator | P6.9 | U | ✅ |
+| OLD-07 | Old backup with a font or colour ID that was later renamed or removed | Mapped to the new ID, or the default, with a note in the summary | P6.9 | U | ✅ |
 | OLD-08 | A future version allows 15 lines per page | Old 10-line pages stay 10 lines; nothing is padded or merged | P6.9 | U | ➕ (when it exists) |
-| OLD-09 | Format version 0, negative, or not a whole number | Refused: "This file is not a supported Note-Add backup" | P6.3 | U | ➕ |
+| OLD-09 | Format version 0, negative, or not a whole number | Refused: "This file is not a supported Note-Add backup" | P6.3 | U | ✅ |
 | OLD-10 | Newer format than the app knows | Refused with "Update the app" (RES-04) | P6.3 | U | ✅ |
 | OLD-11 | Restoring an old backup | Safety backup of current data first, as always; undo available | P6.4 | R | ✅ |
-| OLD-12 | Old backup whose `exportedAt` is older than current data's last change | Summary warns: "This backup is older than your current notes (last changed DD/MM/YYYY)" | P6.6 | C | ➕ |
-| OLD-13 | Safety backups written by an older app version, then undone in a newer one | Go through the same migration path as a user backup | P6.5 | R | ➕ |
+| OLD-12 | Old backup whose `exportedAt` is older than current data's last change | Summary warns: "This backup is older than your current notes (last changed DD/MM/YYYY)" | P6.6 | C | ✅ |
+| OLD-13 | Safety backups written by an older app version, then undone in a newer one | Go through the same migration path as a user backup | P6.5 | R | ✅ |
 
 ## 15. Storage, multiple tabs and browser data
 
@@ -385,7 +385,7 @@ A backup made today may be restored years from now by a much newer app. arch §9
 | STO-08 | `crypto.randomUUID` or the service worker unavailable because the app is opened over plain `http://` on a LAN IP during phone testing | Test on phones through the Vercel preview (HTTPS) only; add a fallback ID generator anyway | P0.16, P2.3 | U | ✅ |
 | MTB-01 | Same notebook open in two tabs or windows | Edits in one appear in the other through live queries | P2.6 | E | ✅ |
 | MTB-02 | Same page edited in two tabs at once | Last write wins per line. The tab that loses shows "This page was changed in another window" and takes the new values when the user leaves the field. Never a blind overwrite of the whole page | P2.6 | E | ✅ |
-| MTB-03 | Restore, undo or database upgrade in one tab while another is open | `BroadcastChannel` tells other tabs to flush and reload | P6.4, P7.1 | E | ➕ |
+| MTB-03 | Restore, undo or database upgrade in one tab while another is open | `BroadcastChannel` tells other tabs to flush and reload | P6.4, P7.1 | E | ✅ |
 | MTB-04 | A new app version upgrades the database schema while an old tab is open | Old tab closes its connection on Dexie's `versionchange` and shows "Note-Add was updated — reload"; the upgrade is not blocked | P2.1 | R | ✅ |
 
 ## 16. PWA, offline, updates and accessibility
@@ -416,7 +416,7 @@ A backup made today may be restored years from now by a much newer app. arch §9
 |---|---|---|---|---|---|
 | SEC-01 | Any request to another origin | Blocked by the CSP; privacy e2e fails | P0.15, P7 | E | ✅ |
 | SEC-02 | E2E tests do not see the CSP because `vite preview` does not apply `vercel.json` headers | Preview server configured with the same headers (read from `vercel.json`) so e2e runs under the real CSP | P0.8, P0.15 | E | ✅ |
-| SEC-03 | Zod 4 uses `new Function` for speed, which the CSP (no `unsafe-eval`) blocks and reports | Turn on Zod's jitless mode at start-up | P6.1 | E | ➕ |
+| SEC-03 | Zod 4 uses `new Function` for speed, which the CSP (no `unsafe-eval`) blocks and reports | Turn on Zod's jitless mode at start-up | P6.1 | E | ✅ |
 | SEC-04 | Library code needing `eval` or inline scripts (pdf-lib, PWA registration) | Checked under the CSP in e2e; PWA registers by script file | P5.5, P7.1 | E | ✅ |
 | SEC-05 | User text rendered as HTML | Never; React text nodes only; canvas text is inert | arch §11 | — | ✅ |
 | DEV-01 | Project path contains spaces and lives in OneDrive | All scripts quote paths; recommended move out of OneDrive (P0.0e) | P0.0e | — | ✅ |
@@ -452,9 +452,9 @@ All proposed defaults below were **accepted by the owner on 22/11/2026**, with t
 | LOOK-04 | Dark mode | ✅ |
 | EXP-04 | Mark Draft pages in exports? | ✅ |
 | EXP-05 | Include Reopened / Total-updated notes in exports? | ✅ |
-| BAK-01 | Backup with no data | Disabled with a reason |
-| RES-14 | Undo creates its own safety backup? | Yes (undo is undoable) |
-| RES-15 | `lastBackupAt` after restore | Set to the file's `exportedAt`; excluded from the round-trip equality check |
+| BAK-01 | Backup with no data | ✅ |
+| RES-14 | Undo creates its own safety backup? | ✅ |
+| RES-15 | `lastBackupAt` after restore | ✅ |
 | MTB-02 | Same page edited in two tabs | ✅ |
 
 ### 18.2 Changes this file implied for the architecture document
