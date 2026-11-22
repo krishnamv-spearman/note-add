@@ -1,5 +1,8 @@
 import Dexie from 'dexie';
 import {
+  chainErrorMessage,
+  countFlagged,
+  displayTitle,
   emptyLine,
   emptyLines,
   isValidIso,
@@ -8,11 +11,12 @@ import {
   LINES_PER_PAGE,
   recalculateChain,
   renumber,
+  toDisplay,
   ZERO,
 } from '@/engine';
 import { newId, now, today } from '../clock';
 import { db } from '../schema';
-import { type ActivityEntry, type ColourId, type Page, TITLE_MAX } from '../types';
+import { type ActivityEntry, type ColourId, type Notebook, type Page, TITLE_MAX } from '../types';
 import { appendActivity } from './activity';
 
 export type RepoError =
@@ -73,7 +77,7 @@ export async function loadPages(notebookId: string): Promise<Page[]> {
  */
 export async function mutatePages<T>(
   notebookId: string,
-  change: (pages: Page[]) => Change<T>,
+  change: (pages: Page[], notebook: Notebook) => Change<T>,
 ): Promise<RepoResult<T>> {
   try {
     const value = await db.transaction('rw', db.pages, db.notebooks, db.activity, async () => {
@@ -81,7 +85,7 @@ export async function mutatePages<T>(
       if (!notebook) throw new Refusal({ kind: 'not-found' });
       const stored = await loadPages(notebookId);
       const loaded = stored.map(normalisePage);
-      const result = change(loaded);
+      const result = change(loaded, notebook);
       const chain = recalculateChain(renumber(result.pages), today());
       if (chain.error) throw new Refusal(chain.error);
 
@@ -227,4 +231,115 @@ export async function verifyNotebook(notebookId: string): Promise<number> {
     console.warn(`Note-Add: corrected ${corrected} page(s) in notebook ${notebookId}`);
   }
   return corrected;
+}
+
+const pageLabel = (page: Page, notebook: Notebook): string =>
+  `Page ${page.number} of ${notebook.name}`;
+
+/**
+ * Locks a page (P3.3). Refused while any amount is not a number (LIF-18, decided
+ * 22/11/2026). Clears "Total updated…": finalising means the user has reviewed it (CHN-08).
+ */
+export async function finalisePage(pageId: string): Promise<RepoResult> {
+  const notebookId = await notebookOf(pageId);
+  if (!notebookId) return { ok: false, error: { kind: 'not-found' } };
+  return mutatePages(notebookId, (pages, notebook) => {
+    const page = pages.find((p) => p.id === pageId);
+    if (!page) throw new Refusal({ kind: 'not-found' });
+    if (page.status === 'final') return { pages, value: undefined };
+    const flagged = countFlagged(page.lines);
+    if (flagged > 0) throw new Refusal({ kind: 'invalid-amounts', count: flagged });
+    const day = today();
+    return {
+      value: undefined,
+      pages: pages.map((p) =>
+        p.id === pageId ? { ...p, status: 'final', finalisedOn: day, totalUpdatedOn: null } : p,
+      ),
+      activity: [
+        {
+          kind: 'page-finalised',
+          notebookId,
+          pageId,
+          text: `${pageLabel(page, notebook)} marked Final, ${toDisplay(day)}`,
+        },
+      ],
+    };
+  });
+}
+
+/** Back to Draft; every reopen date is kept (LIF-02, LIF-03); the note is cleared (CHN-08). */
+export async function reopenPage(pageId: string): Promise<RepoResult> {
+  const notebookId = await notebookOf(pageId);
+  if (!notebookId) return { ok: false, error: { kind: 'not-found' } };
+  return mutatePages(notebookId, (pages, notebook) => {
+    const page = pages.find((p) => p.id === pageId);
+    if (!page) throw new Refusal({ kind: 'not-found' });
+    if (page.status === 'draft') return { pages, value: undefined };
+    const day = today();
+    return {
+      value: undefined,
+      pages: pages.map((p) =>
+        p.id === pageId
+          ? { ...p, status: 'draft', reopenedOn: [...p.reopenedOn, day], totalUpdatedOn: null }
+          : p,
+      ),
+      activity: [
+        {
+          kind: 'page-reopened',
+          notebookId,
+          pageId,
+          text: `${pageLabel(page, notebook)} reopened, ${toDisplay(day)}`,
+        },
+      ],
+    };
+  });
+}
+
+/**
+ * Deletes a Draft page; later pages renumber and their carry-forwards are recalculated.
+ * Refuses Final pages (LIF-09) and the only page of a notebook (LIF-10).
+ */
+export async function deleteDraftPage(pageId: string): Promise<RepoResult> {
+  const notebookId = await notebookOf(pageId);
+  if (!notebookId) return { ok: false, error: { kind: 'not-found' } };
+  return mutatePages(notebookId, (pages, notebook) => {
+    const page = pages.find((p) => p.id === pageId);
+    if (!page) throw new Refusal({ kind: 'not-found' });
+    if (page.status === 'final') throw new Refusal({ kind: 'final-delete' });
+    if (pages.length === 1) throw new Refusal({ kind: 'only-page' });
+    return {
+      value: undefined,
+      pages: pages.filter((p) => p.id !== pageId),
+      activity: [
+        {
+          kind: 'page-deleted',
+          notebookId,
+          pageId: null,
+          text: `${displayTitle(page)} of ${notebook.name} deleted, ${toDisplay(today())}`,
+        },
+      ],
+    };
+  });
+}
+
+/** User-facing text for a repository error. */
+export function repoErrorMessage(e: RepoError): string {
+  switch (e.kind) {
+    case 'over-limit':
+      return chainErrorMessage(e);
+    case 'not-found':
+      return 'That page or notebook no longer exists.';
+    case 'final-locked':
+      return 'This page is Final. Reopen it to edit.';
+    case 'invalid-amounts':
+      return e.count === 1
+        ? '1 amount is not a number. Fix it before marking this page Final.'
+        : `${e.count} amounts are not numbers. Fix them before marking this page Final.`;
+    case 'only-page':
+      return 'A notebook always has at least one page. Delete the notebook instead.';
+    case 'final-delete':
+      return 'Final pages cannot be deleted. Reopen the page first.';
+    case 'invalid-input':
+      return e.message;
+  }
 }

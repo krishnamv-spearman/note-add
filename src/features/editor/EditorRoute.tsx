@@ -1,7 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect } from 'react';
 import { Navigate, useParams } from 'react-router';
-import { db, verifyNotebook } from '@/db';
+import { db, updateSettings, verifyNotebook } from '@/db';
 import { editorPath, PageEditor } from './PageEditor';
 
 /** Loads the notebook and page live; redirects for missing or malformed URLs (P2.4, NB-09/10). */
@@ -24,6 +24,11 @@ export function EditorRoute() {
   useEffect(() => {
     void verifyNotebook(notebookId);
   }, [notebookId]);
+
+  const exists = data?.kind === 'ok';
+  useEffect(() => {
+    if (exists) void updateSettings({ lastOpenedNotebookId: notebookId });
+  }, [exists, notebookId]);
 
   // Live queries keep the previous result while new params load; never act on stale data.
   if (data?.for !== `${notebookId}/${number}`) return <p className="loading">Loading…</p>;

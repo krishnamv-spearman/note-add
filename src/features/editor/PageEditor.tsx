@@ -1,27 +1,34 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import {
-  chainErrorMessage,
+  countFlagged,
   defaultTitle,
   formatPaise,
   isPageEmpty,
   LINES_PER_PAGE,
   pageTotal,
   spokenPaise,
+  toDisplay,
 } from '@/engine';
 import {
   appendPage,
+  deleteDraftPage,
+  finalisePage,
   type Notebook,
   type Page,
-  type RepoError,
+  reopenPage,
+  repoErrorMessage,
   TITLE_MAX,
   updateLines,
   updatePageHeader,
 } from '@/db';
+import { ConfirmDialog } from '@/ui/Dialog';
 import { DateField } from './DateField';
 import { EditingBar } from './EditingBar';
 import { EditorSession } from './EditorSession';
 import { amountState, fieldIndex } from './editorModel';
+
+const displayTitleOf = (page: Page): string => page.title ?? defaultTitle(page.number);
 
 export const editorPath = (notebookId: string, pageNumber: number): string =>
   `/n/${notebookId}/p/${pageNumber}`;
@@ -37,17 +44,6 @@ interface NavState {
   announce?: string;
 }
 
-function repoErrorText(e: RepoError): string {
-  switch (e.kind) {
-    case 'over-limit':
-      return chainErrorMessage(e);
-    case 'final-locked':
-      return 'This page is Final. Reopen it to edit.';
-    default:
-      return 'Something went wrong. Please try again.';
-  }
-}
-
 export function PageEditor({ notebook, page, pageCount }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -61,6 +57,8 @@ export function PageEditor({ notebook, page, pageCount }: Props) {
   const [hint, setHint] = useState<string | null>(null);
   const [titleDraft, setTitleDraft] = useState<string | null>(null);
   const [announced, setAnnounced] = useState(navState.announce ?? '');
+  const [dialog, setDialog] = useState<'final' | 'delete' | null>(null);
+  const [lifecycleError, setLifecycleError] = useState<string | null>(null);
 
   const total = pageTotal(page.broughtForwardPaise, session.effectiveLines(snap));
   const totalText = formatPaise(total);
@@ -109,7 +107,7 @@ export function PageEditor({ notebook, page, pageCount }: Props) {
       if (!saved && session.getSnapshot().save.state === 'error') return;
       const r = await appendPage(notebook.id);
       if (!r.ok) {
-        setHint(repoErrorText(r.error));
+        setHint(repoErrorMessage(r.error));
         return;
       }
       void navigate(editorPath(notebook.id, r.value.pageNumber), {
@@ -162,13 +160,54 @@ export function PageEditor({ notebook, page, pageCount }: Props) {
     if ((value.trim() || null) !== page.title) void updatePageHeader(page.id, { title: value });
   };
 
+  const flaggedCount = countFlagged(session.effectiveLines(snap));
+  const finalBlocked =
+    flaggedCount > 0 ? repoErrorMessage({ kind: 'invalid-amounts', count: flaggedCount }) : null;
+
+  /** LIF-04 / SAV-06: pending edits are flushed first, so the Final page has the last keystroke. */
+  const markFinal = async () => {
+    setDialog(null);
+    await session.flush();
+    const r = await finalisePage(page.id);
+    setLifecycleError(r.ok ? null : repoErrorMessage(r.error));
+  };
+
+  const reopen = async () => {
+    const r = await reopenPage(page.id);
+    setLifecycleError(r.ok ? null : repoErrorMessage(r.error));
+  };
+
+  const askDelete = () => {
+    if (pageCount === 1) {
+      setLifecycleError(repoErrorMessage({ kind: 'only-page' })); // LIF-10
+      return;
+    }
+    setDialog('delete');
+  };
+
+  const remove = async () => {
+    setDialog(null);
+    const r = await deleteDraftPage(page.id);
+    if (r.ok) {
+      void navigate(`/n/${notebook.id}`, {
+        replace: true,
+        state: { notice: `${displayTitleOf(page)} deleted. Later pages were renumbered.` },
+      });
+    } else {
+      setLifecycleError(repoErrorMessage(r.error));
+    }
+  };
+
   const save = snap.save;
+  const latestReopen = page.reopenedOn.at(-1);
   const amountFocused = snap.focused !== null && snap.focused % 2 === 1;
 
   return (
     <article className="editor" aria-labelledby="editor-heading">
       <header className="editor-header">
-        <p className="notebook-name">{notebook.name}</p>
+        <Link to={`/n/${notebook.id}`} className="back-link">
+          ‹ {notebook.name}
+        </Link>
         <div className="page-nav">
           {page.number > 1 ? (
             <Link
@@ -222,6 +261,13 @@ export function PageEditor({ notebook, page, pageCount }: Props) {
             />
           </div>
         </div>
+        <ul className="page-notes">
+          {readOnly && page.finalisedOn && <li>Final since {toDisplay(page.finalisedOn)}</li>}
+          {latestReopen && <li>Reopened on {toDisplay(latestReopen)}</li>}
+          {page.totalUpdatedOn && (
+            <li>Total updated from earlier page on {toDisplay(page.totalUpdatedOn)}</li>
+          )}
+        </ul>
         <p className="save-status" role="status">
           {save.state === 'saving' && 'Saving…'}
           {save.state === 'saved' && 'Saved'}
@@ -357,13 +403,64 @@ export function PageEditor({ notebook, page, pageCount }: Props) {
           {hint}
         </p>
       )}
-      {!readOnly && (
-        <div className="editor-actions">
+      {lifecycleError && (
+        <p className="banner banner-error" role="alert">
+          {lifecycleError}
+        </p>
+      )}
+      <div className="editor-actions">
+        {!readOnly && (
           <button type="button" className="button" onClick={() => void createPage()}>
             New page
           </button>
-        </div>
+        )}
+        {readOnly ? (
+          <button type="button" className="button button-primary" onClick={() => void reopen()}>
+            Reopen
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="button button-primary"
+            aria-disabled={finalBlocked ? true : undefined}
+            aria-describedby={finalBlocked ? 'final-blocked' : undefined}
+            onClick={() => {
+              if (!finalBlocked) setDialog('final');
+            }}
+          >
+            Mark as Final
+          </button>
+        )}
+        {!readOnly && (
+          <button type="button" className="button" onClick={askDelete}>
+            Delete page
+          </button>
+        )}
+      </div>
+      {!readOnly && finalBlocked && (
+        <p id="final-blocked" className="hint">
+          {finalBlocked}
+        </p>
       )}
+      <ConfirmDialog
+        open={dialog === 'final'}
+        title={`Mark ${displayTitleOf(page)} as Final?`}
+        confirmLabel="Mark as Final"
+        onCancel={() => setDialog(null)}
+        onConfirm={() => void markFinal()}
+      >
+        <p>The page will be locked and moved to the notebook’s Archive. You can reopen it later.</p>
+      </ConfirmDialog>
+      <ConfirmDialog
+        open={dialog === 'delete'}
+        title={`Delete ${displayTitleOf(page)}?`}
+        confirmLabel="Delete page"
+        destructive
+        onCancel={() => setDialog(null)}
+        onConfirm={() => void remove()}
+      >
+        <p>Later pages will be renumbered and their brought-forward amounts recalculated.</p>
+      </ConfirmDialog>
       <p className="visually-hidden" aria-live="polite">
         {announced}
       </p>

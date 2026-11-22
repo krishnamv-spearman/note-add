@@ -224,15 +224,15 @@ Phase 6 can be built in parallel with phase 5 once phase 4's Settings screen exi
 
 ### Tasks
 
-- [ ] **P3.1 Notebook repository** (`db/repo/notebooks.ts`): `createNotebook(name, colour)` with validation (1–60 chars, trimmed), `renameNotebook`, `recolourNotebook`, `deleteNotebook` (arch §6.2 rules, if the decision in §0.4 stays "yes").
-- [ ] **P3.2 Activity repository** (`db/repo/activity.ts`, arch §6.3): append inside the same transaction as the change; pre-rendered text such as "Page 3 of Pune trip claims marked Final, 20/11/2026"; trim to latest 200.
-- [ ] **P3.3 Lifecycle operations** through `mutatePages`: `finalisePage` (sets `status`, `finalisedOn`; **refused while any amount is invalid**, decided 22/11/2026, LIF-18), `reopenPage` (pushes today to `reopenedOn`), `deleteDraftPage` (refuses Final pages in the repository; renumbers; recalculates).
-- [ ] **P3.4 Bottom navigation** (`ui/BottomNav.tsx`): Notebooks · New page · Settings (Settings is a stub until phase 4). "New page" appends to `settings.lastOpenedNotebookId`, or opens the new-notebook dialog if there is none. Add the `settings` repository with just this field for now.
-- [ ] **P3.5 Notebooks library** (`features/library/`): notebook stacks (name, page count, latest page total, colour), the visually distinct "Add a new book" tile, new-notebook dialog (name + colour from the seven presets), recent activity (last 5). Replaces the phase 2 start screen.
-- [ ] **P3.6 Search** on the library using `engine/search.ts`: results grouped by notebook, each page result opening the editor at that page; empty state "No notebooks or pages match".
-- [ ] **P3.7 Pages list** (`features/notebook/`): header (name, colour, `+ New page`, rename and colour actions), Draft pages newest first as cards (badge, date, title, first two lines, total), collapsed **Archive** of Final pages, dotted "Add a new page" card. Export buttons are present but disabled with "Coming soon" until phase 5.
-- [ ] **P3.8 Editor lifecycle UI:** "Mark as Final" (confirmation; disabled with "N amounts are not numbers. Fix them before marking this page Final." while any amount is invalid), read-only Final page with **Reopen**, "Reopened on DD/MM/YYYY" note, "Total updated from earlier page on DD/MM/YYYY" note, "Delete page" on Drafts (confirmation naming the page and saying later pages will be renumbered).
-- [ ] **P3.9 `ConfirmDialog`** (`ui/`) on the native `<dialog>` element; focus returns to the trigger on close.
+- [x] **P3.1 Notebook repository** (`db/repo/notebooks.ts`): `createNotebook(name, colour)` with validation (1–60 chars, trimmed), `renameNotebook`, `recolourNotebook`, `deleteNotebook` (arch §6.2 rules, if the decision in §0.4 stays "yes").
+- [x] **P3.2 Activity repository** (`db/repo/activity.ts`, arch §6.3): append inside the same transaction as the change; pre-rendered text such as "Page 3 of Pune trip claims marked Final, 20/11/2026"; trim to latest 200.
+- [x] **P3.3 Lifecycle operations** through `mutatePages`: `finalisePage` (sets `status`, `finalisedOn`; **refused while any amount is invalid**, decided 22/11/2026, LIF-18), `reopenPage` (pushes today to `reopenedOn`), `deleteDraftPage` (refuses Final pages in the repository; renumbers; recalculates).
+- [x] **P3.4 Bottom navigation** (`ui/BottomNav.tsx`): Notebooks · New page · Settings (Settings is a stub until phase 4). "New page" appends to `settings.lastOpenedNotebookId`, or opens the new-notebook dialog if there is none. Add the `settings` repository with just this field for now.
+- [x] **P3.5 Notebooks library** (`features/library/`): notebook stacks (name, page count, latest page total, colour), the visually distinct "Add a new book" tile, new-notebook dialog (name + colour from the seven presets), recent activity (last 5). Replaces the phase 2 start screen.
+- [x] **P3.6 Search** on the library using `engine/search.ts`: results grouped by notebook, each page result opening the editor at that page; empty state "No notebooks or pages match".
+- [x] **P3.7 Pages list** (`features/notebook/`): header (name, colour, `+ New page`, rename and colour actions), Draft pages newest first as cards (badge, date, title, first two lines, total), collapsed **Archive** of Final pages, dotted "Add a new page" card. Export buttons are present but disabled with "Coming soon" until phase 5.
+- [x] **P3.8 Editor lifecycle UI:** "Mark as Final" (confirmation; disabled with "N amounts are not numbers. Fix them before marking this page Final." while any amount is invalid), read-only Final page with **Reopen**, "Reopened on DD/MM/YYYY" note, "Total updated from earlier page on DD/MM/YYYY" note, "Delete page" on Drafts (confirmation naming the page and saying later pages will be renumbered).
+- [x] **P3.9 `ConfirmDialog`** (`ui/`) on the native `<dialog>` element; focus returns to the trigger on close.
 
 ### Tests
 

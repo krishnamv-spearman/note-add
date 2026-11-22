@@ -10,7 +10,7 @@ Run started 22/11/2026. Owner decisions of 22/11/2026 applied to the docs first:
 | 0 Harness | ✅ done | 3 | 3 |
 | 1 Engine | ✅ done | 224 | 3 |
 | 2 Editor | ✅ done | 291 | 23 (+4 skipped) |
-| 3 Library | not started | | |
+| 3 Library | ✅ done | 321 | 55 (+8 skipped) |
 | 4 Look | not started | | |
 | 5 Export | not started | | |
 | 6 Backup | not started | | |
@@ -85,6 +85,24 @@ Run started 22/11/2026. Owner decisions of 22/11/2026 applied to the docs first:
 
 ---
 
+## Phase 3 — Library, pages list and page lifecycle
+
+**Built**
+- Repository: `renameNotebook` (activity keeps the old name, ACT-03), `recolourNotebook` (page overrides kept, EDT-18), `deleteNotebook` (pages and notebook in one transaction; a second explicit confirmation when any page is Final, NB-07; clears `lastOpenedNotebookId`), `notebookSummaries` (page count, Final count, latest total). `mutatePages` now passes the notebook to the change so activity text is pre-rendered ("Page 3 of Pune trip claims marked Final, 20/11/2026").
+- Lifecycle through `mutatePages`: `finalisePage` (**refused while any amount is invalid**, LIF-18), `reopenPage` (every reopen date kept), `deleteDraftPage` (refuses Final pages and the only page; renumbers; recalculates; refused if a later total would go over the limit). Finalising and reopening clear "Total updated…" (CHN-08). `repoErrorMessage` gives user-facing text for every repository error.
+- Settings repository (`getSettings`, `updateSettings`, `newPageTarget` with the NB-06 fallback); `lastOpenedNotebookId` set when a notebook or page is opened.
+- UI components (`src/ui/`): `Dialog` and `ConfirmDialog` on native `<dialog>` (focus returns to the trigger, Escape closes), `ColourPicker` (7 swatches, 44 px), `StatusBadge` (text, never colour alone), `NotebookStack` (thick border + offset shadow), `AddBookTile` (thin border, no shadow, `+`), `BottomNav` (Notebooks · New page · Settings). `src/theme/colours.ts` created early as the single colour source.
+- Library (`/`): search box (results grouped by notebook, page results open the editor, Final badge, empty state saying what is searched), notebook stacks, "Add a new book" dialog (name + colour) that lands on page 1, recent activity (last 5; links only while the notebook exists).
+- Pages list (`/n/:id`): back link, name and colour, + New page, Rename, Colour, Delete notebook; Draft cards newest first (badge, date, title, first two lines, total) in batches of 50; empty Drafts state; dotted "Add a new page" card; collapsed Archive of Final pages (opened automatically when every page is Final); Export PDF/JPEG buttons present but disabled ("Coming soon").
+- Editor: back link to the notebook; Mark as Final (confirmation; flushes first; disabled with "N amounts are not numbers…" while any amount is invalid); read-only Final page with Reopen; "Final since…", "Reopened on…", "Total updated from earlier page on…" notes; Delete page (confirmation; refused for the only page with a reason). Settings route is a stub until phase 4.
+
+**Tests:** 321 unit tests (+30: 20 lifecycle/notebook/settings repository tests, 10 component tests for dialogs, Final/Reopen/Delete UI, library and pages list). E2E: 55 passed + 8 skipped (chromium-only specs on the phone projects): `notebooks`, `search`, `final-reopen`, `final-recalc`, `delete-draft`, `navigation` on all three projects; `activity`, `totals-consistency`, `two-tabs` on chromium-desktop; editor and smoke as before.
+
+**Exit criteria**
+- ✅ End-to-end tests for each flow pass (locally on all three projects; CI not available in this run).
+
+---
+
 ## Decisions to review
 
 | # | Phase | Decision | Why |
@@ -108,7 +126,14 @@ Run started 22/11/2026. Owner decisions of 22/11/2026 applied to the docs first:
 | D17 | 2 | The editing bar shows while an amount is focused when an on-screen keyboard is detected (`visualViewport` shrinks) **or** the primary pointer is coarse (touch). | Lets the iPhone e2e test use it (emulation has no keyboard) and covers phones whose keyboard does not resize the visual viewport. A tablet with a physical keyboard may still show it (KBD-12 is a manual check). |
 | D18 | 2 | Amount fields have no hard `maxLength`; text over 20 characters is kept and marked invalid with "Too long (20 characters at most)" (PST-12). Descriptions are cut at 120 with "Cut to 120 characters". Title uses `maxLength=60`. | PST-12 says never cut a pasted amount silently. |
 | D19 | 2 | Shift+Enter does nothing (focus stays); Tab follows the natural order (KBD-08). | One reading of "does nothing special". |
-| D20 | 2 | Activity entries are written for notebook creation and page creation now; lifecycle entries come in phase 3. `appendActivity` already trims to 200. | Activity kinds include `page-created`. |
+| D20 | 2→3 | Activity entries are written for: notebook created, notebook renamed, page marked Final, page reopened, page deleted (backup and restore come in phase 6). **New pages are not logged** (corrected in phase 3; phase 2 said they were). | Logging every new page would push the lifecycle events the spec describes out of the 5-item Recent activity. |
+| D23 | 3 | On a Final page the editor hides its own New page button (Enter on line 10 never creates a page, KBD-09); the bottom-nav **New page** still appends after a Final last page (LIF-17). | Keeps KBD-09 and LIF-17 both true. |
+| D24 | 3 | Deleting a notebook writes no activity entry (there is no `notebook-deleted` kind in arch §4.1); earlier entries for it become plain text (ACT-04). | Follows the data model as written. |
+| D25 | 3 | Recent activity links open the page if it still exists, otherwise the notebook. | Pages can be renumbered or deleted after the entry was written. |
+| D26 | 3 | Creating a notebook from the library opens its page 1 straight away. | Arch §6.2: "so the user lands on a usable page"; fastest path to the 2-minute task. |
+| D27 | 3 | The Archive `<details>` opens automatically when every page is Final (LIF-13 "Archive expanded hint"); otherwise it starts collapsed. | Spec: collapsed by default. |
+| D28 | 3 | Mark as Final uses `aria-disabled` (not `disabled`) while blocked, so the reason stays reachable by keyboard and screen readers; clicking it does nothing. | Accessible disabled state with an explanation. |
+| D29 | 3 | `src/theme/colours.ts` was created in phase 3 (plan: P4.1) because the colour picker needs the presets. | Single source from the start. |
 | D21 | 2 | Previous/next page links were added to the editor header. | Needed to move between pages before the phase 3 pages list, and for "no browser back button" in installed mode (PWA-05). |
 | D22 | 2 | A test-only shim in `tests/setup/dom.ts` drops `AbortSignal` from `Request` because jsdom's signal is rejected by Node's `Request` in React Router data routers. | Test environment only; no app code affected. |
 
@@ -124,3 +149,5 @@ Run started 22/11/2026. Owner decisions of 22/11/2026 applied to the docs first:
 | M2.1 | 2 | Real Android phone (Chrome, Gboard and the maker's keyboard): fill three pages using only the keyboard's Next key; the minus key or ± enters a refund; Hindi input: confirming a word with Enter does not jump fields (test-plan §10.3 M1–M8, §10.4 K1–K5). |
 | M2.2 | 2 | Real iPhone (Safari): the editing bar sits just above the decimal keypad, ± and Next ↵ work, the page does not jump or zoom when the keyboard opens, the focused line stays visible (EDT-15, EDT-16, K2). |
 | M2.3 | 2 | Tablet with a physical keyboard: note whether the editing bar appears (see D17, KBD-12). |
+| M3.1 | 3 | On a phone and desktop (test-plan §10.5 C1–C5): fill 5 pages, change page 1, pages 2–5 update; mark page 3 Final, edit page 1, see "Total updated from earlier page on…"; Reopen page 3; delete Draft page 2 of 5; a large refund on page 1 shows brackets everywhere. |
+| M3.2 | 3 | Screen reader spot check of the dialogs (Mark as Final, Delete page, Delete notebook): focus moves in and returns to the button afterwards. |

@@ -123,7 +123,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | RND-03 | Sum of many awkward values (`0.10` × 10, `0.01` × 1000 across 100 pages) | Exactly 100 and 1000 paise | P1.4 | U (property) | ✅ |
 | RND-04 | The amounts shown on a page add up to the total shown | Always, for every page: property test over random pages comparing the sum of displayed strings (parsed back) with the displayed total | P1.4 | U (property) | ✅ |
 | RND-05 | Brought forward shown on page N equals the total shown on page N−1, digit for digit | Always | P1.6 | U, E | ✅ |
-| RND-06 | Total in the library, pages list, editor and export for the same page | Identical strings (all from `formatPaise`) | P3.5, P5.2 | E | ➕ |
+| RND-06 | Total in the library, pages list, editor and export for the same page | Identical strings (all from `formatPaise`) | P3.5, P5.2 | E | ✅ |
 | RND-07 | Export (JPEG/PDF) | Uses the same formatted strings as the screen; no re-formatting | P5.2 | U | ✅ |
 | RND-08 | Backup file | Integers only; a restore never rounds a decimal, it refuses it (RES-07) | P6.3 | U | ✅ |
 | RND-09 | Code-level guard | Lint bans `parseFloat`, `toFixed` and `Math.round` in engine and data code | P0.5 | Lint | ✅ |
@@ -139,7 +139,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | CHN-05 | Final page whose BF changes and then changes back to the original value | Note stays (it records that a change happened), date updated to the latest change | P1.6 | U | ✅ |
 | CHN-06 | Edit that does not change any total (for example, editing a description) | No later page rewritten; `changedIds` contains only the edited page | P1.6 | U | ✅ |
 | CHN-07 | Editing an amount to the same value (retyping `450` as `450.00`) | No later page rewritten; no `totalUpdatedOn` set on Final pages | P1.6 | U | ✅ |
-| CHN-08 | Reopen a Final page that has "Total updated…" | Note cleared on reopen and on re-finalising (the user has now reviewed it) | P3.3 | R | ❓ |
+| CHN-08 | Reopen a Final page that has "Total updated…" | Note cleared on reopen and on re-finalising (the user has now reviewed it) | P3.3 | R | ✅ |
 | CHN-09 | Cached totals in the database disagree with a recomputation (bug or manual tampering) | Dev mode logs the mismatch; on load the chain is recomputed and corrected, with no silent change to amounts | arch §4.3 | R | ✅ |
 | CHN-10 | Stored page has the wrong number of lines (corrupt record) | Normalised on read to exactly 10 (pad with empty lines); never drop a line with content; log it | P2.16 | R | ✅ |
 
@@ -163,18 +163,18 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 |---|---|---|---|---|---|
 | LIF-01 | Mark as Final | Confirmation; page read-only; moves to Archive; activity entry | P3.3, P3.8 | E | ✅ |
 | LIF-02 | Reopen | Back to Draft; "Reopened on DD/MM/YYYY"; history keeps every reopen date | P3.3 | R, E | ✅ |
-| LIF-03 | Reopen and re-finalise several times | Each reopen date kept; latest shown | P3.3 | R | ➕ |
-| LIF-04 | Mark Final while an autosave is pending | Pending edit flushed first, then finalised; final page contains the last keystroke | P3.8 | C | ➕ |
+| LIF-03 | Reopen and re-finalise several times | Each reopen date kept; latest shown | P3.3 | R | ✅ |
+| LIF-04 | Mark Final while an autosave is pending | Pending edit flushed first, then finalised; final page contains the last keystroke | P3.8 | C | ✅ |
 | LIF-05 | Delete a Draft in the middle (page 2 of 4) | Confirmation; later pages renumber; carry-forwards recalculated | P3.3 | R, E | ✅ |
-| LIF-06 | Delete page 1 | Old page 2 becomes page 1 with BF 0 | P3.3 | R | ➕ |
-| LIF-07 | Delete a Draft that sits before Final pages | Final pages renumber and their totals update with "Total updated…" | P3.3 | R | ➕ |
-| LIF-08 | Delete a Draft when that pushes a later total over the limit (for example the deleted page held a large refund) | Delete refused with the page named | P3.3 | R | ➕ |
+| LIF-06 | Delete page 1 | Old page 2 becomes page 1 with BF 0 | P3.3 | R | ✅ |
+| LIF-07 | Delete a Draft that sits before Final pages | Final pages renumber and their totals update with "Total updated…" | P3.3 | R | ✅ |
+| LIF-08 | Delete a Draft when that pushes a later total over the limit (for example the deleted page held a large refund) | Delete refused with the page named | P3.3 | R | ✅ |
 | LIF-09 | Delete a Final page | Not offered in the UI; repository refuses it too | P3.3 | R | ✅ |
-| LIF-10 | Delete the only page in a notebook | Not allowed; message suggests deleting the notebook instead (a notebook always has at least one page) | P3.3 | R, C | ❓ |
-| LIF-11 | Default titles after renumbering | Pages with no title follow their new number ("Page 3" becomes "Page 2"); custom titles unchanged | P3.3 | R | ➕ |
-| LIF-12 | Custom title that clashes, for example a page titled "Page 5" that is page 3 | Allowed; it is the user's text | P2.3 | — | ➕ (note only) |
-| LIF-13 | Finalising every page | Draft section shows an empty state plus the "Add a new page" card; Archive expanded hint | P3.7 | C | ➕ |
-| LIF-14 | Any code path tries to change a Final page's lines, date, title or colour (`updateLine`, `updatePageHeader`, a stale autosave arriving after Mark Final) | Repository refuses; only the chain may change its brought forward and total | P3.3 | R | ➕ |
+| LIF-10 | Delete the only page in a notebook | Not allowed; message suggests deleting the notebook instead (a notebook always has at least one page) | P3.3 | R, C | ✅ |
+| LIF-11 | Default titles after renumbering | Pages with no title follow their new number ("Page 3" becomes "Page 2"); custom titles unchanged | P3.3 | R | ✅ |
+| LIF-12 | Custom title that clashes, for example a page titled "Page 5" that is page 3 | Allowed; it is the user's text | P2.3 | — | ✅ |
+| LIF-13 | Finalising every page | Draft section shows an empty state plus the "Add a new page" card; Archive expanded hint | P3.7 | C | ✅ |
+| LIF-14 | Any code path tries to change a Final page's lines, date, title or colour (`updateLine`, `updatePageHeader`, a stale autosave arriving after Mark Final) | Repository refuses; only the chain may change its brought forward and total | P3.3 | R | ✅ |
 | LIF-15 | Final page whose total was updated by an earlier page, then exported | Export shows the new total and the "Total updated…" note | P5.2 | U | ➕ |
 | LIF-16 | Final page in a backup | Restores as Final with `finalisedOn`, `reopenedOn` and `totalUpdatedOn` intact | P6.4 | R | ➕ |
 | LIF-17 | Final page sits last, user presses New page | New Draft page appended with BF = the Final page's total | P2.10 | E | ✅ |
@@ -243,8 +243,8 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | DAT-03 | App left open across midnight | New pages use the current date, not one cached at start-up | P2.3 | U | ✅ |
 | DAT-04 | User travels or changes time zone | Stored dates (`YYYY-MM-DD`) never shift | P1.8 | U (TZ set) | ✅ |
 | DAT-05 | Device clock wrong or moved backwards | Nothing crashes; reminder maths with a negative gap shows no banner | P6.7 | U | ➕ |
-| DAT-06 | Pages dated out of order (page 3 dated before page 2) | Allowed; order is by page number, never by date | P3.7 | — | ➕ (note) |
-| DAT-07 | "Newest first" in the pages list | Means highest page number first, not latest date | P3.7 | E | ❓ |
+| DAT-06 | Pages dated out of order (page 3 dated before page 2) | Allowed; order is by page number, never by date | P3.7 | — | ✅ |
+| DAT-07 | "Newest first" in the pages list | Means highest page number first, not latest date | P3.7 | E | ✅ |
 | DAT-08 | Date tests on Windows dev machines | Time zone set through the Vitest config (`env: { TZ }`), not by changing `process.env.TZ` mid-test | P1.8 | U | ✅ |
 
 ## 10. Notebooks, search and recent activity
@@ -253,25 +253,25 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 |---|---|---|---|---|---|
 | NB-01 | Name empty or only spaces | Rejected: "Give the notebook a name" | P3.1 | U, C | ✅ |
 | NB-02 | Name over 60 characters | Cut at 60 | P3.1 | C | ✅ |
-| NB-03 | Two notebooks with the same name | Allowed (colour tells them apart) | P3.1 | R | ➕ |
-| NB-04 | Name with emoji or characters unsafe in file names (`/ \ : * ?`) | Allowed; sanitised only in export file names | P3.1, P5.6 | U | ➕ |
+| NB-03 | Two notebooks with the same name | Allowed (colour tells them apart) | P3.1 | R | ✅ |
+| NB-04 | Name with emoji or characters unsafe in file names (`/ \ : * ?`) | Allowed; sanitised only in export file names | P3.1, P5.6 | U | ✅ |
 | NB-05 | No notebooks yet | Library shows only "Add a new book" and a one-line hint; bottom-nav New page opens the create dialog | P3.4, P3.5 | E | ✅ |
-| NB-06 | "New page" when the last opened notebook has been deleted | Falls back to the most recently updated notebook; if none, the create dialog | P3.4 | C | ➕ |
+| NB-06 | "New page" when the last opened notebook has been deleted | Falls back to the most recently updated notebook; if none, the create dialog | P3.4 | C | ✅ |
 | NB-07 | Delete a notebook that has Final pages | Second explicit confirmation naming the number of Final pages | P3.1 | E | ✅ |
 | NB-08 | Many notebooks (100+) or a notebook with 1000 pages | Library and pages list stay responsive; pages list renders lazily or in batches | P3.5, P3.7 | E (seeded) | ➕ |
 | NB-09 | Deep link to a deleted notebook or a page number that no longer exists | Redirect to the library or the last page, with a short notice | P2.4 | E | ✅ |
 | NB-10 | Malformed URL (`/n/xyz/p/abc`, `/n/…/p/0`, `/n/…/p/-1`) | Redirect, no crash | P2.4 | E | ✅ |
-| SRC-01 | Empty or whitespace-only query | Shows all notebooks (normal library) | P3.6 | C | ➕ |
+| SRC-01 | Empty or whitespace-only query | Shows all notebooks (normal library) | P3.6 | C | ✅ |
 | SRC-02 | Case and accents (`cafe` finds `Café`) | Match | P1.9 | U | ✅ |
 | SRC-03 | Special characters `(`, `.`, `*`, `\` | Literal text match (no regular expressions) | P1.9 | U | ✅ |
-| SRC-04 | Search for an amount (`450`) | Not matched (spec: names, titles, descriptions only); empty-state text says what is searched | P3.6 | C | ❓ |
+| SRC-04 | Search for an amount (`450`) | Not matched (spec: names, titles, descriptions only); empty-state text says what is searched | P3.6 | C | ✅ |
 | SRC-05 | Default title "Page 3" | Matches "page 3" | P1.9 | U | ✅ |
-| SRC-06 | Matches on Archived (Final) pages | Included, with a Final badge | P3.6 | E | ➕ |
+| SRC-06 | Matches on Archived (Final) pages | Included, with a Final badge | P3.6 | E | ✅ |
 | SRC-07 | Hindi or other non-Latin text | Matches after Unicode normalisation | P1.9 | U | ✅ |
-| ACT-01 | Fewer than 5 entries, or none | Shows what exists; none → section hidden | P3.5 | C | ➕ |
+| ACT-01 | Fewer than 5 entries, or none | Shows what exists; none → section hidden | P3.5 | C | ✅ |
 | ACT-02 | Line edits | Do not create activity entries (only lifecycle events) | P3.2 | R | ✅ |
 | ACT-03 | Notebook renamed after an entry was written | Old entry keeps the old name (pre-rendered text) | P3.2 | R | ✅ |
-| ACT-04 | Entry refers to a deleted notebook or page | Shown as plain text, not a link | P3.5 | C | ➕ |
+| ACT-04 | Entry refers to a deleted notebook or page | Shown as plain text, not a link | P3.5 | C | ✅ |
 | ACT-05 | More than 200 entries | Oldest trimmed | P3.2 | R | ✅ |
 
 ## 11. Look, colours and fonts
@@ -284,7 +284,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | LOOK-04 | Device in dark mode | v1 is light only; `color-scheme: light` so form controls and scrollbars do not turn dark on paper-coloured slips | P4.8 | E (emulated) | ❓ |
 | LOOK-05 | Browser zoom 200% or Android "largest" text | Layout reflows; no clipped amounts or overlapping rows | P4.8, P7.7 | E | ➕ |
 | LOOK-06 | Windows High Contrast (forced colours) | Ruled lines (background gradients) disappear, so rows also get a border visible in forced colours | P4.5 | M | ➕ |
-| LOOK-07 | Draft/Final shown only by colour | Never; badges always carry text | P3.7 | C | ➕ |
+| LOOK-07 | Draft/Final shown only by colour | Never; badges always carry text | P3.7 | C | ✅ |
 | LOOK-08 | Font chosen, then app reloaded | Applied before first paint, no flash | P4.10 | E | ✅ |
 
 ## 12. Export (JPEG and PDF)
@@ -396,7 +396,7 @@ A backup made today may be restored years from now by a much newer app. arch §9
 | PWA-02 | Offline after one visit: open, create, edit, export | All work | P7.1 | E | ✅ |
 | PWA-03 | New version deployed while the user is typing | Prompt only; on Reload, pending saves flush first | P7.2 | E | ✅ (flush ➕) |
 | PWA-04 | Update while a page is mid-export | Reload prompt waits until export finishes | P7.2 | C | ➕ |
-| PWA-05 | No browser back button in installed mode (iPhone standalone) | Every screen except the library has an in-app back control | P3.7, P3.8 | E | ➕ |
+| PWA-05 | No browser back button in installed mode (iPhone standalone) | Every screen except the library has an in-app back control | P3.7, P3.8 | E | ✅ |
 | PWA-06 | spearman.in link in About, while installed | Opens in the browser (`target="_blank" rel="noopener"`), not inside the app | P4.9 | M | ➕ |
 | PWA-07 | Already installed | "Install app" button hidden; iPhone hint not shown | P7.5 | E | ✅ |
 | PWA-08 | iPad reports itself as a Mac | Detected through touch support as well as the user agent | P7.5 | U | ✅ |
@@ -441,14 +441,14 @@ All proposed defaults below were **accepted by the owner on 22/11/2026**, with t
 | MON-25 | Accept Devanagari and full-width digits? | ✅ |
 | PST-07 | Accept the Indian "only" suffix `450/-`? | ✅ |
 | PST-13 | Split a pasted "Taxi 450" into description and amount? | ✅ |
-| LIF-18 | Mark Final on a page with flagged amounts? | **Refused** until every amount is valid or empty |
+| LIF-18 | Mark Final on a page with flagged amounts? | ✅ |
 | CHN-05 | Final page total changes then changes back: keep the note? | ✅ |
-| CHN-08 | Clear "Total updated…" on Reopen / re-Final? | Yes |
-| LIF-10 | Delete the only page of a notebook? | Not allowed; suggest deleting the notebook |
+| CHN-08 | Clear "Total updated…" on Reopen / re-Final? | ✅ |
+| LIF-10 | Delete the only page of a notebook? | ✅ |
 | EDT-03 | Rejected amount, then the user leaves the field | ✅ |
 | KBD-05 | Enter on line 10 of a completely empty page | ✅ |
-| DAT-07 | Meaning of "newest first" | Highest page number first |
-| SRC-04 | Search amounts? | No (as spec); say so in the empty state |
+| DAT-07 | Meaning of "newest first" | ✅ |
+| SRC-04 | Search amounts? | ✅ |
 | LOOK-04 | Dark mode | Light only in v1 |
 | EXP-04 | Mark Draft pages in exports? | Yes, a small "Draft" label |
 | EXP-05 | Include Reopened / Total-updated notes in exports? | Yes |

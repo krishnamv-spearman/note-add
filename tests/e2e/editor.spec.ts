@@ -6,6 +6,8 @@ import {
   fillPageByKeyboard,
   openFreshNotebook,
   total,
+  editor,
+  stepPage,
 } from './helpers';
 
 const rowsFor = (page: number): [string, string][] =>
@@ -28,11 +30,11 @@ test('KBD-03 / KBD-10 / SAV-02: fill three pages by keyboard alone; data survive
   }
 
   // Page 4 was created by the last Next; go back to page 3 and check the chain.
-  await page.getByRole('link', { name: 'Previous page' }).click();
+  await stepPage(page, 'Previous');
   await expect(page.getByRole('heading', { name: 'Page 3 of 4' })).toBeVisible();
   const page3Bf = await broughtForward(page).textContent();
   const page3Total = await total(page).textContent();
-  await page.getByRole('link', { name: 'Previous page' }).click();
+  await stepPage(page, 'Previous');
   await expect(page.getByRole('heading', { name: 'Page 2 of 4' })).toBeVisible();
   // RND-05: page 3's brought forward equals page 2's total, digit for digit.
   await expect(total(page)).toHaveText(page3Bf ?? 'missing');
@@ -43,7 +45,7 @@ test('KBD-03 / KBD-10 / SAV-02: fill three pages by keyboard alone; data survive
   await expect(description(page, 10)).toHaveValue('Item 2.10');
   await expect(amount(page, 4)).toHaveValue('(50.00)');
   await expect(amount(page, 1)).toHaveValue('20.25');
-  await page.getByRole('link', { name: 'Next page' }).click();
+  await stepPage(page, 'Next');
   await expect(total(page)).toHaveText(page3Total ?? 'missing');
   await expect(description(page, 1)).toHaveValue('Item 3.1');
 });
@@ -53,37 +55,37 @@ test('CHN-02 / CHN-12 / CHN-13: editing page 1 updates pages 2 and 3 without a r
 }) => {
   await openFreshNotebook(page);
   await amount(page, 1).fill('100');
-  await page.getByRole('button', { name: 'New page' }).click();
+  await editor(page).getByRole('button', { name: 'New page' }).click();
   await expect(page.getByRole('heading', { name: 'Page 2 of 2' })).toBeVisible();
   await amount(page, 1).fill('200');
-  await page.getByRole('button', { name: 'New page' }).click();
+  await editor(page).getByRole('button', { name: 'New page' }).click();
   await expect(page.getByRole('heading', { name: 'Page 3 of 3' })).toBeVisible();
   await amount(page, 1).fill('300');
   await amount(page, 1).blur();
   await expect(total(page)).toHaveText('600.00');
 
-  await page.getByRole('link', { name: 'Previous page' }).click();
-  await page.getByRole('link', { name: 'Previous page' }).click();
+  await stepPage(page, 'Previous');
+  await stepPage(page, 'Previous');
   await expect(page.getByRole('heading', { name: 'Page 1 of 3' })).toBeVisible();
   await amount(page, 1).fill('-100'); // sign flip
   await amount(page, 1).blur();
   await expect(page.getByText('Saved')).toBeVisible();
-  await page.getByRole('link', { name: 'Next page' }).click();
+  await stepPage(page, 'Next');
   await expect(broughtForward(page)).toHaveText('(100.00)');
-  await page.getByRole('link', { name: 'Next page' }).click();
+  await stepPage(page, 'Next');
   await expect(broughtForward(page)).toHaveText('100.00');
   await expect(total(page)).toHaveText('400.00');
 
   // valid → invalid text counts as 0 from then on (CHN-13)
-  await page.getByRole('link', { name: 'Previous page' }).click();
-  await page.getByRole('link', { name: 'Previous page' }).click();
+  await stepPage(page, 'Previous');
+  await stepPage(page, 'Previous');
   await amount(page, 1).fill('45o');
   await amount(page, 1).blur();
   await expect(page.getByRole('img', { name: 'Not a number, counted as zero' })).toBeVisible();
   await expect(total(page)).toHaveText('0.00');
   await expect(page.getByText('Saved')).toBeVisible();
-  await page.getByRole('link', { name: 'Next page' }).click();
-  await page.getByRole('link', { name: 'Next page' }).click();
+  await stepPage(page, 'Next');
+  await stepPage(page, 'Next');
   await expect(total(page)).toHaveText('500.00');
 });
 
@@ -122,7 +124,8 @@ test('NB-09 / NB-10: malformed and missing URLs redirect without crashing', asyn
   await page.goto(`${notebookPath}/p/99`);
   await expect(page.getByText('There is no page 99; showing the last page.')).toBeVisible();
   await page.goto('/n/xyz/p/1');
-  await expect(page.getByRole('heading', { name: 'Page 1 of 1' })).toBeVisible();
+  await expect(page.getByText('That notebook no longer exists.')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Notebooks' })).toBeVisible();
 });
 
 test('STO-01: a browser without IndexedDB gets a clear message', async ({ page }) => {

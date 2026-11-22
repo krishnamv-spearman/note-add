@@ -4,3 +4,4 @@ export * from './clock';
 export * from './repo/pages';
 export * from './repo/notebooks';
 export * from './repo/activity';
+export * from './repo/settings';

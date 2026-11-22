@@ -2,12 +2,15 @@ import { useEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router';
 import { onDbEvent } from '@/db';
 import { onTabMessage } from '@/platform/broadcast';
+import { BottomNav } from '@/ui/bits';
+import { useNewPage } from './features/newPage';
 
 /** App chrome: brand, notices passed through navigation, update and reload banners. */
 export function Layout() {
   const location = useLocation();
   const notice = (location.state as { notice?: string } | null)?.notice;
   const [updated, setUpdated] = useState(false);
+  const newPage = useNewPage();
 
   useEffect(() => onDbEvent(() => setUpdated(true)), []);
   // MTB-03: another tab restored a backup; reload (the editor flushes on pagehide).
@@ -40,6 +43,7 @@ export function Layout() {
       <main className="content">
         <Outlet />
       </main>
+      <BottomNav onNewPage={() => void newPage()} />
     </div>
   );
 }

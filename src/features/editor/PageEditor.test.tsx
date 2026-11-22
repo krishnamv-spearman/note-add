@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryRouter } from 'react-router';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -8,6 +8,8 @@ import { App } from '../../App';
 import { routes } from '../../routes';
 
 const amount = (n: number) => screen.getByRole('textbox', { name: `Line ${n} amount` });
+/** The editor itself (the bottom navigation has its own New page button). */
+const editor = () => within(screen.getByRole('article'));
 const desc = (n: number) => screen.getByRole('textbox', { name: `Line ${n} description` });
 
 let notebookId = '';
@@ -87,7 +89,7 @@ describe('PageEditor keyboard', () => {
 
   it('KBD-06: New page tapped twice creates exactly one page', async () => {
     await openEditor();
-    const button = screen.getByRole('button', { name: 'New page' });
+    const button = editor().getByRole('button', { name: 'New page' });
     fireEvent.click(button);
     fireEvent.click(button);
     await screen.findByRole('heading', { name: 'Page 2 of 2' });
@@ -122,7 +124,7 @@ describe('PageEditor keyboard', () => {
     await openEditor();
     expect(amount(1)).toHaveAttribute('readonly');
     expect(desc(1)).toHaveAttribute('readonly');
-    expect(screen.queryByRole('button', { name: 'New page' })).toBeNull();
+    expect(editor().queryByRole('button', { name: 'New page' })).toBeNull();
     await user.click(amount(10));
     await user.keyboard('{Enter}');
     expect(screen.queryByRole('toolbar', { name: 'Amount keys' })).toBeNull();
