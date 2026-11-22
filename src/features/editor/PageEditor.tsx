@@ -24,6 +24,7 @@ import {
 } from '@/db';
 import { ColourPicker } from '@/ui/ColourPicker';
 import { ConfirmDialog, Dialog } from '@/ui/Dialog';
+import { ExportControls } from '../export/ExportControls';
 import { Slip } from '@/ui/Slip';
 import { slipColour } from '@/theme/colours';
 import { DateField } from './DateField';
@@ -461,6 +462,7 @@ export function PageEditor({ notebook, page, pageCount }: Props) {
           </button>
         )}
       </div>
+      <ExportControls pageId={page.id} beforeExport={() => session.flush()} />
       {!readOnly && finalBlocked && (
         <p id="final-blocked" className="hint">
           {finalBlocked}

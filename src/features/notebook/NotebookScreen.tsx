@@ -19,6 +19,7 @@ import { StatusBadge } from '@/ui/bits';
 import { Slip } from '@/ui/Slip';
 import { ConfirmDialog } from '@/ui/Dialog';
 import { editorPath } from '../editor/PageEditor';
+import { ExportControls } from '../export/ExportControls';
 import { NotebookDialog } from '../library/NewNotebookDialog';
 
 const BATCH = 50; // NB-08: render long notebooks in batches
@@ -51,12 +52,7 @@ function PageCard({ notebook, page }: { notebook: Notebook; page: Page }) {
         </Slip>
       </Link>
       <span className="page-card-actions">
-        <button type="button" className="button" disabled title="Coming soon">
-          Export PDF
-        </button>
-        <button type="button" className="button" disabled title="Coming soon">
-          Export JPEG
-        </button>
+        <ExportControls pageId={page.id} />
       </span>
     </li>
   );

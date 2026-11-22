@@ -36,3 +36,28 @@ for (const colour of COLOURS) {
     );
   });
 }
+
+const FONTS = ['Calibri-style', 'Verdana-style', 'Cambria-style', 'Classic serif'] as const;
+
+for (const font of FONTS) {
+  test(`export baseline: JPEG in ${font}`, async ({ page }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
+    });
+    await page.clock.setFixedTime(new Date('2026-11-20T10:00:00+05:30'));
+    await page.goto('/settings');
+    await page.getByRole('radio', { name: new RegExp(`^${font}`) }).check();
+    await createNotebookViaUi(page, 'Visual');
+    await description(page, 1).fill('Taxi to airport');
+    await amount(page, 1).fill('1280.75');
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      page.getByRole('article').getByRole('button', { name: 'Export JPEG' }).click(),
+    ]);
+    const { readFileSync } = await import('node:fs');
+    expect(readFileSync(await download.path())).toMatchSnapshot(
+      `export-${font.toLowerCase().replace(/\s+/g, '-')}.jpg`,
+      { maxDiffPixelRatio: 0.001 },
+    );
+  });
+}

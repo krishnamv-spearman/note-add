@@ -289,15 +289,15 @@ Phase 6 can be built in parallel with phase 5 once phase 4's Settings screen exi
 
 ### Tasks
 
-- [ ] **P5.1 Shared layout constants** (`features/export/layout.ts`): margins, line height, column widths, font sizes, as numbers used by the renderer and as CSS variables used by `Slip`, so both share proportions (arch §8.1).
-- [ ] **P5.2 `buildSlipModel(page, notebook, settings)`**: pure function using engine formatters; unit-tested (brackets, Indian grouping, "Page N" default title, flags).
-- [ ] **P5.3 `renderSlip(ctx, model)`**: Canvas 2D at 1080 × 1350 logical px; waits for `document.fonts.load` of the slip font and Work Sans; ruled lines, header, BF row, 10 lines with ellipsis truncation, total, footer "Made with Note-Add · spearman.in".
-- [ ] **P5.4 `toJpeg`**: `canvas.toBlob('image/jpeg', 0.92)`.
-- [ ] **P5.5 `toPdf`** (decided 22/11/2026, arch §8.2): pdf-lib draws the slip as **real selectable text** from the same `SlipModel` and layout constants, on a page with the slip's aspect ratio. The slip font (regular + bold), Work Sans and a Noto Sans Devanagari fallback are **embedded** from the bundled font files with `@pdf-lib/fontkit` (`subset: true`). Text runs are split by glyph coverage (EXP-12).
-- [ ] **P5.6 File names**: `<notebook>-<page title>-<DD-MM-YYYY>.pdf|.jpg`, unsafe characters replaced, capped at 100 characters; unit-tested.
-- [ ] **P5.7 `shareOrDownload`** (`platform/share.ts`, arch §8.3): `canShare` → `share`, `AbortError` silent, `NotAllowedError` → "Your file is ready" with a second-tap **Share** button; otherwise download.
-- [ ] **P5.8 Lazy loading**: export code and pdf-lib loaded with `import()` on first tap; a short "Preparing…" state.
-- [ ] **P5.9 Wire up buttons**: Export PDF / Export JPEG on page cards (enable the phase 3 placeholders) and in the editor.
+- [x] **P5.1 Shared layout constants** (`features/export/layout.ts`): margins, line height, column widths, font sizes, as numbers used by the renderer and as CSS variables used by `Slip`, so both share proportions (arch §8.1).
+- [x] **P5.2 `buildSlipModel(page, notebook, settings)`**: pure function using engine formatters; unit-tested (brackets, Indian grouping, "Page N" default title, flags).
+- [x] **P5.3 `renderSlip(ctx, model)`**: Canvas 2D at 1080 × 1350 logical px; waits for `document.fonts.load` of the slip font and Work Sans; ruled lines, header, BF row, 10 lines with ellipsis truncation, total, footer "Made with Note-Add · spearman.in".
+- [x] **P5.4 `toJpeg`**: `canvas.toBlob('image/jpeg', 0.92)`.
+- [x] **P5.5 `toPdf`** (decided 22/11/2026, arch §8.2): pdf-lib draws the slip as **real selectable text** from the same `SlipModel` and layout constants, on a page with the slip's aspect ratio. The slip font (regular + bold), Work Sans and a Noto Sans Devanagari fallback are **embedded** from the bundled font files with `@pdf-lib/fontkit` (`subset: true`). Text runs are split by glyph coverage (EXP-12).
+- [x] **P5.6 File names**: `<notebook>-<page title>-<DD-MM-YYYY>.pdf|.jpg`, unsafe characters replaced, capped at 100 characters; unit-tested.
+- [x] **P5.7 `shareOrDownload`** (`platform/share.ts`, arch §8.3): `canShare` → `share`, `AbortError` silent, `NotAllowedError` → "Your file is ready" with a second-tap **Share** button; otherwise download.
+- [x] **P5.8 Lazy loading**: export code and pdf-lib loaded with `import()` on first tap; a short "Preparing…" state.
+- [x] **P5.9 Wire up buttons**: Export PDF / Export JPEG on page cards (enable the phase 3 placeholders) and in the editor.
 
 ### Tests
 

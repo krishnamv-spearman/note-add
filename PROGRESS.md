@@ -12,7 +12,7 @@ Run started 22/11/2026. Owner decisions of 22/11/2026 applied to the docs first:
 | 2 Editor | ✅ done | 291 | 23 (+4 skipped) |
 | 3 Library | ✅ done | 321 | 55 (+8 skipped) |
 | 4 Look | ✅ done | 338 | 67 (+38 skipped) |
-| 5 Export | not started | | |
+| 5 Export | ✅ done | 362 | 73 (+62 skipped) |
 | 6 Backup | not started | | |
 
 (Counts are cumulative totals after the phase. E2E counts are tests × projects.)
@@ -123,6 +123,24 @@ Run started 22/11/2026. Owner decisions of 22/11/2026 applied to the docs first:
 
 ---
 
+## Phase 5 — Export (JPEG, PDF, share)
+
+**Built** (`src/features/export/`, `src/platform/share.ts`)
+- `layout.ts`: one set of layout constants (1080 × 1350 logical px, margins, row pitch, column widths, font sizes) for both renderers; PDF page 108 × 135 mm; shared `fitText` (ellipsis) and `wrapNotes` (notes on up to two lines).
+- `model.ts`: pure `buildSlipModel` using the engine formatters (same strings as the screen): notebook, title ("Page N" default), DD/MM/YYYY date, "Page 3 of 7", **Draft/Final label** (EXP-04), notes "Final since…", "Reopened on…", "Total updated from earlier page on…" (EXP-05), brought forward, 10 lines with flags, total, effective page colour, chosen font, footer "Made with Note-Add · spearman.in". `exportFileName`: `<notebook>-<page title>-<DD-MM-YYYY>.pdf|.jpg`, unsafe characters → "-", fallback name, trailing dots/spaces trimmed, reserved Windows names guarded, ≤ 100 characters.
+- **JPEG**: Canvas 2D renderer after `document.fonts.load` of the slip font and Work Sans; ruled lines, header, BF row, 10 lines with ellipsis, total, footer; `toBlob('image/jpeg', 0.92)`. Non-Latin scripts use the browser's fallback fonts.
+- **PDF (decided 22/11/2026)**: pdf-lib draws **real, selectable vector text** from the same model and constants. The slip font (regular + bold), Work Sans and Noto Sans Devanagari are **embedded as subsets** from the bundled WOFF files (fetched from the app's own origin). Every character goes to the first font in a fallback chain that has it; characters no bundled font covers (emoji) become `?` in the PDF only (EXP-12). Saved without object streams for wide viewer compatibility.
+- `shareOrDownload`: `canShare({files})` → `navigator.share`; `AbortError` → silent; `NotAllowedError` → "Your file is ready" with a second-tap **Share** button (`shareAgain`, which downloads if refused again); no share or unsupported type → `<a download>`.
+- `ExportControls` (Export PDF / Export JPEG with "Preparing…") on every page card and in the editor; the editor flushes pending typing first (EXP-07, SAV-06). The export code, pdf-lib and fontkit are a lazy chunk loaded on first tap; if it cannot load (offline before it was ever fetched) the message is "Export needs one online visit first…" (EXP-08).
+
+**Tests:** 362 unit tests (+24): `tests/unit/pdf.test.ts` builds real PDFs in Node from the bundled fonts and reads them back with pdfjs — **the extracted text equals the on-screen strings exactly, in reading order**, fonts are embedded (`/FontFile2`, `/BaseFont /Carlito-Regular-…`, no Helvetica/Times/Courier), each slip font embeds, Hindi uses the Devanagari fallback, emoji become `?`, long text gets an ellipsis, notes wrap, empty pages export; model, file-name and fitting tests; share logic with a mocked `navigator` (shared, cancelled, needs-tap → second tap, refused again → download, no share → download, unsupported type → download, other errors → download). E2E `export.spec.ts` (chromium, 6 tests): PDF download name, `%PDF`, **PDF text compared with strings read from the live page**, embedded fonts, no CSP violations; JPEG 1080 × 1350; Hindi/emoji/Arabic pixels drawn; page-card export; **emulated share menu** (file passed to `navigator.share`, NotAllowedError → "Your file is ready" → Share, AbortError silent); offline chunk message. 4 export baselines per font added to `visual.spec.ts` (CI Linux only).
+
+**Exit criteria**
+- ✅ Exports match the on-screen page on desktop: automated text equality for the PDF and pixel checks for the JPEG on chromium-desktop; the share-menu path is exercised in emulation.
+- ⚠️ "On phone": real share sheets cannot be automated → manual tests M5.1–M5.5.
+
+---
+
 ## Decisions to review
 
 | # | Phase | Decision | Why |
@@ -160,6 +178,14 @@ Run started 22/11/2026. Owner decisions of 22/11/2026 applied to the docs first:
 | D33 | 4 | Visual baselines (`visual.spec.ts`) run only when `CI` is set on Linux (DEV-03); none were created in this run. | Font rendering differs between Windows and Linux. → manual test M4.2. |
 | D34 | 4 | The long three-page keyboard e2e is marked `test.slow()` (3× time limit). It passes in 11 s alone but went over 45 s on WebKit with four parallel workers. No assertion changed. | Timeout under load, not a defect. |
 | D35 | 4 | P4.11 (minus-sign style) skipped: the §0.4 default "brackets only" stands. | Plan says skip unless decided yes. |
+| **D36** | **5** | **PDF fonts are embedded from the WOFF files with `subset: true`.** WOFF2 subsetting crashes fontkit for several of the fonts, and non-subset embedding would put WOFF bytes into the PDF (invalid). The WOFF files are separate assets fetched only at export time. | Tested every font × format × subset combination. |
+| **D37** | **5** | **Bundle budgets are exceeded (for phase 7 to fix):** initial JS is 152 KB gzip (budget 150 KB) and the lazy export chunk is 515 KB gzip (budget 250 KB) — fontkit brings its Unicode and shaping data. Options for phase 7: move the font registry's CSS imports out of the entry, trim React Router, or swap to a lighter subsetting path. | Not a phase 5 exit criterion; arch §14 makes it a phase 7 CI check. |
+| D38 | 5 | `regenerator-runtime` is loaded in the export chunk because fontkit's Indic shaper (Hindi text in PDFs) expects a global `regeneratorRuntime`; without it a Hindi description crashed the PDF export. | Found by the EXP-12 unit test. |
+| D39 | 5 | pdf-lib does not shape complex scripts fully: Hindi in the PDF is drawn with the Devanagari fallback font but conjuncts and vowel-sign positions may be simplified (the text stays selectable). The JPEG uses the browser's shaping. | Documented in arch §8.2. |
+| D40 | 5 | Header text (notebook name, title, date line, notes, footer) uses Work Sans and the lines/BF/total use the slip font, as on screen. Final pages also show "Final since DD/MM/YYYY" among the notes. | Matches the screen. |
+| D41 | 5 | Three or more notes wrap onto two lines; anything still too long gets an ellipsis. | Found by test: three notes did not fit one line. |
+| D42 | 5 | EXP-09 (canvas size limits on old iPhones) no longer applies: the PDF is vector, not a 2× raster; the JPEG canvas is 1.5 MP. Left ➕ for a manual check on an old iPhone. | Decision of 22/11/2026 removed the large PDF canvas. |
+| D43 | 5 | In e2e the download tests remove `navigator.share` to emulate a desktop without Web Share (Chromium on Windows has it). The share path is tested separately with a scripted `navigator.share`. | Deterministic; both paths covered. |
 | D21 | 2 | Previous/next page links were added to the editor header. | Needed to move between pages before the phase 3 pages list, and for "no browser back button" in installed mode (PWA-05). |
 | D22 | 2 | A test-only shim in `tests/setup/dom.ts` drops `AbortSignal` from `Request` because jsdom's signal is rejected by Node's `Request` in React Router data routers. | Test environment only; no app code affected. |
 
@@ -180,3 +206,8 @@ Run started 22/11/2026. Owner decisions of 22/11/2026 applied to the docs first:
 | M4.1 | 4 | Phone and desktop (test-plan §10.6 L1–L4): all 7 colours and 4 fonts look right and amounts line up; phone in dark mode keeps paper-coloured slips; largest system text size clips nothing; Windows High Contrast still shows the rows. |
 | M4.2 | 4 | After pushing, let CI (Linux) create the 7 slip baselines (`npx playwright test visual.spec.ts --update-snapshots` in CI or the Playwright Docker image), review the images and commit them. |
 | M4.3 | 4 | Settings › About: the spearman.in link opens in the browser, not inside the installed app (PWA-06). |
+| **M5.1** | **5** | **Android Chrome (browser and installed):** Export PDF → the share sheet opens → send to WhatsApp and to email → the PDF opens on the receiving device, text can be selected and searched, numbers match the screen (test-plan §10.7 E1). |
+| **M5.2** | **5** | **Android Chrome:** Export JPEG → share to email → the attachment opens, 1080 × 1350, matches the screen (E2). |
+| **M5.3** | **5** | **iPhone Safari, in Safari and installed to the home screen:** Export PDF and JPEG → the share sheet opens; if it does not open on the first tap, "Your file is ready" appears and its **Share** button opens the sheet (SHR-02, SHR-06). Cancelling the sheet shows no error (E5). |
+| **M5.4** | **5** | **Desktop Edge/Chrome on Windows and Safari on Mac:** note whether the system share sheet appears (SHR-05, acceptable) or the file downloads; either way the file name is `<notebook>-<title>-<DD-MM-YYYY>`. Firefox downloads (SHR-04). |
+| **M5.5** | **5** | Side by side, the export and the on-screen page for each of the 4 fonts and two colours (E4). Also a page with a Hindi description in the PDF (D39) and the oldest available iPhone (EXP-09). |

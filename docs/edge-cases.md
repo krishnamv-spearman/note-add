@@ -175,7 +175,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | LIF-12 | Custom title that clashes, for example a page titled "Page 5" that is page 3 | Allowed; it is the user's text | P2.3 | — | ✅ |
 | LIF-13 | Finalising every page | Draft section shows an empty state plus the "Add a new page" card; Archive expanded hint | P3.7 | C | ✅ |
 | LIF-14 | Any code path tries to change a Final page's lines, date, title or colour (`updateLine`, `updatePageHeader`, a stale autosave arriving after Mark Final) | Repository refuses; only the chain may change its brought forward and total | P3.3 | R | ✅ |
-| LIF-15 | Final page whose total was updated by an earlier page, then exported | Export shows the new total and the "Total updated…" note | P5.2 | U | ➕ |
+| LIF-15 | Final page whose total was updated by an earlier page, then exported | Export shows the new total and the "Total updated…" note | P5.2 | U | ✅ |
 | LIF-16 | Final page in a backup | Restores as Final with `finalisedOn`, `reopenedOn` and `totalUpdatedOn` intact | P6.4 | R | ➕ |
 | LIF-17 | Final page sits last, user presses New page | New Draft page appended with BF = the Final page's total | P2.10 | E | ✅ |
 | LIF-18 | Mark Final on a page with flagged (invalid) amounts | **Refused** (decided 22/11/2026): "2 amounts are not numbers. Fix them before marking this page Final." Enforced in the UI and in the repository | P3.3, P3.8 | R, C, E | ✅ decided |
@@ -231,7 +231,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | SAV-03 | Browser killed by the OS within the 400 ms window | At most the last unsaved keystrokes are lost; documented, accepted | P2.8 | — | ✅ |
 | SAV-04 | Save fails (storage full, database closed) | "Couldn't save — your typing is kept on screen" with Retry; local state kept | P2.8 | C | ✅ |
 | SAV-05 | Save rejected by the chain (over-limit) | Message names the page; local state kept for correction | P2.8 | C | ✅ |
-| SAV-06 | Export or Mark Final with a pending save | Flush first, then act | P5.9, P3.8 | C | ➕ |
+| SAV-06 | Export or Mark Final with a pending save | Flush first, then act | P5.9, P3.8 | C | ✅ |
 | SAV-07 | Database changes underneath the open editor (another tab, restore, recalculation from an edit elsewhere) | Brought forward updates live. Line fields take the new values only when the user has no unsaved edits on that page; otherwise see MTB-02 | P2.6 | C | ✅ |
 
 ## 9. Dates and time
@@ -291,23 +291,23 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 
 | ID | Scenario | Expected | Task | Test | Status |
 |---|---|---|---|---|---|
-| EXP-01 | Page with all lines empty | Exports normally | P5.3 | E | ➕ |
+| EXP-01 | Page with all lines empty | Exports normally | P5.3 | E | ✅ |
 | EXP-02 | Long descriptions | Ellipsis, same rule as on screen | P5.3 | U, E | ✅ |
-| EXP-03 | Hindi, emoji, right-to-left text | Rendered with browser fallback fonts | P5.3 | E | ✅ (RTL ➕) |
-| EXP-04 | Draft page exported | Shows a small "Draft" label so a recipient does not mistake it for final | P5.3 | E | ❓ |
-| EXP-05 | Final page with "Reopened on" or "Total updated…" notes | Notes included in a small line under the header | P5.3 | E | ❓ |
+| EXP-03 | Hindi, emoji, right-to-left text | Rendered with browser fallback fonts | P5.3 | E | ✅ |
+| EXP-04 | Draft page exported | Shows a small "Draft" label so a recipient does not mistake it for final | P5.3 | E | ✅ |
+| EXP-05 | Final page with "Reopened on" or "Total updated…" notes | Notes included in a small line under the header | P5.3 | E | ✅ |
 | EXP-06 | Page colour override and chosen font | Export uses the page's effective colour and the chosen font | P5.2 | U | ✅ |
-| EXP-07 | Export immediately after typing | Pending save flushed first; export matches the screen | P5.9 | E | ➕ |
-| EXP-08 | Export first used while offline, before the service worker has cached the export chunk (first visit) | Clear message "Export needs one online visit first"; no crash | P5.8 | E | ➕ |
+| EXP-07 | Export immediately after typing | Pending save flushed first; export matches the screen | P5.9 | E | ✅ |
+| EXP-08 | Export first used while offline, before the service worker has cached the export chunk (first visit) | Clear message "Export needs one online visit first"; no crash | P5.8 | E | ✅ |
 | EXP-09 | Canvas size limits on older iPhones | 2160 × 2700 PDF render (5.8 MP) stays under the iOS limit (~16.7 MP); tested on the oldest supported iPhone | P5.5 | M | ➕ |
 | EXP-10 | Fonts not loaded at draw time | `document.fonts.load` awaited before drawing | P5.3 | E | ✅ |
-| EXP-11 | PDF text | Real, selectable text drawn with pdf-lib, the bundled slip font and Work Sans embedded (subset). Extracted text matches the on-screen strings exactly (decided 22/11/2026) | P5.5 | U, E | ➕ |
-| EXP-12 | PDF text in a script the bundled slip fonts do not cover (Hindi) | Drawn with a bundled Noto Sans Devanagari fallback, embedded the same way; characters no bundled font covers (emoji) are replaced by `?` in the PDF only, never dropped silently from the JPEG | P5.5 | U | ➕ |
+| EXP-11 | PDF text | Real, selectable text drawn with pdf-lib, the bundled slip font and Work Sans embedded (subset). Extracted text matches the on-screen strings exactly (decided 22/11/2026) | P5.5 | U, E | ✅ |
+| EXP-12 | PDF text in a script the bundled slip fonts do not cover (Hindi) | Drawn with a bundled Noto Sans Devanagari fallback, embedded the same way; characters no bundled font covers (emoji) are replaced by `?` in the PDF only, never dropped silently from the JPEG | P5.5 | U | ✅ |
 | FN-01 | No title | File name uses "Page 3" | P5.6 | U | ✅ |
-| FN-02 | Name/title made only of unsafe characters | Falls back to `note-add-page-<DD-MM-YYYY>` | P5.6 | U | ➕ |
-| FN-03 | Windows reserved names (`CON`, `NUL`, `COM1`), trailing dots or spaces | Prefixed or trimmed so the file saves on Windows | P5.6 | U | ➕ |
+| FN-02 | Name/title made only of unsafe characters | Falls back to `note-add-page-<DD-MM-YYYY>` | P5.6 | U | ✅ |
+| FN-03 | Windows reserved names (`CON`, `NUL`, `COM1`), trailing dots or spaces | Prefixed or trimmed so the file saves on Windows | P5.6 | U | ✅ |
 | FN-04 | Very long notebook name and title | Capped at 100 characters, extension kept | P5.6 | U | ✅ |
-| FN-05 | Same page exported twice | Same name; the OS adds "(1)"; no app handling needed | — | — | ➕ (note) |
+| FN-05 | Same page exported twice | Same name; the OS adds "(1)"; no app handling needed | — | — | ✅ |
 
 ## 13. Share and download
 
@@ -450,8 +450,8 @@ All proposed defaults below were **accepted by the owner on 22/11/2026**, with t
 | DAT-07 | Meaning of "newest first" | ✅ |
 | SRC-04 | Search amounts? | ✅ |
 | LOOK-04 | Dark mode | ✅ |
-| EXP-04 | Mark Draft pages in exports? | Yes, a small "Draft" label |
-| EXP-05 | Include Reopened / Total-updated notes in exports? | Yes |
+| EXP-04 | Mark Draft pages in exports? | ✅ |
+| EXP-05 | Include Reopened / Total-updated notes in exports? | ✅ |
 | BAK-01 | Backup with no data | Disabled with a reason |
 | RES-14 | Undo creates its own safety backup? | Yes (undo is undoable) |
 | RES-15 | `lastBackupAt` after restore | Set to the file's `exportedAt`; excluded from the round-trip equality check |
