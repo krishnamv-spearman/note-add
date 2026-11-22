@@ -7,12 +7,10 @@
   --rule: #e8d96b;
   --error: #8a1c1c;
   --focus: #1f5fbf;
-  font-family:
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
+  --slip-font: Carlito, Calibri, system-ui, sans-serif;
+  --chrome-font: 'Work Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --row-h: 44px;
+  font-family: var(--chrome-font);
   color: var(--ink);
   background: var(--bg);
 }
@@ -178,16 +176,39 @@ span.nav-link {
   color: var(--ink-2);
 }
 
+/* Slip: the sticky-note surface (arch §7.4). --paper and --rule come from theme/colours.ts. */
 .slip {
-  background: var(--paper);
-  box-shadow: 0 6px 16px rgb(0 0 0 / 0.12);
+  display: block;
+  background-color: var(--paper, #fff4a3);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.08),
+    0 8px 18px rgb(0 0 0 / 0.12);
   padding: 0.75rem 1rem;
   margin: 0.75rem 0;
+  font-family: var(--slip-font);
+  color: var(--ink);
+}
+
+/* Faint ruled lines in the darker shade of the paper on decorative slips. */
+.slip-ruled.page-card-slip,
+.slip-ruled.font-preview {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(1.6em - 1px),
+    var(--rule) calc(1.6em - 1px),
+    var(--rule) 1.6em
+  );
+  line-height: 1.6em;
+}
+
+.editor-slip {
+  aspect-ratio: auto;
 }
 
 .row {
   display: grid;
-  grid-template-columns: 1fr minmax(7.5rem, 40%);
+  grid-template-columns: minmax(0, 1fr) minmax(9.75rem, 42%);
   gap: 0.5rem;
   align-items: center;
   min-height: 44px;
@@ -592,4 +613,121 @@ span.nav-link {
 .bottom-nav a.active {
   font-weight: 700;
   text-decoration: underline;
+}
+
+/* LOOK-06: ruled lines must stay visible in Windows High Contrast. */
+@media (forced-colors: active) {
+  .row,
+  .page-card-total {
+    border-bottom: 1px solid CanvasText;
+  }
+}
+
+/* FMT-08: the widest amount fits at 320 px. */
+@media (max-width: 360px) {
+  .app {
+    padding: 0 0.75rem 6rem;
+  }
+  .slip {
+    padding: 0.5rem;
+  }
+}
+
+.page-card-link {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.page-card-slip {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0.75rem;
+}
+
+.colour-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.field-label {
+  font-size: 0.875rem;
+  color: var(--ink-2);
+}
+
+.colour-dot-button {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ink-2);
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.colour-dot-button .colour-dot {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ink);
+}
+
+.font-choices {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.font-choice {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 56px;
+  padding: 0.25rem 0;
+  cursor: pointer;
+}
+
+.font-choice input {
+  width: 22px;
+  height: 22px;
+  margin: 11px;
+}
+
+.font-choice-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.font-choice-label {
+  font-size: 1.125rem;
+}
+
+.font-choice-note {
+  font-size: 0.875rem;
+  color: var(--ink-2);
+}
+
+.licences {
+  list-style: none;
+  padding: 0;
+}
+
+.privacy {
+  padding: 0.75rem;
+  border-left: 4px solid var(--ink-2);
+  background: #fff;
+}
+
+.settings section {
+  margin-bottom: 1.5rem;
 }

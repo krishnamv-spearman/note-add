@@ -30,6 +30,12 @@ npm run test:e2e     # end-to-end tests on the production build
 
 Static files on Vercel (`vercel.json` holds the SPA rewrite and security headers). The Vercel address will be recorded here once the project is linked (not done yet).
 
+## Fonts
+
+All fonts are bundled with the app (no network) and licensed under the SIL Open Font Licence: Carlito (Calibri-style, default), Atkinson Hyperlegible (Verdana-style), Caladea (Cambria-style), Merriweather (classic serif) for descriptions and amounts; Work Sans for the interface; Noto Sans Devanagari as a fallback inside exported PDFs.
+
+**Glyph check (LOOK-03):** every slip font has the digits, brackets, comma and full stop used in amounts. The rupee sign `₹` is included in Carlito, Merriweather and Work Sans but **not** in Atkinson Hyperlegible or Caladea; with those two fonts a `₹` typed in a description is drawn with the device's fallback font on screen. Amounts never show `₹`, so totals are unaffected. Hindi and other non-Latin descriptions use the device's fonts on screen.
+
 ## Licences
 
 Code: MIT (see `LICENSE`). Fonts: SIL Open Font Licence; each family's licence is in `public/fonts/LICENSES/`.

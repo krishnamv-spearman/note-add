@@ -22,7 +22,10 @@ import {
   updateLines,
   updatePageHeader,
 } from '@/db';
-import { ConfirmDialog } from '@/ui/Dialog';
+import { ColourPicker } from '@/ui/ColourPicker';
+import { ConfirmDialog, Dialog } from '@/ui/Dialog';
+import { Slip } from '@/ui/Slip';
+import { slipColour } from '@/theme/colours';
 import { DateField } from './DateField';
 import { EditingBar } from './EditingBar';
 import { EditorSession } from './EditorSession';
@@ -57,7 +60,8 @@ export function PageEditor({ notebook, page, pageCount }: Props) {
   const [hint, setHint] = useState<string | null>(null);
   const [titleDraft, setTitleDraft] = useState<string | null>(null);
   const [announced, setAnnounced] = useState(navState.announce ?? '');
-  const [dialog, setDialog] = useState<'final' | 'delete' | null>(null);
+  const [dialog, setDialog] = useState<'final' | 'delete' | 'colour' | null>(null);
+  const effectiveColour = page.colour ?? notebook.colour;
   const [lifecycleError, setLifecycleError] = useState<string | null>(null);
 
   const total = pageTotal(page.broughtForwardPaise, session.effectiveLines(snap));
@@ -241,6 +245,26 @@ export function PageEditor({ notebook, page, pageCount }: Props) {
             readOnly={readOnly}
             onChange={(date) => void updatePageHeader(page.id, { date })}
           />
+          <div className="colour-field">
+            <span className="field-label" aria-hidden="true">
+              Colour
+            </span>
+            <button
+              type="button"
+              className="colour-dot-button"
+              aria-label={`Page colour: ${slipColour(effectiveColour).label}${page.colour ? '' : ' (notebook colour)'}`}
+              disabled={readOnly}
+              onClick={() => setDialog('colour')}
+            >
+              <span
+                className="colour-dot"
+                style={{
+                  background: slipColour(effectiveColour).paper,
+                  borderColor: slipColour(effectiveColour).rule,
+                }}
+              />
+            </button>
+          </div>
           <div className="title-field">
             <label htmlFor="page-title">Title</label>
             <input
@@ -293,7 +317,7 @@ export function PageEditor({ notebook, page, pageCount }: Props) {
         </div>
       )}
 
-      <div className={`slip slip-${page.colour ?? notebook.colour}`}>
+      <Slip colour={effectiveColour} className="editor-slip">
         <div className="row bf-row">
           <span>Brought forward</span>
           <span
@@ -396,7 +420,7 @@ export function PageEditor({ notebook, page, pageCount }: Props) {
             {totalText}
           </span>
         </div>
-      </div>
+      </Slip>
 
       {hint && (
         <p className="hint" role="status">
@@ -442,6 +466,34 @@ export function PageEditor({ notebook, page, pageCount }: Props) {
           {finalBlocked}
         </p>
       )}
+      <Dialog
+        open={dialog === 'colour'}
+        title="Page colour"
+        onClose={() => setDialog(null)}
+        actions={
+          <>
+            <button
+              type="button"
+              className="button"
+              onClick={() => {
+                setDialog(null);
+                void updatePageHeader(page.id, { colour: null });
+              }}
+            >
+              Use notebook colour
+            </button>
+            <button type="button" className="button button-primary" onClick={() => setDialog(null)}>
+              Done
+            </button>
+          </>
+        }
+      >
+        <ColourPicker
+          value={effectiveColour}
+          legend="Colour for this page"
+          onChange={(colour) => void updatePageHeader(page.id, { colour })}
+        />
+      </Dialog>
       <ConfirmDialog
         open={dialog === 'final'}
         title={`Mark ${displayTitleOf(page)} as Final?`}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router';
-import { db } from '@/db';
+import { db, getSettings } from '@/db';
+import { applySlipFont } from '@/theme/fonts';
 import { hasIndexedDb } from '@/platform/storage';
 import { routes } from './routes';
 import './styles.css';
@@ -25,10 +26,12 @@ export function App({ router }: { router?: ReturnType<typeof createBrowserRouter
 
   useEffect(() => {
     if (!hasIndexedDb()) return;
-    db.open().then(
-      () => setBoot('ready'),
-      () => setBoot('failed'),
-    );
+    db.open()
+      .then(async () => {
+        applySlipFont((await getSettings()).font); // P4.10: before the first slip is painted
+        setBoot('ready');
+      })
+      .catch(() => setBoot('failed'));
   }, []);
 
   if (boot === 'failed') return <NoStorage />;

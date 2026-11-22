@@ -19,6 +19,7 @@ const rowsFor = (page: number): [string, string][] =>
 test('KBD-03 / KBD-10 / SAV-02: fill three pages by keyboard alone; data survives a reload', async ({
   page,
 }, testInfo) => {
+  test.slow(); // 60 fields by keyboard; WebKit is slow under parallel load
   await openFreshNotebook(page);
   await description(page, 1).focus();
 

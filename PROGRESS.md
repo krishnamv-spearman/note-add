@@ -11,7 +11,7 @@ Run started 22/11/2026. Owner decisions of 22/11/2026 applied to the docs first:
 | 1 Engine | ✅ done | 224 | 3 |
 | 2 Editor | ✅ done | 291 | 23 (+4 skipped) |
 | 3 Library | ✅ done | 321 | 55 (+8 skipped) |
-| 4 Look | not started | | |
+| 4 Look | ✅ done | 338 | 67 (+38 skipped) |
 | 5 Export | not started | | |
 | 6 Backup | not started | | |
 
@@ -103,6 +103,26 @@ Run started 22/11/2026. Owner decisions of 22/11/2026 applied to the docs first:
 
 ---
 
+## Phase 4 — Look, colours, fonts and settings
+
+**Built**
+- `theme/colours.ts`: the seven slips (paper + ruled) and the two inks, used by CSS, the colour pickers and (next phase) the exports. Contrast test: all 14 slip × ink pairs ≥ 4.5:1 (lowest lavender 8.96 / 6.65, as arch §5.7).
+- Fonts bundled from Fontsource (no network): Carlito, Atkinson Hyperlegible, Caladea, Merriweather (400 + 700) and Work Sans (400/500/600) as WOFF2 with per-subset `unicode-range`, `font-display: swap`; Noto Sans Devanagari added for the phase 5 PDF fallback. OFL licence for each family in `public/fonts/LICENSES/`, linked from Settings.
+- Glyph check with fontkit (LOOK-03): all slip fonts have digits, brackets, comma and full stop; `₹` is missing from Atkinson Hyperlegible and Caladea (falls back) — noted in the README.
+- `theme/fonts.ts` registry (label, family, fallback stack, preload URL); `applySlipFont` sets `--slip-font` and preloads only Work Sans and the selected slip font. Applied at boot after reading settings and before the router renders (no flash of the wrong font), and live when the setting changes.
+- `ui/Slip` (paper colour, rule colour, soft shadow, slip font; ruled background on decorative slips) used by the editor, page cards and the font preview. Notebook stack (thick border, offset second slip, shadow) vs "Add a new book" (thin border, no shadow, `+`).
+- Per-page colour override: colour dot in the editor header opens a picker with "Use notebook colour".
+- Chrome in Work Sans on an off-white background; 44 × 44 px targets; visible focus rings; `color-scheme: light`; forced-colours borders on rows (LOOK-06); tighter padding at ≤ 360 px so the widest amount fits at 320 px.
+- Settings: font picker (four choices, each shown in its own font, with a live preview slip; the choice is optimistic so the radio follows the tap at once), backup placeholder, About and privacy (version from `package.json`, "Made by Spearman" link opening outside the app, the spec §7 privacy statement, font licences).
+
+**Tests:** 338 unit tests (+17 colour/contrast). E2E: 67 passed + 38 skipped: `settings-font` (each font applies and persists after reload, font file actually loaded; About section) on all projects; `touch-targets` on pixel-7 and iphone-14 (every button, link, input and summary on every screen and in the new-notebook dialog ≥ 44 × 44); `layout-small` on chromium (320 px widest amounts in Atkinson, 200% text, dark mode, Hindi/emoji/Arabic descriptions). `visual.spec.ts` (7 colour baselines) runs only on CI Linux (DEV-03) and was skipped here.
+
+**Exit criteria**
+- ✅ Contrast test passes for all colours (14/14).
+- ✅ Font choice persists across reloads (all three projects).
+
+---
+
 ## Decisions to review
 
 | # | Phase | Decision | Why |
@@ -134,6 +154,12 @@ Run started 22/11/2026. Owner decisions of 22/11/2026 applied to the docs first:
 | D27 | 3 | The Archive `<details>` opens automatically when every page is Final (LIF-13 "Archive expanded hint"); otherwise it starts collapsed. | Spec: collapsed by default. |
 | D28 | 3 | Mark as Final uses `aria-disabled` (not `disabled`) while blocked, so the reason stays reachable by keyboard and screen readers; clicking it does nothing. | Accessible disabled state with an explanation. |
 | D29 | 3 | `src/theme/colours.ts` was created in phase 3 (plan: P4.1) because the colour picker needs the presets. | Single source from the start. |
+| D30 | 4 | Fonts come from the Fontsource npm packages (not vendored copies); Vite fingerprints and bundles them. All subsets are emitted into `dist/` but browsers fetch only the subsets a page needs. Phase 7 should limit the service-worker precache to latin and latin-ext. | Fewer binary files in git; exact versions are pinned. |
+| D31 | 4 | Editor ruled lines are per-row borders in the rule colour rather than one `repeating-linear-gradient`; the gradient is used on decorative slips (page cards, font preview). | Editor rows can grow when a message appears under a field, which would put a fixed gradient out of step. Borders also stay visible in forced colours (LOOK-06). |
+| D32 | 4 | LOOK-02 is partly done: every slip font has a similar system fallback stack (Calibri, Verdana, Cambria, Georgia…), but no `size-adjust` metric overrides were added. Left ➕ in edge-cases.md. | Metric-matched fallbacks need per-font measurements; low value while fonts are bundled and preloaded. |
+| D33 | 4 | Visual baselines (`visual.spec.ts`) run only when `CI` is set on Linux (DEV-03); none were created in this run. | Font rendering differs between Windows and Linux. → manual test M4.2. |
+| D34 | 4 | The long three-page keyboard e2e is marked `test.slow()` (3× time limit). It passes in 11 s alone but went over 45 s on WebKit with four parallel workers. No assertion changed. | Timeout under load, not a defect. |
+| D35 | 4 | P4.11 (minus-sign style) skipped: the §0.4 default "brackets only" stands. | Plan says skip unless decided yes. |
 | D21 | 2 | Previous/next page links were added to the editor header. | Needed to move between pages before the phase 3 pages list, and for "no browser back button" in installed mode (PWA-05). |
 | D22 | 2 | A test-only shim in `tests/setup/dom.ts` drops `AbortSignal` from `Request` because jsdom's signal is rejected by Node's `Request` in React Router data routers. | Test environment only; no app code affected. |
 
@@ -151,3 +177,6 @@ Run started 22/11/2026. Owner decisions of 22/11/2026 applied to the docs first:
 | M2.3 | 2 | Tablet with a physical keyboard: note whether the editing bar appears (see D17, KBD-12). |
 | M3.1 | 3 | On a phone and desktop (test-plan §10.5 C1–C5): fill 5 pages, change page 1, pages 2–5 update; mark page 3 Final, edit page 1, see "Total updated from earlier page on…"; Reopen page 3; delete Draft page 2 of 5; a large refund on page 1 shows brackets everywhere. |
 | M3.2 | 3 | Screen reader spot check of the dialogs (Mark as Final, Delete page, Delete notebook): focus moves in and returns to the button afterwards. |
+| M4.1 | 4 | Phone and desktop (test-plan §10.6 L1–L4): all 7 colours and 4 fonts look right and amounts line up; phone in dark mode keeps paper-coloured slips; largest system text size clips nothing; Windows High Contrast still shows the rows. |
+| M4.2 | 4 | After pushing, let CI (Linux) create the 7 slip baselines (`npx playwright test visual.spec.ts --update-snapshots` in CI or the Playwright Docker image), review the images and commit them. |
+| M4.3 | 4 | Settings › About: the spearman.in link opens in the browser, not inside the installed app (PWA-06). |

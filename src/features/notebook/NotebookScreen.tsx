@@ -16,6 +16,7 @@ import {
 } from '@/db';
 import { slipColour } from '@/theme/colours';
 import { StatusBadge } from '@/ui/bits';
+import { Slip } from '@/ui/Slip';
 import { ConfirmDialog } from '@/ui/Dialog';
 import { editorPath } from '../editor/PageEditor';
 import { NotebookDialog } from '../library/NewNotebookDialog';
@@ -27,25 +28,27 @@ function PageCard({ notebook, page }: { notebook: Notebook; page: Page }) {
   return (
     <li className="page-card">
       <Link to={editorPath(notebook.id, page.number)} className="page-card-link">
-        <span className="page-card-top">
-          <StatusBadge status={page.status} />
-          <span>{toDisplay(page.date)}</span>
-        </span>
-        <span className="page-card-title">{displayTitle(page)}</span>
-        {preview.map((l, i) => (
-          <span key={i} className="page-card-line">
-            <span>{l.description || '—'}</span>
-            <span className="amount">
-              {l.amountPaise === null ? l.amountText : formatPaise(l.amountPaise)}
+        <Slip as="span" colour={page.colour ?? notebook.colour} className="page-card-slip">
+          <span className="page-card-top">
+            <StatusBadge status={page.status} />
+            <span>{toDisplay(page.date)}</span>
+          </span>
+          <span className="page-card-title">{displayTitle(page)}</span>
+          {preview.map((l, i) => (
+            <span key={i} className="page-card-line">
+              <span>{l.description || '—'}</span>
+              <span className="amount">
+                {l.amountPaise === null ? l.amountText : formatPaise(l.amountPaise)}
+              </span>
+            </span>
+          ))}
+          <span className="page-card-total">
+            <span>Total</span>
+            <span className="amount" data-testid={`card-total-${page.number}`}>
+              {formatPaise(page.totalPaise)}
             </span>
           </span>
-        ))}
-        <span className="page-card-total">
-          <span>Total</span>
-          <span className="amount" data-testid={`card-total-${page.number}`}>
-            {formatPaise(page.totalPaise)}
-          </span>
-        </span>
+        </Slip>
       </Link>
       <span className="page-card-actions">
         <button type="button" className="button" disabled title="Coming soon">

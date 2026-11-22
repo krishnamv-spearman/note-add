@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router';
-import { onDbEvent } from '@/db';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { getSettings, onDbEvent } from '@/db';
+import { applySlipFont } from '@/theme/fonts';
 import { onTabMessage } from '@/platform/broadcast';
 import { BottomNav } from '@/ui/bits';
 import { useNewPage } from './features/newPage';
@@ -11,6 +13,11 @@ export function Layout() {
   const notice = (location.state as { notice?: string } | null)?.notice;
   const [updated, setUpdated] = useState(false);
   const newPage = useNewPage();
+  const font = useLiveQuery(async () => (await getSettings()).font, []);
+
+  useEffect(() => {
+    if (font) applySlipFont(font);
+  }, [font]);
 
   useEffect(() => onDbEvent(() => setUpdated(true)), []);
   // MTB-03: another tab restored a backup; reload (the editor flushes on pagehide).

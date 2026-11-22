@@ -257,16 +257,16 @@ Phase 6 can be built in parallel with phase 5 once phase 4's Settings screen exi
 
 ### Tasks
 
-- [ ] **P4.1 Colour tokens** (`theme/colours.ts`): the seven slips (paper + ruled) and the two inks, as the single source for CSS variables and the export renderer.
-- [ ] **P4.2 Contrast test** (`theme/colours.test.ts`): every slip × {ink, secondary ink} ≥ 4.5:1 using `engine/contrast.ts`. (Pre-check in arch §5.7: lowest is lavender at 8.96 and 6.65.)
-- [ ] **P4.3 Fonts.** Add WOFF2 files for Carlito, Atkinson Hyperlegible, Caladea, Merriweather (regular + bold each) and Work Sans (regular, medium, semibold), from Fontsource packages or vendored. `@font-face` with `font-display: swap`. Copy each family's `OFL.txt` to `public/fonts/LICENSES/`. Check each slip font renders digits, `₹`, brackets and comma; note any missing glyph in the README.
-- [ ] **P4.4 Font registry** (`theme/fonts.ts`): setting label, family name, files, preload flag. Preload Work Sans and the selected slip font only (arch §14).
-- [ ] **P4.5 `Slip` component** (arch §7.4): paper colour, ruled lines via `repeating-linear-gradient`, soft shadow, square-ish proportions, `--slip-font`. Use it in the editor, page cards and notebook stacks.
-- [ ] **P4.6 Notebook stack and "Add a new book" tile** styling: thick border and shadow vs thin border, no shadow and `+`.
-- [ ] **P4.7 Per-page colour override:** colour dot in the editor header; `null` inherits the notebook colour.
-- [ ] **P4.8 Chrome styling:** Work Sans, neutral off-white background, 44 × 44 px minimum on all interactive elements, visible focus rings.
-- [ ] **P4.9 Settings screen** (`features/settings/`): Font picker with four choices and a live preview slip; About and privacy (app version from `package.json`, "Made by Spearman" link to spearman.in, the privacy statement from spec §7). Placeholders for Backup/Restore.
-- [ ] **P4.10 Settings persistence:** `font` in the settings row; applied on app start before first paint to avoid a flash of the wrong font.
+- [x] **P4.1 Colour tokens** (`theme/colours.ts`): the seven slips (paper + ruled) and the two inks, as the single source for CSS variables and the export renderer.
+- [x] **P4.2 Contrast test** (`theme/colours.test.ts`): every slip × {ink, secondary ink} ≥ 4.5:1 using `engine/contrast.ts`. (Pre-check in arch §5.7: lowest is lavender at 8.96 and 6.65.)
+- [x] **P4.3 Fonts.** Add WOFF2 files for Carlito, Atkinson Hyperlegible, Caladea, Merriweather (regular + bold each) and Work Sans (regular, medium, semibold), from Fontsource packages or vendored. `@font-face` with `font-display: swap`. Copy each family's `OFL.txt` to `public/fonts/LICENSES/`. Check each slip font renders digits, `₹`, brackets and comma; note any missing glyph in the README.
+- [x] **P4.4 Font registry** (`theme/fonts.ts`): setting label, family name, files, preload flag. Preload Work Sans and the selected slip font only (arch §14).
+- [x] **P4.5 `Slip` component** (arch §7.4): paper colour, ruled lines via `repeating-linear-gradient`, soft shadow, square-ish proportions, `--slip-font`. Use it in the editor, page cards and notebook stacks.
+- [x] **P4.6 Notebook stack and "Add a new book" tile** styling: thick border and shadow vs thin border, no shadow and `+`.
+- [x] **P4.7 Per-page colour override:** colour dot in the editor header; `null` inherits the notebook colour.
+- [x] **P4.8 Chrome styling:** Work Sans, neutral off-white background, 44 × 44 px minimum on all interactive elements, visible focus rings.
+- [x] **P4.9 Settings screen** (`features/settings/`): Font picker with four choices and a live preview slip; About and privacy (app version from `package.json`, "Made by Spearman" link to spearman.in, the privacy statement from spec §7). Placeholders for Backup/Restore.
+- [x] **P4.10 Settings persistence:** `font` in the settings row; applied on app start before first paint to avoid a flash of the wrong font.
 - [ ] **P4.11 Minus-sign style** — only if decided "yes" in §0.4; otherwise skip.
 
 ### Tests

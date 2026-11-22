@@ -98,7 +98,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | FMT-05 | Output identical in every browser and Node | String-built, not `Intl`; `Intl` only a test cross-check | P1.3 | U | ✅ |
 | FMT-06 | Field shows formatted value on blur, raw text on focus | `1280.75` typed → `1,280.75` shown after blur → `1280.75` when focused again | P2.7 | C | ✅ |
 | FMT-07 | Negative page total | Total row shows brackets, same ink colour, no red | P2.5 | C | ✅ |
-| FMT-08 | Widest values fit at 320 px screen width (iPhone SE), with brackets, in the widest font (Atkinson) | No overflow or clipping in amount column or total row | P4.5 | E (320 px viewport) | ➕ |
+| FMT-08 | Widest values fit at 320 px screen width (iPhone SE), with brackets, in the widest font (Atkinson) | No overflow or clipping in amount column or total row | P4.5 | E (320 px viewport) | ✅ |
 
 ## 3. Totals and limits
 
@@ -191,7 +191,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | EDT-05 | Description longer than 120 characters (typed or pasted) | Cut at 120 with a short notice | P2.5 | C | ✅ |
 | EDT-06 | Pasting multi-line or tab-separated text (from a spreadsheet) into a description | Newlines and tabs become single spaces | P2.5 | C | ✅ |
 | EDT-07 | Description with only spaces | Trimmed to empty on save | P2.8 | C | ✅ |
-| EDT-08 | Emoji, Hindi, Tamil, Urdu or Arabic text in a description | Displayed with system font fallback; right-to-left text uses `dir="auto"` | P2.5, P4.3 | E | ➕ |
+| EDT-08 | Emoji, Hindi, Tamil, Urdu or Arabic text in a description | Displayed with system font fallback; right-to-left text uses `dir="auto"` | P2.5, P4.3 | E | ✅ |
 | EDT-09 | Date field format | Shown and typed as DD/MM/YYYY on every device. A native `<input type="date">` shows the device's locale format (MM/DD/YYYY on US-English phones), so use a text field with a DD/MM/YYYY mask plus an optional picker button | P2.5 | E | ✅ |
 | EDT-10 | Invalid date typed (`31/02/2026`, `00/01/2026`, `1/1/26`) | Message under the field; previous date kept | P2.5 | C | ✅ |
 | EDT-11 | Date cleared | Reverts to the previous date (a page always has a date) | P2.5 | C | ✅ |
@@ -201,7 +201,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | EDT-15 | Phone keyboard covers the focused line or the total row | Focused field scrolled into view above the keyboard and editing bar | P2.11 | M | ➕ |
 | EDT-16 | iPhone zooms in when an input is focused | All inputs use a font size of at least 16 px | P2.5 | M | ✅ |
 | EDT-17 | Browser autofill suggests values in amount fields | `autocomplete="off"`; no autocorrect or autocapitalise on amounts | P2.5 | C | ✅ |
-| EDT-18 | Page colour overridden, then notebook colour changed | Page keeps its override | P4.7 | R | ➕ |
+| EDT-18 | Page colour overridden, then notebook colour changed | Page keeps its override | P4.7 | R | ✅ |
 | EDT-19 | Final page | Inputs `readOnly` (text selectable, read by screen readers); Reopen visible; no editing bar | P3.8 | C | ✅ |
 
 ## 7. Keyboard navigation and new pages
@@ -281,8 +281,8 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | LOOK-01 | Ink and secondary ink on all seven slips | ≥ 4.5:1 (lowest: lavender 8.96 and 6.65) | P4.2 | U | ✅ |
 | LOOK-02 | Selected font not yet loaded, or font file fails | Falls back to a similar system stack; layout does not jump (`size-adjust` fallback) | P4.3 | E | ➕ |
 | LOOK-03 | A slip font lacks `₹` or another glyph | Checked per font in P4.3; missing glyphs fall back; noted in README | P4.3 | M | ✅ |
-| LOOK-04 | Device in dark mode | v1 is light only; `color-scheme: light` so form controls and scrollbars do not turn dark on paper-coloured slips | P4.8 | E (emulated) | ❓ |
-| LOOK-05 | Browser zoom 200% or Android "largest" text | Layout reflows; no clipped amounts or overlapping rows | P4.8, P7.7 | E | ➕ |
+| LOOK-04 | Device in dark mode | v1 is light only; `color-scheme: light` so form controls and scrollbars do not turn dark on paper-coloured slips | P4.8 | E (emulated) | ✅ |
+| LOOK-05 | Browser zoom 200% or Android "largest" text | Layout reflows; no clipped amounts or overlapping rows | P4.8, P7.7 | E | ✅ |
 | LOOK-06 | Windows High Contrast (forced colours) | Ruled lines (background gradients) disappear, so rows also get a border visible in forced colours | P4.5 | M | ➕ |
 | LOOK-07 | Draft/Final shown only by colour | Never; badges always carry text | P3.7 | C | ✅ |
 | LOOK-08 | Font chosen, then app reloaded | Applied before first paint, no flash | P4.10 | E | ✅ |
@@ -397,7 +397,7 @@ A backup made today may be restored years from now by a much newer app. arch §9
 | PWA-03 | New version deployed while the user is typing | Prompt only; on Reload, pending saves flush first | P7.2 | E | ✅ (flush ➕) |
 | PWA-04 | Update while a page is mid-export | Reload prompt waits until export finishes | P7.2 | C | ➕ |
 | PWA-05 | No browser back button in installed mode (iPhone standalone) | Every screen except the library has an in-app back control | P3.7, P3.8 | E | ✅ |
-| PWA-06 | spearman.in link in About, while installed | Opens in the browser (`target="_blank" rel="noopener"`), not inside the app | P4.9 | M | ➕ |
+| PWA-06 | spearman.in link in About, while installed | Opens in the browser (`target="_blank" rel="noopener"`), not inside the app | P4.9 | M | ✅ |
 | PWA-07 | Already installed | "Install app" button hidden; iPhone hint not shown | P7.5 | E | ✅ |
 | PWA-08 | iPad reports itself as a Mac | Detected through touch support as well as the user agent | P7.5 | U | ✅ |
 | PWA-09 | Hosted under `/note-add/` instead of a subdomain | Manifest scope, start URL, service worker scope and router base all follow `VITE_BASE`; e2e run once with the base set | P7.3 | E | ➕ |
@@ -421,7 +421,7 @@ A backup made today may be restored years from now by a much newer app. arch §9
 | SEC-05 | User text rendered as HTML | Never; React text nodes only; canvas text is inert | arch §11 | — | ✅ |
 | DEV-01 | Project path contains spaces and lives in OneDrive | All scripts quote paths; recommended move out of OneDrive (P0.0e) | P0.0e | — | ✅ |
 | DEV-02 | Windows line endings (CRLF) cause Prettier and lint churn | `.gitattributes` with `* text=auto eol=lf` | P0.11 | — | ✅ |
-| DEV-03 | Screenshot baselines differ between Windows and Linux font rendering | Baselines created and compared on CI Linux only (or in the Playwright Docker image) | P4, P5 | E | ➕ |
+| DEV-03 | Screenshot baselines differ between Windows and Linux font rendering | Baselines created and compared on CI Linux only (or in the Playwright Docker image) | P4, P5 | E | ✅ |
 | DEV-04 | Husky hooks on Windows (Git Bash vs PowerShell) | Hook scripts written in POSIX sh, run by Git for Windows; checked once on this machine | P0.10 | M | ✅ |
 
 ---
@@ -449,7 +449,7 @@ All proposed defaults below were **accepted by the owner on 22/11/2026**, with t
 | KBD-05 | Enter on line 10 of a completely empty page | ✅ |
 | DAT-07 | Meaning of "newest first" | ✅ |
 | SRC-04 | Search amounts? | ✅ |
-| LOOK-04 | Dark mode | Light only in v1 |
+| LOOK-04 | Dark mode | ✅ |
 | EXP-04 | Mark Draft pages in exports? | Yes, a small "Draft" label |
 | EXP-05 | Include Reopened / Total-updated notes in exports? | Yes |
 | BAK-01 | Backup with no data | Disabled with a reason |

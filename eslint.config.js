@@ -86,6 +86,10 @@ export default tseslint.config(
     rules: reactHooks.configs['recommended-latest'].rules,
   },
   { files: ['src/**/*.tsx'], ...jsxA11y.flatConfigs.recommended },
+  {
+    files: ['src/**/*.tsx'],
+    rules: { 'jsx-a11y/label-has-associated-control': ['error', { depth: 3 }] },
+  },
   // Architecture guard: the engine is pure (arch §3, §13.2).
   {
     files: ['src/engine/**/*.ts'],
