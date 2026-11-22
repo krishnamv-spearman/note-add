@@ -69,7 +69,7 @@ Table-driven: one row per input, expected result and edge-case ID. Must include 
 | Non-ASCII digits (accepted, decided 22/11/2026) | `४५०`, `４５０` | MON-25 |
 | Not numbers | `abc`, `12a`, `1.2.3`, `1e5`, `0x10`, `Infinity`, `NaN`, `1.5L`, `5k` | MON-23–24, 26 |
 | Decimals | `450.505`, `450.500`, `10.005` rejected (never rounded) | MON-05–06, RND-01 |
-| Limits | `99,99,99,999.99` ok; `100000000.00` rejected; same for negatives; 30-digit paste | MON-27–30 |
+| Limits | `99,99,99,999.99` ok; `1000000000.00` (one paisa over) rejected; same for negatives; 30-digit paste | MON-27–30 |
 | Paste junk | NBSP, thin space, zero-width space, LRM, BOM, trailing tab/newline | PST-01–03 |
 | Pasted formats | `(₹1,280.75)`, `-₹300`, `Rs.-300`, `450/-`; `450 only`, `1,280.75 Dr`, `1.234,56` invalid; `1,234.567` rejected | PST-04–11 |
 | Float traps | `0.29`, `1.15`, `4.35`, `8.20`, `19.99` → exact paise | RND-02 |
@@ -102,7 +102,7 @@ These compare the engine with an **independent reference** written separately in
 
 | Property | Generator | IDs |
 |---|---|---|
-| `parseAmount(formatPaise(x)) === x`, both styles | any integer in ±9,999,999,999 | MON-32 |
+| `parseAmount(formatPaise(x)) === x`, both styles | any integer in ±99,999,999,999 | MON-32 |
 | `pageSum` equals BigInt sum | 10 random amounts, some null | TOT-07 |
 | Sum of displayed line amounts (parsed back) + BF equals displayed total | random page | RND-04 |
 | Page N BF string equals page N−1 total string | random notebook, 1–300 pages | RND-05 |

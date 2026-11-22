@@ -247,7 +247,7 @@ The cache is only written by the repository's recalculation step (§6.1), inside
 ### 5.1 Representation
 
 - An amount is a JavaScript `number` that is always an integer number of paise, checked with `Number.isSafeInteger`.
-- The limit is ±99,99,99,999.99 rupees = **±9,999,999,999 paise** (about 10¹⁰). The largest intermediate sum on one page is 11 values within that limit, about 1.1 × 10¹¹, far below `Number.MAX_SAFE_INTEGER` (9 × 10¹⁵). So integer `number` arithmetic is exact and **BigInt is not needed**. Plain numbers also serialise to JSON and IndexedDB without conversion, which keeps backups simple.
+- The limit is ±99,99,99,999.99 rupees = **±99,999,999,999 paise** (about 10¹¹; corrected 22/11/2026, the earlier figure 9,999,999,999 was ₹9.99 crore). The largest intermediate sum on one page is 11 values within that limit, about 1.1 × 10¹², far below `Number.MAX_SAFE_INTEGER` (9 × 10¹⁵). So integer `number` arithmetic is exact and **BigInt is not needed**. Plain numbers also serialise to JSON and IndexedDB without conversion, which keeps backups simple.
 - A branded type `Paise` (`number & { __brand: 'Paise' }`) stops a raw number being passed where paise are expected; only `parseAmount` and the arithmetic helpers create it.
 
 ### 5.2 Parsing (`parseAmount`)
@@ -271,7 +271,7 @@ Rules, in order:
 5. More than 2 digits after the point, even trailing zeros (`450.500`) → `rejected: too-many-decimals` ("Up to 2 decimal places, for example 450.50"). **Nothing is ever rounded.**
 6. Check the length and the limit **on the digit string** before converting to a number, so a 30-digit paste cannot lose precision.
 7. Build paise from integer part × 100 + fractional part padded to 2 digits, using integer maths on digit strings. `-0` becomes `0`.
-8. Outside ±9,999,999,999 → `rejected: over-limit` ("Amounts must be under ₹99.99 crore").
+8. Outside ±99,999,999,999 paise → `rejected: over-limit` ("Amounts must be under ₹99.99 crore").
 
 The full list of accepted and refused inputs is in [edge-cases.md §1](edge-cases.md).
 
@@ -607,7 +607,7 @@ This is the summary; the full list of test suites, cases and the manual device c
 
 | Layer | Tool | What is covered | Phase |
 |---|---|---|---|
-| Engine: money | Vitest + fast-check | Parsing every input form in §5.2; formatting incl. `0.00`, `(0.05)`, `1,00,000.00`, `99,99,99,999.99`; limits at exactly ±9,999,999,999 and ±1 beyond; property test: `parse(format(x)) === x` for all valid x; property test: our sum equals a BigInt reference sum | 1 |
+| Engine: money | Vitest + fast-check | Parsing every input form in §5.2; formatting incl. `0.00`, `(0.05)`, `1,00,000.00`, `99,99,99,999.99`; limits at exactly ±99,999,999,999 paise and ±1 beyond; property test: `parse(format(x)) === x` for all valid x; property test: our sum equals a BigInt reference sum | 1 |
 | Engine: chain | Vitest + fast-check | 50-, 200- and 1000-page chains; edit page 1 of a 50-page notebook and check every later page; negatives; Final pages get `totalUpdatedOn`; over-limit anywhere in the chain is reported; delete + renumber | 1 |
 | Engine: dates, search, contrast | Vitest | DD/MM/YYYY round-trips, invalid dates; search matches; **contrast ≥ 4.5 for all 7 colours × 2 inks** | 1, 4 |
 | Repositories | Vitest + fake-indexeddb | `mutatePages` atomicity (a failing chain writes nothing); refusing to delete Final pages; activity trimming; backup → wipe → restore deep-equals original; safety backup + undo; schema migrations | 2, 3, 6 |

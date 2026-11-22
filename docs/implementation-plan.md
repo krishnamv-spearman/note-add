@@ -72,7 +72,7 @@ Phase 6 can be built in parallel with phase 5 once phase 4's Settings screen exi
 ### Prerequisites (one-time, on this machine and accounts)
 
 - [x] **P0.0a** **Node.js 26 LTS** (includes npm) is installed on this machine (confirmed 22/11/2026: `node -v` → v26.13.1, npm 11.20.0).
-- [ ] **P0.0b** Install **Git for Windows** if `git --version` fails; set `user.name` and `user.email`.
+- [x] **P0.0b** Install **Git for Windows** if `git --version` fails; set `user.name` and `user.email`.
 - [ ] **P0.0c** GitHub account with the `gh` CLI signed in (`gh auth login`), or create the repo in the browser.
 - [ ] **P0.0d** Vercel account (free Hobby plan), linked to GitHub.
 - [x] **P0.0e** Project folder decided (22/11/2026): `C:\Projects\AI Projects\002_Note-Add`, which is outside OneDrive. The path contains spaces, so every script quotes paths (DEV-01).
@@ -80,27 +80,27 @@ Phase 6 can be built in parallel with phase 5 once phase 4's Settings screen exi
 ### Tasks
 
 - [ ] **P0.1 Repository.** `git init`, create public GitHub repo `note-add`, add `LICENSE` (MIT suggested for the code; fonts keep their OFL), move `docs/` in.
-- [ ] **P0.2 Scaffold.** `npm create vite@latest` with the `react-ts` template. Pin exact versions in `package.json` (no `^`), commit `package-lock.json`. Set `"engines": { "node": ">=26" }` and add `.nvmrc` with `26`.
-- [ ] **P0.3 TypeScript strict.** `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitOverride`. Path alias `@/` → `src/`.
-- [ ] **P0.4 Folder skeleton** from arch §3, with an `index.ts` placeholder in each of `engine/`, `db/`, `features/`, `ui/`, `theme/`, `platform/`.
-- [ ] **P0.5 ESLint 9 flat config** with typescript-eslint (type-aware), react-hooks, jsx-a11y, and the **architecture guards** from arch §13.2:
+- [x] **P0.2 Scaffold.** `npm create vite@latest` with the `react-ts` template. Pin exact versions in `package.json` (no `^`), commit `package-lock.json`. Set `"engines": { "node": ">=26" }` and add `.nvmrc` with `26`.
+- [x] **P0.3 TypeScript strict.** `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitOverride`. Path alias `@/` → `src/`.
+- [x] **P0.4 Folder skeleton** from arch §3, with an `index.ts` placeholder in each of `engine/`, `db/`, `features/`, `ui/`, `theme/`, `platform/`.
+- [x] **P0.5 ESLint 9 flat config** with typescript-eslint (type-aware), react-hooks, jsx-a11y, and the **architecture guards** from arch §13.2:
   - `no-restricted-imports`: `src/engine/**` may not import `react`, `react-dom`, `dexie`, `@/ui`, `@/features`, `@/db`, `@/platform`.
   - `no-restricted-syntax`/`no-restricted-globals` in `src/engine/**` and `src/db/**`: ban `parseFloat`, `.toFixed(`, `Number.parseFloat`.
   - A deliberately broken sample file is used once to confirm each guard fires, then deleted.
-- [ ] **P0.6 Prettier** config and `format` / `format:check` scripts.
-- [ ] **P0.7 Vitest** configured (jsdom environment for `src/ui` and `src/features`, node for `src/engine`), with coverage via `@vitest/coverage-v8`. One trivial passing test.
-- [ ] **P0.8 Playwright** installed with three projects: `chromium-desktop`, `pixel-7` (Chromium), `iphone-14` (WebKit). `webServer` runs `npm run build && npm run preview`. One smoke test: the placeholder page loads and shows "Note-Add".
-- [ ] **P0.9 npm scripts** from arch §13.3: `dev`, `build`, `preview`, `lint`, `typecheck`, `test`, `test:e2e`, `format`.
-- [ ] **P0.10 Husky + lint-staged** pre-commit: lint-staged (eslint --fix, prettier) → `npm run typecheck` → `npm test`. Confirm it blocks a commit with a failing test.
-- [ ] **P0.11 `.gitignore`**: `node_modules/`, `dist/`, `.env*`, `coverage/`, `playwright-report/`, `test-results/`, `.vercel/`.
-- [ ] **P0.12 `CLAUDE.md`** with the rules in arch §13.1, plus: commands to run, folder map, and "read docs/architecture.md before changing a module".
-- [ ] **P0.13 GitHub Actions** `.github/workflows/ci.yml` (arch §13.4): Node 26 from `.nvmrc`, `npm ci` with cache, lint, typecheck, unit tests with coverage, build, Playwright with browser cache, upload report on failure. Runs on every push and PR.
-- [ ] **P0.14 Placeholder page:** "Note-Add — coming soon · Made by Spearman", in plain CSS, no external fonts.
-- [ ] **P0.15 `vercel.json`:** SPA rewrite plus **security headers including the CSP from arch §11, added now rather than in phase 7**, so any accidental third-party request fails from day one. (The CSP has no `'unsafe-inline'` for scripts, so the PWA plugin in phase 7 must register the service worker with a script file, not an inline script.)
-- [ ] **P0.15a Same headers in e2e** (SEC-02): `vite.config.ts` sets `preview.headers` from a shared headers file that `vercel.json` also uses, so Playwright runs under the real CSP.
-- [ ] **P0.15b `.gitattributes`** with `* text=auto eol=lf` (DEV-02).
+- [x] **P0.6 Prettier** config and `format` / `format:check` scripts.
+- [x] **P0.7 Vitest** configured (jsdom environment for `src/ui` and `src/features`, node for `src/engine`), with coverage via `@vitest/coverage-v8`. One trivial passing test.
+- [x] **P0.8 Playwright** installed with three projects: `chromium-desktop`, `pixel-7` (Chromium), `iphone-14` (WebKit). `webServer` runs `npm run build && npm run preview`. One smoke test: the placeholder page loads and shows "Note-Add".
+- [x] **P0.9 npm scripts** from arch §13.3: `dev`, `build`, `preview`, `lint`, `typecheck`, `test`, `test:e2e`, `format`.
+- [x] **P0.10 Husky + lint-staged** pre-commit: lint-staged (eslint --fix, prettier) → `npm run typecheck` → `npm test`. Confirm it blocks a commit with a failing test.
+- [x] **P0.11 `.gitignore`**: `node_modules/`, `dist/`, `.env*`, `coverage/`, `playwright-report/`, `test-results/`, `.vercel/`.
+- [x] **P0.12 `CLAUDE.md`** with the rules in arch §13.1, plus: commands to run, folder map, and "read docs/architecture.md before changing a module".
+- [x] **P0.13 GitHub Actions** `.github/workflows/ci.yml` (arch §13.4): Node 26 from `.nvmrc`, `npm ci` with cache, lint, typecheck, unit tests with coverage, build, Playwright with browser cache, upload report on failure. Runs on every push and PR.
+- [x] **P0.14 Placeholder page:** "Note-Add — coming soon · Made by Spearman", in plain CSS, no external fonts.
+- [x] **P0.15 `vercel.json`:** SPA rewrite plus **security headers including the CSP from arch §11, added now rather than in phase 7**, so any accidental third-party request fails from day one. (The CSP has no `'unsafe-inline'` for scripts, so the PWA plugin in phase 7 must register the service worker with a script file, not an inline script.)
+- [x] **P0.15a Same headers in e2e** (SEC-02): `vite.config.ts` sets `preview.headers` from a shared headers file that `vercel.json` also uses, so Playwright runs under the real CSP.
+- [x] **P0.15b `.gitattributes`** with `* text=auto eol=lf` (DEV-02).
 - [ ] **P0.16 Vercel project** linked to the repo: preview per branch, production from `main`. Record the `*.vercel.app` address in the README.
-- [ ] **P0.17 README** stub: what the app is, how to run it, links to docs.
+- [x] **P0.17 README** stub: what the app is, how to run it, links to docs.
 
 ### Tests
 
@@ -122,8 +122,8 @@ Phase 6 can be built in parallel with phase 5 once phase 4's Settings screen exi
 
 ### Tasks
 
-- [ ] **P1.1 Types and constants** (`engine/types.ts`, `engine/page.ts`): branded `Paise`, `IsoDate`, `Line`, `ChainInput`, `LINES_PER_PAGE = 10`, `MAX_PAISE = 9_999_999_999`, `MIN_PAISE = -9_999_999_999`. Helpers `addPaise`, `isWithinLimit`, both asserting `Number.isSafeInteger`.
-- [ ] **P1.2 `parseAmount`** (`engine/money.ts`), arch §5.2, string-only parsing. The full case list is edge-cases.md §1, §2 and §3 (`MON-*`, `PST-*`, `RND-*`). Test table at minimum:
+- [x] **P1.1 Types and constants** (`engine/types.ts`, `engine/page.ts`): branded `Paise`, `IsoDate`, `Line`, `ChainInput`, `LINES_PER_PAGE = 10`, `MAX_PAISE = 99_999_999_999`, `MIN_PAISE = -99_999_999_999` (₹99,99,99,999.99; corrected 22/11/2026 to match spec §5). Helpers `addPaise`, `isWithinLimit`, both asserting `Number.isSafeInteger`.
+- [x] **P1.2 `parseAmount`** (`engine/money.ts`), arch §5.2, string-only parsing. The full case list is edge-cases.md §1, §2 and §3 (`MON-*`, `PST-*`, `RND-*`). Test table at minimum:
 
   | Input | Result |
   |---|---|
@@ -139,16 +139,17 @@ Phase 6 can be built in parallel with phase 5 once phase 4's Settings screen exi
   | `'₹1,280.75'`, `'Rs. 1280.75'`, `'1,00,000'` | 128075, 128075, 10000000 |
   | `'450,50'` (comma as decimal) | invalid (never ₹45,050) |
   | `'450.505'` | rejected: too-many-decimals |
-  | `'99,99,99,999.99'` | 9999999999 |
-  | `'100000000.00'` (₹10 crore) | rejected: over-limit |
-  | `'-99,99,99,999.99'` | −9999999999 |
+  | `'99,99,99,999.99'` | 99999999999 |
+  | `'100000000.00'` (₹10 crore) | 10000000000 (within the limit) |
+  | `'1000000000.00'` (₹100 crore, one paisa over) | rejected: over-limit |
+  | `'-99,99,99,999.99'` | −99999999999 |
   | `'abc'`, `'12a'`, `'1.2.3'`, `'--5'`, `'1e5'`, `'0x10'`, `'Infinity'`, `'NaN'` | invalid |
   | `'0.1'` + `'0.2'` summed | exactly 30 paise |
 
-- [ ] **P1.3 `formatPaise`** (arch §5.3), string-based Indian grouping, brackets for negatives, `style` option (`'brackets'` default, `'minus'`). Tests: `0 → 0.00`, `5 → 0.05`, `-5 → (0.05)`, `100000 → 1,000.00`, `10000000 → 1,00,000.00`, `9999999999 → 99,99,99,999.99`, `-30000 → (300.00)`, minus style `-30000 → -300.00`. Cross-check against `Intl.NumberFormat('en-IN')` in one test.
-- [ ] **P1.4 Property tests** (fast-check): for every integer in the limit, `parseAmount(formatPaise(x))` gives `x` (both styles); for random lists of amounts, `pageSum` equals a BigInt reference sum.
-- [ ] **P1.5 `pageSum` / `pageTotal` / line flags** (`engine/page.ts`): `null` amounts count as 0; `isFlagged(line)` is true when `amountText` is non-empty and `amountPaise` is null.
-- [ ] **P1.6 `recalculateChain`** (`engine/chain.ts`, arch §5.4). Tests:
+- [x] **P1.3 `formatPaise`** (arch §5.3), string-based Indian grouping, brackets for negatives, `style` option (`'brackets'` default, `'minus'`). Tests: `0 → 0.00`, `5 → 0.05`, `-5 → (0.05)`, `100000 → 1,000.00`, `10000000 → 1,00,000.00`, `99999999999 → 99,99,99,999.99`, `-30000 → (300.00)`, minus style `-30000 → -300.00`. Cross-check against `Intl.NumberFormat('en-IN')` in one test.
+- [x] **P1.4 Property tests** (fast-check): for every integer in the limit, `parseAmount(formatPaise(x))` gives `x` (both styles); for random lists of amounts, `pageSum` equals a BigInt reference sum.
+- [x] **P1.5 `pageSum` / `pageTotal` / line flags** (`engine/page.ts`): `null` amounts count as 0; `isFlagged(line)` is true when `amountText` is non-empty and `amountPaise` is null.
+- [x] **P1.6 `recalculateChain`** (`engine/chain.ts`, arch §5.4). Tests:
   - Page 1 BF = 0; page N BF = total of N−1.
   - Chains of 50, 200 and 1000 pages; edit page 1 of a 50-page notebook and check every later BF and total to the paisa.
   - Negatives and refunds that bring a total below zero.
@@ -156,12 +157,12 @@ Phase 6 can be built in parallel with phase 5 once phase 4's Settings screen exi
   - `changedIds` lists only pages whose cached values actually changed.
   - Over-limit on page 40 caused by an edit on page 1 returns `error.pageNumber === 40`.
   - Totals exactly at ±MAX are allowed; one paisa beyond is an error.
-- [ ] **P1.7 `renumber`**: after deleting page 3 of 7, numbers are 1..6, and the chain is correct when re-run.
-- [ ] **P1.8 Dates** (`engine/dates.ts`, arch §5.5): `toDisplay`, `fromDisplay` (rejects 31/02/2026, 29/02/2027; accepts 29/02/2028), `toFileDate` (`DD-MM-YYYY`), `todayIso(clock)` with an injected clock. Test a date near midnight in a non-UTC zone (set `TZ` in the test) to prove local dates.
-- [ ] **P1.9 Search** (`engine/search.ts`, arch §5.6): `normalise` and `matches`; cases for notebook name, page title, the "Page N" default title, line description, accented text, multiple spaces, no match.
-- [ ] **P1.10 Contrast** (`engine/contrast.ts`, arch §5.7): `contrastRatio` against known WCAG reference pairs (black/white = 21). The full colour test is in phase 4, once `theme/colours.ts` exists.
-- [ ] **P1.11 Coverage gate:** 100% lines and branches for `src/engine/**` in the Vitest config; CI fails below it.
-- [ ] **P1.12 Engine README** (`src/engine/README.md`, short): public functions and the paise rule.
+- [x] **P1.7 `renumber`**: after deleting page 3 of 7, numbers are 1..6, and the chain is correct when re-run.
+- [x] **P1.8 Dates** (`engine/dates.ts`, arch §5.5): `toDisplay`, `fromDisplay` (rejects 31/02/2026, 29/02/2027; accepts 29/02/2028), `toFileDate` (`DD-MM-YYYY`), `todayIso(clock)` with an injected clock. Test a date near midnight in a non-UTC zone (set `TZ` in the test) to prove local dates.
+- [x] **P1.9 Search** (`engine/search.ts`, arch §5.6): `normalise` and `matches`; cases for notebook name, page title, the "Page N" default title, line description, accented text, multiple spaces, no match.
+- [x] **P1.10 Contrast** (`engine/contrast.ts`, arch §5.7): `contrastRatio` against known WCAG reference pairs (black/white = 21). The full colour test is in phase 4, once `theme/colours.ts` exists.
+- [x] **P1.11 Coverage gate:** 100% lines and branches for `src/engine/**` in the Vitest config; CI fails below it.
+- [x] **P1.12 Engine README** (`src/engine/README.md`, short): public functions and the paise rule.
 
 ### Exit criteria
 

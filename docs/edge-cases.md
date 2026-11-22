@@ -38,31 +38,31 @@ A summary of every ➕ and ❓ item, and the changes they imply for arch and pla
 | MON-03 | One decimal `450.5` | 45050 | P1.2 | U | ✅ |
 | MON-04 | Two decimals `1280.75` | 128075 | P1.2 | U | ✅ |
 | MON-05 | Three decimals `450.505` | Rejected: "Up to 2 decimal places, for example 450.50"; last valid value kept | P1.2, P2.7 | U, C | ✅ |
-| MON-06 | Trailing zeros beyond 2 places `450.500` | Rejected, same as MON-05 (simple, predictable rule) | P1.2 | U | ➕ |
+| MON-06 | Trailing zeros beyond 2 places `450.500` | Rejected, same as MON-05 (simple, predictable rule) | P1.2 | U | ✅ |
 | MON-07 | Leading point `.5` | 50 | P1.2 | U | ✅ |
 | MON-08 | Trailing point `450.` | 45000 | P1.2 | U | ✅ |
-| MON-09 | Leading zeros `007.50` | 750 | P1.2 | U | ➕ |
+| MON-09 | Leading zeros `007.50` | 750 | P1.2 | U | ✅ |
 | MON-10 | Zero forms `0`, `0.00`, `-0`, `-0.00` | 0, never negative zero; displays `0.00`, not `(0.00)` | P1.2, P1.3 | U | ✅ |
 | MON-11 | Negative `-300` | −30000; shown `(300.00)` | P1.2 | U | ✅ |
 | MON-12 | Brackets `(300.00)` | −30000 (so a copied display value parses back) | P1.2 | U | ✅ |
-| MON-13 | Leading plus `+300` | 30000 | P1.2 | U | ➕ |
-| MON-14 | Comma used as decimal separator `450,50` | **Invalid**, flagged. Commas are only accepted in valid Indian (`1,00,000`) or Western (`100,000`) grouping positions. Blindly stripping commas (as arch §5.2 currently says) would turn ₹450.50 into ₹45,050 | P1.2 | U | ➕ (arch §5.2 change) |
+| MON-13 | Leading plus `+300` | 30000 | P1.2 | U | ✅ |
+| MON-14 | Comma used as decimal separator `450,50` | **Invalid**, flagged. Commas are only accepted in valid Indian (`1,00,000`) or Western (`100,000`) grouping positions. Blindly stripping commas (as arch §5.2 currently says) would turn ₹450.50 into ₹45,050 | P1.2 | U | ✅ |
 | MON-15 | Valid Indian grouping `1,00,000` and Western `100,000` | Both 10000000 | P1.2 | U | ✅ |
-| MON-16 | Badly placed commas `1,0,0`, `10,00,0` | Invalid | P1.2 | U | ➕ |
-| MON-17 | Rupee sign and prefixes `₹1,280.75`, `Rs. 1280.75`, `rs 50`, `INR 50` | Prefix stripped; parsed normally | P1.2 | U | ✅ (`INR` ➕) |
-| MON-18 | Rupee sign alone `₹` | Invalid | P1.2 | U | ➕ |
-| MON-19 | Spaces inside digits `1 280` | Invalid (ambiguous) | P1.2 | U | ➕ |
-| MON-20 | Unicode minus `−300` (U+2212) or en dash `–300` (pasted from Excel/Word) | Treated as minus: −30000 | P1.2 | U | ➕ |
-| MON-21 | Both forms `-(300)` or `(-300)` | Invalid | P1.2 | U | ➕ |
-| MON-22 | Double minus `--5`, minus at end `5-` | Invalid | P1.2 | U | ✅ (`5-` ➕) |
+| MON-16 | Badly placed commas `1,0,0`, `10,00,0` | Invalid | P1.2 | U | ✅ |
+| MON-17 | Rupee sign and prefixes `₹1,280.75`, `Rs. 1280.75`, `rs 50`, `INR 50` | Prefix stripped; parsed normally | P1.2 | U | ✅ |
+| MON-18 | Rupee sign alone `₹` | Invalid | P1.2 | U | ✅ |
+| MON-19 | Spaces inside digits `1 280` | Invalid (ambiguous) | P1.2 | U | ✅ |
+| MON-20 | Unicode minus `−300` (U+2212) or en dash `–300` (pasted from Excel/Word) | Treated as minus: −30000 | P1.2 | U | ✅ |
+| MON-21 | Both forms `-(300)` or `(-300)` | Invalid | P1.2 | U | ✅ |
+| MON-22 | Double minus `--5`, minus at end `5-` | Invalid | P1.2 | U | ✅ |
 | MON-23 | Scientific / hex / special `1e5`, `0x10`, `Infinity`, `NaN` | Invalid | P1.2 | U | ✅ |
 | MON-24 | Letters mixed in `12a`, `1.2.3`, `abc` | Invalid; counts 0; flagged | P1.2 | U | ✅ |
 | MON-25 | Devanagari digits `४५०` or full-width digits `４５０` | Mapped to ASCII digits and parsed (Indian users on Hindi keyboards). Decided 22/11/2026 | P1.2 | U | ✅ decided |
-| MON-26 | Lakh/crore shorthand `1.5L`, `2cr`, `5k` | Invalid (no shorthand in v1) | P1.2 | U | ➕ |
-| MON-27 | Maximum `99,99,99,999.99` | 9999999999 | P1.2 | U | ✅ |
-| MON-28 | One paisa over `100000000.00` | Rejected: "Amounts must be under ₹99.99 crore" | P1.2 | U | ✅ |
+| MON-26 | Lakh/crore shorthand `1.5L`, `2cr`, `5k` | Invalid (no shorthand in v1) | P1.2 | U | ✅ |
+| MON-27 | Maximum `99,99,99,999.99` | 99999999999 paise (corrected 22/11/2026) | P1.2 | U | ✅ |
+| MON-28 | One paisa over: `1000000000.00` (₹100 crore; corrected 22/11/2026, was `100000000.00`, which is ₹10 crore and within the limit) | Rejected: "Amounts must be under ₹99.99 crore" | P1.2 | U | ✅ |
 | MON-29 | Minimum `-99,99,99,999.99`; one paisa under | Accepted; rejected | P1.2 | U | ✅ |
-| MON-30 | Very long digit string (30+ digits, or `0000…0001`) | Over-limit check happens on digit strings before any numeric conversion, so there is no precision loss; input field capped at 20 characters | P1.2, P2.7 | U | ➕ |
+| MON-30 | Very long digit string (30+ digits, or `0000…0001`) | Over-limit check happens on digit strings before any numeric conversion, so there is no precision loss; input field capped at 20 characters | P1.2, P2.7 | U | ✅ |
 | MON-31 | Classic float trap `0.1` + `0.2` | Exactly 30 paise | P1.2 | U | ✅ |
 | MON-32 | Round-trip: every valid paise value formatted then parsed | Same value, both display styles | P1.4 | U (property) | ✅ |
 
@@ -72,17 +72,17 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 
 | ID | Scenario | Expected | Task | Test | Status |
 |---|---|---|---|---|---|
-| PST-01 | Leading or trailing spaces, including non-breaking space (U+00A0), thin space (U+2009) and narrow no-break space (U+202F) | Trimmed; parsed normally | P1.2 | U | ➕ |
-| PST-02 | Invisible characters copied from WhatsApp or web pages: zero-width space (U+200B), left-to-right mark (U+200E), byte-order mark (U+FEFF) | Removed before parsing | P1.2 | U | ➕ |
-| PST-03 | Trailing newline or tab (one cell copied from Excel or Google Sheets) | Removed; parsed normally | P1.2 | U | ➕ |
+| PST-01 | Leading or trailing spaces, including non-breaking space (U+00A0), thin space (U+2009) and narrow no-break space (U+202F) | Trimmed; parsed normally | P1.2 | U | ✅ |
+| PST-02 | Invisible characters copied from WhatsApp or web pages: zero-width space (U+200B), left-to-right mark (U+200E), byte-order mark (U+FEFF) | Removed before parsing | P1.2 | U | ✅ |
+| PST-03 | Trailing newline or tab (one cell copied from Excel or Google Sheets) | Removed; parsed normally | P1.2 | U | ✅ |
 | PST-04 | Several cells or lines pasted into one amount (`450\t300`, `450\n300`) | Invalid, flagged; nothing is summed or split automatically | P1.2, P2.14 | U, C | ➕ |
-| PST-05 | Accounting negative with symbol `(₹1,280.75)` or `₹(1,280.75)` | −128075 | P1.2 | U | ➕ |
-| PST-06 | Symbol after the minus `-₹300`, `Rs.-300`, `₹-300` | −30000 | P1.2 | U | ➕ |
+| PST-05 | Accounting negative with symbol `(₹1,280.75)` or `₹(1,280.75)` | −128075 | P1.2 | U | ✅ |
+| PST-06 | Symbol after the minus `-₹300`, `Rs.-300`, `₹-300` | −30000 | P1.2 | U | ✅ |
 | PST-07 | Indian "only" suffix `450/-` or `₹ 450/-` (common on bills and in messages) | Suffix stripped: 45000. Decided 22/11/2026 | P1.2 | U | ✅ decided |
-| PST-08 | Word suffixes `450 only`, `450 INR`, `1.5 Cr`, `₹450.00 (paid)` | Invalid (no guessing) | P1.2 | U | ➕ |
-| PST-09 | Bank SMS style with trailing `Dr`/`Cr` (`1,280.75 Dr`) | Invalid; the user types the sign. Guessing debit/credit could flip a sign | P1.2 | U | ➕ |
-| PST-10 | Number with Western grouping and 3 decimals from a foreign invoice `1,234.567` | Rejected: too-many-decimals | P1.2 | U | ➕ |
-| PST-11 | European style `1.234,56` | Invalid (would otherwise read as ₹1.23456 or ₹123,456) | P1.2 | U | ➕ |
+| PST-08 | Word suffixes `450 only`, `450 INR`, `1.5 Cr`, `₹450.00 (paid)` | Invalid (no guessing) | P1.2 | U | ✅ |
+| PST-09 | Bank SMS style with trailing `Dr`/`Cr` (`1,280.75 Dr`) | Invalid; the user types the sign. Guessing debit/credit could flip a sign | P1.2 | U | ✅ |
+| PST-10 | Number with Western grouping and 3 decimals from a foreign invoice `1,234.567` | Rejected: too-many-decimals | P1.2 | U | ✅ |
+| PST-11 | European style `1.234,56` | Invalid (would otherwise read as ₹1.23456 or ₹123,456) | P1.2 | U | ✅ |
 | PST-12 | Paste of more than 20 characters into the amount field | Pasted text kept (not cut silently, which could drop digits), field marked invalid with "Too long" | P2.14 | C | ➕ |
 | PST-13 | Description pasted with an amount in it (`Taxi 450`) | Stays a description; amount not split out | P2.14 | C | ❓ |
 | PST-14 | Value copied from the app's own total row (`1,00,000.00` or `(300.00)`) pasted into a line | Parses back exactly | P1.2 | U | ✅ |
@@ -92,7 +92,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | ID | Scenario | Expected | Task | Test | Status |
 |---|---|---|---|---|---|
 | FMT-01 | 0, 5, −5 paise | `0.00`, `0.05`, `(0.05)` | P1.3 | U | ✅ |
-| FMT-02 | Each grouping boundary: 999.99, 1,000.00, 99,999.99, 1,00,000.00, 9,99,999.99, 10,00,000.00, 1,00,00,000.00 | Correct Indian grouping at every boundary | P1.3 | U | ➕ (boundaries) |
+| FMT-02 | Each grouping boundary: 999.99, 1,000.00, 99,999.99, 1,00,000.00, 9,99,999.99, 10,00,000.00, 1,00,00,000.00 | Correct Indian grouping at every boundary | P1.3 | U | ✅ |
 | FMT-03 | Maximum and minimum | `99,99,99,999.99`, `(99,99,99,999.99)` | P1.3 | U | ✅ |
 | FMT-04 | Minus style | `-300.00` | P1.3 | U | ✅ |
 | FMT-05 | Output identical in every browser and Node | String-built, not `Intl`; `Intl` only a test cross-check | P1.3 | U | ✅ |
@@ -104,12 +104,12 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 
 | ID | Scenario | Expected | Task | Test | Status |
 |---|---|---|---|---|---|
-| TOT-01 | All lines empty | Total = brought forward | P1.5 | U | ➕ |
+| TOT-01 | All lines empty | Total = brought forward | P1.5 | U | ✅ |
 | TOT-02 | Mix of valid, empty and invalid amounts | Invalid and empty count as 0; only invalid ones are flagged | P1.5 | U | ✅ |
 | TOT-03 | Description with no amount; amount with no description | Both allowed, neither flagged | P1.5, P2.7 | U, C | ✅ (second case ➕) |
-| TOT-04 | Each amount within limit but the page total over limit (10 × ₹99 crore) | Edit rejected with "This would make the page total more than ₹99.99 crore" | P1.6, P2.8 | U, C | ➕ |
+| TOT-04 | Each amount within limit but the page total over limit (10 × ₹99 crore) | Edit rejected with "This would make the page total more than ₹99.99 crore" | P1.6, P2.8 | U, C | ✅ |
 | TOT-05 | Total exactly at the limit | Allowed | P1.6 | U | ✅ |
-| TOT-06 | Negative total below −₹99.99 crore | Rejected the same way | P1.6 | U | ➕ |
+| TOT-06 | Negative total below −₹99.99 crore | Rejected the same way | P1.6 | U | ✅ |
 | TOT-07 | Totals near the limit summed across 11 values | No precision loss (all safe integers) | P1.4 | U (property) | ✅ |
 
 ### 3.1 Rounding
@@ -119,10 +119,10 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | ID | Scenario | Expected | Task | Test | Status |
 |---|---|---|---|---|---|
 | RND-01 | Third decimal place `10.005` | Rejected, **not** rounded to 10.01 or 10.00 | P1.2 | U | ✅ |
-| RND-02 | Values that break floating-point maths when multiplied by 100: `0.29`, `1.15`, `4.35`, `1.005`, `8.20`, `19.99` | Exactly 29, 115, 435, rejected, 820, 1999 paise (string-based parsing, never `x * 100`) | P1.2 | U | ➕ |
-| RND-03 | Sum of many awkward values (`0.10` × 10, `0.01` × 1000 across 100 pages) | Exactly 100 and 1000 paise | P1.4 | U (property) | ➕ |
-| RND-04 | The amounts shown on a page add up to the total shown | Always, for every page: property test over random pages comparing the sum of displayed strings (parsed back) with the displayed total | P1.4 | U (property) | ➕ |
-| RND-05 | Brought forward shown on page N equals the total shown on page N−1, digit for digit | Always | P1.6 | U, E | ➕ |
+| RND-02 | Values that break floating-point maths when multiplied by 100: `0.29`, `1.15`, `4.35`, `1.005`, `8.20`, `19.99` | Exactly 29, 115, 435, rejected, 820, 1999 paise (string-based parsing, never `x * 100`) | P1.2 | U | ✅ |
+| RND-03 | Sum of many awkward values (`0.10` × 10, `0.01` × 1000 across 100 pages) | Exactly 100 and 1000 paise | P1.4 | U (property) | ✅ |
+| RND-04 | The amounts shown on a page add up to the total shown | Always, for every page: property test over random pages comparing the sum of displayed strings (parsed back) with the displayed total | P1.4 | U (property) | ✅ |
+| RND-05 | Brought forward shown on page N equals the total shown on page N−1, digit for digit | Always | P1.6 | U, E | ✅ |
 | RND-06 | Total in the library, pages list, editor and export for the same page | Identical strings (all from `formatPaise`) | P3.5, P5.2 | E | ➕ |
 | RND-07 | Export (JPEG/PDF) | Uses the same formatted strings as the screen; no re-formatting | P5.2 | U | ✅ |
 | RND-08 | Backup file | Integers only; a restore never rounds a decimal, it refuses it (RES-07) | P6.3 | U | ✅ |
@@ -132,13 +132,13 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 
 | ID | Scenario | Expected | Task | Test | Status |
 |---|---|---|---|---|---|
-| CHN-01 | Notebook with one page | BF 0; total = page sum | P1.6 | U | ➕ |
+| CHN-01 | Notebook with one page | BF 0; total = page sum | P1.6 | U | ✅ |
 | CHN-02 | Edit page 1 of 50, 200, 1000 pages | Every later BF and total correct to the paisa | P1.6, P2.2 | U, R | ✅ |
 | CHN-03 | Edit on page 1 pushes page 40 over the limit | Whole edit rejected; message names page 40; nothing written | P1.6, P2.2 | U, R | ✅ |
 | CHN-04 | Final page whose BF changes | Total updates; "Total updated from earlier page on DD/MM/YYYY" shown | P1.6, P3.8 | U, E | ✅ |
-| CHN-05 | Final page whose BF changes and then changes back to the original value | Note stays (it records that a change happened), date updated to the latest change | P1.6 | U | ❓ |
+| CHN-05 | Final page whose BF changes and then changes back to the original value | Note stays (it records that a change happened), date updated to the latest change | P1.6 | U | ✅ |
 | CHN-06 | Edit that does not change any total (for example, editing a description) | No later page rewritten; `changedIds` contains only the edited page | P1.6 | U | ✅ |
-| CHN-07 | Editing an amount to the same value (retyping `450` as `450.00`) | No later page rewritten; no `totalUpdatedOn` set on Final pages | P1.6 | U | ➕ |
+| CHN-07 | Editing an amount to the same value (retyping `450` as `450.00`) | No later page rewritten; no `totalUpdatedOn` set on Final pages | P1.6 | U | ✅ |
 | CHN-08 | Reopen a Final page that has "Total updated…" | Note cleared on reopen and on re-finalising (the user has now reviewed it) | P3.3 | R | ❓ |
 | CHN-09 | Cached totals in the database disagree with a recomputation (bug or manual tampering) | Dev mode logs the mismatch; on load the chain is recomputed and corrected, with no silent change to amounts | arch §4.3 | R | ➕ |
 | CHN-10 | Stored page has the wrong number of lines (corrupt record) | Normalised on read to exactly 10 (pad with empty lines); never drop a line with content; log it | P2.16 | R | ➕ |
@@ -148,14 +148,14 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | ID | Scenario | Expected | Task | Test | Status |
 |---|---|---|---|---|---|
 | CHN-11 | Page 1 edited in one tab while page 50 is open in another | Page 50's brought forward and total update live, without reload | P2.15 | E | ➕ |
-| CHN-12 | Sign flipped on page 1 (`300` → `-300`) | Every later total drops by exactly 600.00 | P1.6 | U | ➕ |
-| CHN-13 | Amount on page 1 changed from valid to invalid text (`450` → `45o`) | Counts as 0 from then on; every later page drops by 450.00; the line is flagged | P1.6, P2.7 | U, C | ➕ |
+| CHN-12 | Sign flipped on page 1 (`300` → `-300`) | Every later total drops by exactly 600.00 | P1.6 | U | ✅ |
+| CHN-13 | Amount on page 1 changed from valid to invalid text (`450` → `45o`) | Counts as 0 from then on; every later page drops by 450.00; the line is flagged | P1.6, P2.7 | U, C | ✅ |
 | CHN-14 | Amount on page 1 changed to a rejected value (`450.505`) | Nothing changes anywhere; last valid value kept | P2.7 | C | ➕ |
 | CHN-15 | Fast typing on page 1 of a 200-page notebook | One recalculation per save (debounced), not per keystroke; each save within the 50 ms budget | P2.8, P7.8 | R | ➕ |
-| CHN-16 | Edit page 1 when later pages are a mix: Draft, Final, Draft, Final | Every page updates; only the Final ones get "Total updated…" | P1.6 | U | ➕ |
-| CHN-17 | Edit an early page, then delete a page between it and the end | Chain correct after both; renumbered pages keep their own lines | P1.7 | U | ➕ |
-| CHN-18 | Edit page 1 so that a later page's total becomes exactly 0 | Shows `0.00` (not `(0.00)`); no special case | P1.6 | U | ➕ |
-| CHN-19 | Reference check: chain computed by `recalculateChain` vs an independent simple loop with BigInt, over random notebooks with random edits | Identical for every page | P1.6 | U (property) | ➕ |
+| CHN-16 | Edit page 1 when later pages are a mix: Draft, Final, Draft, Final | Every page updates; only the Final ones get "Total updated…" | P1.6 | U | ✅ |
+| CHN-17 | Edit an early page, then delete a page between it and the end | Chain correct after both; renumbered pages keep their own lines | P1.7 | U | ✅ |
+| CHN-18 | Edit page 1 so that a later page's total becomes exactly 0 | Shows `0.00` (not `(0.00)`); no special case | P1.6 | U | ✅ |
+| CHN-19 | Reference check: chain computed by `recalculateChain` vs an independent simple loop with BigInt, over random notebooks with random edits | Identical for every page | P1.6 | U (property) | ✅ |
 
 ## 5. Page lifecycle: Final, Reopen, Delete
 
@@ -195,7 +195,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | EDT-09 | Date field format | Shown and typed as DD/MM/YYYY on every device. A native `<input type="date">` shows the device's locale format (MM/DD/YYYY on US-English phones), so use a text field with a DD/MM/YYYY mask plus an optional picker button | P2.5 | E | ➕ (arch §7 change) |
 | EDT-10 | Invalid date typed (`31/02/2026`, `00/01/2026`, `1/1/26`) | Message under the field; previous date kept | P2.5 | C | ➕ |
 | EDT-11 | Date cleared | Reverts to the previous date (a page always has a date) | P2.5 | C | ➕ |
-| EDT-12 | Year far in the past or future (`01/01/1850`, `01/01/2300`) | Accepted range 01/01/1900 to 31/12/2099 | P1.8 | U | ➕ |
+| EDT-12 | Year far in the past or future (`01/01/1850`, `01/01/2300`) | Accepted range 01/01/1900 to 31/12/2099 | P1.8 | U | ✅ |
 | EDT-13 | Title cleared | Saved as `null`; shown as "Page N" | P2.3 | C | ✅ |
 | EDT-14 | Title longer than 60 characters | Cut at 60 | P2.5 | C | ➕ |
 | EDT-15 | Phone keyboard covers the focused line or the total row | Focused field scrolled into view above the keyboard and editing bar | P2.11 | M | ➕ |
@@ -238,14 +238,14 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 
 | ID | Scenario | Expected | Task | Test | Status |
 |---|---|---|---|---|---|
-| DAT-01 | Leap years: `29/02/2028` valid, `29/02/2027` and `29/02/2100` invalid | As stated (2100 is not a leap year) | P1.8 | U | ✅ (2100 ➕) |
+| DAT-01 | Leap years: `29/02/2028` valid, `29/02/2027` and `29/02/2100` invalid | As stated (2100 is not a leap year) | P1.8 | U | ✅ |
 | DAT-02 | New page created just after midnight | Gets the new day's date | P1.8 | U | ✅ |
 | DAT-03 | App left open across midnight | New pages use the current date, not one cached at start-up | P2.3 | U | ➕ |
 | DAT-04 | User travels or changes time zone | Stored dates (`YYYY-MM-DD`) never shift | P1.8 | U (TZ set) | ✅ |
 | DAT-05 | Device clock wrong or moved backwards | Nothing crashes; reminder maths with a negative gap shows no banner | P6.7 | U | ➕ |
 | DAT-06 | Pages dated out of order (page 3 dated before page 2) | Allowed; order is by page number, never by date | P3.7 | — | ➕ (note) |
 | DAT-07 | "Newest first" in the pages list | Means highest page number first, not latest date | P3.7 | E | ❓ |
-| DAT-08 | Date tests on Windows dev machines | Time zone set through the Vitest config (`env: { TZ }`), not by changing `process.env.TZ` mid-test | P1.8 | U | ➕ |
+| DAT-08 | Date tests on Windows dev machines | Time zone set through the Vitest config (`env: { TZ }`), not by changing `process.env.TZ` mid-test | P1.8 | U | ✅ |
 
 ## 10. Notebooks, search and recent activity
 
@@ -263,11 +263,11 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | NB-10 | Malformed URL (`/n/xyz/p/abc`, `/n/…/p/0`, `/n/…/p/-1`) | Redirect, no crash | P2.4 | E | ➕ |
 | SRC-01 | Empty or whitespace-only query | Shows all notebooks (normal library) | P3.6 | C | ➕ |
 | SRC-02 | Case and accents (`cafe` finds `Café`) | Match | P1.9 | U | ✅ |
-| SRC-03 | Special characters `(`, `.`, `*`, `\` | Literal text match (no regular expressions) | P1.9 | U | ➕ |
+| SRC-03 | Special characters `(`, `.`, `*`, `\` | Literal text match (no regular expressions) | P1.9 | U | ✅ |
 | SRC-04 | Search for an amount (`450`) | Not matched (spec: names, titles, descriptions only); empty-state text says what is searched | P3.6 | C | ❓ |
 | SRC-05 | Default title "Page 3" | Matches "page 3" | P1.9 | U | ✅ |
 | SRC-06 | Matches on Archived (Final) pages | Included, with a Final badge | P3.6 | E | ➕ |
-| SRC-07 | Hindi or other non-Latin text | Matches after Unicode normalisation | P1.9 | U | ➕ |
+| SRC-07 | Hindi or other non-Latin text | Matches after Unicode normalisation | P1.9 | U | ✅ |
 | ACT-01 | Fewer than 5 entries, or none | Shows what exists; none → section hidden | P3.5 | C | ➕ |
 | ACT-02 | Line edits | Do not create activity entries (only lifecycle events) | P3.2 | R | ➕ |
 | ACT-03 | Notebook renamed after an entry was written | Old entry keeps the old name (pre-rendered text) | P3.2 | R | ✅ |
@@ -415,14 +415,14 @@ A backup made today may be restored years from now by a much newer app. arch §9
 | ID | Scenario | Expected | Task | Test | Status |
 |---|---|---|---|---|---|
 | SEC-01 | Any request to another origin | Blocked by the CSP; privacy e2e fails | P0.15, P7 | E | ✅ |
-| SEC-02 | E2E tests do not see the CSP because `vite preview` does not apply `vercel.json` headers | Preview server configured with the same headers (read from `vercel.json`) so e2e runs under the real CSP | P0.8, P0.15 | E | ➕ |
+| SEC-02 | E2E tests do not see the CSP because `vite preview` does not apply `vercel.json` headers | Preview server configured with the same headers (read from `vercel.json`) so e2e runs under the real CSP | P0.8, P0.15 | E | ✅ |
 | SEC-03 | Zod 4 uses `new Function` for speed, which the CSP (no `unsafe-eval`) blocks and reports | Turn on Zod's jitless mode at start-up | P6.1 | E | ➕ |
 | SEC-04 | Library code needing `eval` or inline scripts (pdf-lib, PWA registration) | Checked under the CSP in e2e; PWA registers by script file | P5.5, P7.1 | E | ✅ |
 | SEC-05 | User text rendered as HTML | Never; React text nodes only; canvas text is inert | arch §11 | — | ✅ |
 | DEV-01 | Project path contains spaces and lives in OneDrive | All scripts quote paths; recommended move out of OneDrive (P0.0e) | P0.0e | — | ✅ |
-| DEV-02 | Windows line endings (CRLF) cause Prettier and lint churn | `.gitattributes` with `* text=auto eol=lf` | P0.11 | — | ➕ |
+| DEV-02 | Windows line endings (CRLF) cause Prettier and lint churn | `.gitattributes` with `* text=auto eol=lf` | P0.11 | — | ✅ |
 | DEV-03 | Screenshot baselines differ between Windows and Linux font rendering | Baselines created and compared on CI Linux only (or in the Playwright Docker image) | P4, P5 | E | ➕ |
-| DEV-04 | Husky hooks on Windows (Git Bash vs PowerShell) | Hook scripts written in POSIX sh, run by Git for Windows; checked once on this machine | P0.10 | M | ➕ |
+| DEV-04 | Husky hooks on Windows (Git Bash vs PowerShell) | Hook scripts written in POSIX sh, run by Git for Windows; checked once on this machine | P0.10 | M | ✅ |
 
 ---
 
@@ -438,11 +438,11 @@ All proposed defaults below were **accepted by the owner on 22/11/2026**, with t
 
 | ID | Question | Decision |
 |---|---|---|
-| MON-25 | Accept Devanagari and full-width digits? | Yes, map to ASCII |
-| PST-07 | Accept the Indian "only" suffix `450/-`? | Yes, strip it |
+| MON-25 | Accept Devanagari and full-width digits? | ✅ |
+| PST-07 | Accept the Indian "only" suffix `450/-`? | ✅ |
 | PST-13 | Split a pasted "Taxi 450" into description and amount? | No; stays a description |
 | LIF-18 | Mark Final on a page with flagged amounts? | **Refused** until every amount is valid or empty |
-| CHN-05 | Final page total changes then changes back: keep the note? | Keep, with the latest date |
+| CHN-05 | Final page total changes then changes back: keep the note? | ✅ |
 | CHN-08 | Clear "Total updated…" on Reopen / re-Final? | Yes |
 | LIF-10 | Delete the only page of a notebook? | Not allowed; suggest deleting the notebook |
 | EDT-03 | Rejected amount, then the user leaves the field | Revert to the last valid value, with a short message |
