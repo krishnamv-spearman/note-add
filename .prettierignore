@@ -1,0 +1,9 @@
+dist
+coverage
+playwright-report
+test-results
+package-lock.json
+docs
+public
+tests/fixtures
+tests/e2e/__screenshots__

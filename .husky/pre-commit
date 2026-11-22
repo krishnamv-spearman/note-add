@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+# Pre-commit (arch 13.3): lint-staged, then type check, then unit tests. POSIX sh for Git for Windows (DEV-04).
+npx lint-staged
+npm run typecheck
+npm test
