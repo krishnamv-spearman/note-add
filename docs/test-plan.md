@@ -113,7 +113,8 @@ These compare the engine with an **independent reference** written separately in
 ### 4.6 Other engine suites
 
 - `dates.test.ts`: display ↔ ISO round trips, invalid dates (`31/02/2026`, `29/02/2027`, `29/02/2100`), leap years (`29/02/2028`), the 1900–2099 range, midnight near a day boundary in each test time zone. IDs DAT-01–04, EDT-10–12.
-- `search.test.ts`: names, titles, default "Page N" titles, descriptions, accents, Hindi, regex characters taken literally. IDs SRC-02–07.
+- `search.test.ts`: names, titles, default "Page N" titles, descriptions, accents, Latin Extended-A, regex characters taken literally. IDs SRC-02–07.
+- `text.test.ts` (decided 23/11/2026): English-only rule — Latin, accents, `₹` and punctuation kept; Devanagari, Arabic, emoji, CJK removed; invisible marks removed; combining accents composed; code point boundaries. IDs TXT-01–04.
 - `contrast.test.ts`: WCAG reference pairs (black on white = 21:1); then, in phase 4, all 7 slips × 2 inks ≥ 4.5:1 (LOOK-01).
 
 ---
@@ -145,7 +146,7 @@ Each test starts with a fresh database (`resetDb()`).
 | `PageEditor.save.test.tsx` | Debounce; flush on blur, `visibilitychange`, before Mark Final and Export; save failure keeps typing with Retry; external change while editing shows the notice | SAV-01–07, LIF-04, MTB-02 |
 | `PageEditor.a11y.test.tsx` | Labels; bracket amounts read as "minus … rupees"; throttled live total; new-page announcement | A11Y-01–04 |
 | `ConfirmDialog.test.tsx` | Focus in, trap, return; Escape closes | A11Y-05 |
-| `RestoreFlow.test.tsx` | Summary text; "older than your current notes" warning; cosmetic fallback notes | OLD-12, RES-09 |
+| `RestoreFlow.test.tsx` | Unsupported text refused (TXT-05); summary text; "older than your current notes" warning; cosmetic fallback notes | OLD-12, RES-09 |
 
 ---
 
@@ -172,7 +173,7 @@ Run against the **production build** served by `vite preview` with the **same he
 | `settings-font.spec.ts` | Each font applies and persists after reload | all | LOOK-08 | 4 |
 | `layout-small.spec.ts` | 320 px wide, widest font, `(99,99,99,999.99)` fits; 200% zoom reflows | chromium | FMT-08, LOOK-05 | 4 |
 | `touch-targets.spec.ts` | Every interactive element ≥ 44 × 44 px on every screen | pixel-7, iphone-14 | A11Y-07 | 4 |
-| `export.spec.ts` | PDF and JPEG download with correct names; PDF starts with `%PDF`; **PDF text is selectable and its extracted text matches the on-screen page**, fonts embedded; JPEG is 1080 × 1350; flush before export; Draft label; Hindi/emoji/RTL text renders | chromium | EXP-*, FN-*, SAV-06 | 5 |
+| `export.spec.ts` | PDF and JPEG download with correct names; PDF starts with `%PDF`; **PDF text is selectable and its extracted text matches the on-screen page**, fonts embedded; JPEG is 1080 × 1350; flush before export; Draft label; text with other scripts removed exports exactly as shown, no `?`, no fallback font (TXT-06) | chromium | EXP-*, FN-*, SAV-06 | 5 |
 | `backup-restore.spec.ts` | Create data → backup → clear site data → restore → everything back; undo; bad files refused; other tab reloads | chromium | BAK-*, RES-*, MTB-03 | 6 |
 | `old-backup.spec.ts` | Restore the committed v1 fixture through the real UI | chromium | OLD-01 | 6 |
 | `reminder.spec.ts` | `page.clock` at +31 days → banner; dismiss → hidden 30 days; empty notebook → no banner | chromium | REM-*, DAT-05 | 6 |
@@ -229,7 +230,7 @@ At least one of each. Note the exact model and OS version in the run record.
 | **D** | Windows laptop | Chrome or Edge, browser and installed |
 | **D2** (optional) | Mac | Safari |
 
-Keyboards to try on Android: Gboard and the phone maker's own keyboard (for example Samsung Keyboard). On both phones, also try Hindi input (Gboard Hindi, iOS Hindi).
+Keyboards to try on Android: Gboard and the phone maker's own keyboard (for example Samsung Keyboard). On both phones, also try a Hindi keyboard: Hindi letters are removed with "Only English text is supported for now" (decided 23/11/2026), and Devanagari digits in amounts still work.
 
 ### 10.2 How to run
 
@@ -248,7 +249,7 @@ Keyboards to try on Android: Gboard and the phone maker's own keyboard (for exam
 | M5 | `99,99,99,999.99` accepted; one more digit refused with the crore message; fits on screen | [ ] | [ ] | [ ] | [ ] | [ ] |
 | M6 | Paste an amount copied from a WhatsApp message (`₹1,280.75`) and from a bank SMS → correct or clearly flagged, never a wrong number | [ ] | [ ] | [ ] | [ ] | [ ] |
 | M7 | Paste `450,50` → flagged invalid (not ₹45,050) | [ ] | [ ] | [ ] | [ ] | [ ] |
-| M8 | Hindi keyboard: type a Hindi description, press Enter to confirm a word → focus does not jump | [ ] | [ ] | [ ] | [ ] | n/a |
+| M8 | Hindi keyboard: type a Hindi description → letters removed with the English-only message; confirm a word with Enter → focus does not jump; Devanagari digits in an amount are accepted | [ ] | [ ] | [ ] | [ ] | n/a |
 | M9 | iPhone zoom: focusing an input does not zoom the page | n/a | n/a | [ ] | [ ] | n/a |
 
 ### 10.4 Keyboard flow and pages (phase 2)

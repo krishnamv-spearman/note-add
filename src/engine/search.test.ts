@@ -24,7 +24,7 @@ const page = (
 const pages = [
   page('a1', 'n1', 1, null, ['Taxi to airport', 'Hotel']),
   page('a2', 'n1', 2, 'Return  journey', ['Auto (shared)']),
-  page('b1', 'n2', 1, null, ['Coffee', 'दूध']),
+  page('b1', 'n2', 1, null, ['Coffee', 'Łódź pierogi']),
   page('c1', 'n3', 1, 'Weekly shop', ['Rice 450']),
 ];
 
@@ -69,8 +69,9 @@ describe('search', () => {
     expect(search('\\', notebooks, pages)).toEqual([]);
   });
 
-  it('SRC-07: Hindi text matches', () => {
-    expect(search('दूध', notebooks, pages)[0]?.pageIds).toEqual(['b1']);
+  it('SRC-07: Latin Extended-A text matches regardless of case (English-only, decided 23/11/2026)', () => {
+    expect(search('ŁÓDŹ', notebooks, pages)[0]?.pageIds).toEqual(['b1']);
+    expect(search('PIEROGI', notebooks, pages)[0]?.pageIds).toEqual(['b1']);
   });
 
   it('SRC-01: blank query returns no hits (the UI shows the normal library)', () => {

@@ -16,7 +16,6 @@ const LICENCES: [string, string][] = [
   ['Caladea-OFL.txt', 'Caladea'],
   ['Merriweather-OFL.txt', 'Merriweather'],
   ['WorkSans-OFL.txt', 'Work Sans'],
-  ['NotoSansDevanagari-OFL.txt', 'Noto Sans Devanagari'],
 ];
 
 const SAMPLE: [string, string][] = [

@@ -146,6 +146,13 @@ describe('bad files are refused with their own message and change nothing', () =
     ['RES-08', 'page-number-gap.json', /not numbered 1, 2, 3/],
     ['RES-08', 'nine-lines.json', /invalid data \(data\.pages\.0\.lines\)/],
     ['RES-10', 'oversized-string.json', /invalid data \(data\.pages\.0\.lines\.5\.description\)/],
+    [
+      'TXT-05',
+      'unsupported-text-description.json',
+      /line 5 of page 6 in “Pune trip claims”\). Only English text is supported for now, so nothing was restored\./,
+    ],
+    ['TXT-05', 'unsupported-text-notebook-name.json', /notebook name “Trip 🚕”/],
+    ['TXT-05', 'unsupported-text-title.json', /title of page 3 in “Pune trip claims”/],
   ];
 
   it.each(cases)('%s: %s', async (_id, file, message) => {
@@ -199,6 +206,28 @@ describe('bad files are refused with their own message and change nothing', () =
     expect(r.ok).toBe(true);
     expect(({} as Record<string, unknown>).polluted).toBeUndefined();
     if (r.ok) expect(Object.getPrototypeOf(r.value.doc)).toBe(Object.prototype);
+  });
+
+  it('TXT-05: activity entries with unsupported text are left out with a note (cosmetic)', () => {
+    const doc = JSON.parse(VALID) as { data: { activity: unknown[] } };
+    doc.data.activity.push({ at: 1, kind: 'backup', notebookId: null, pageId: null, text: 'नोट' });
+    const r = inspectBackupText(JSON.stringify(doc));
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.value.notes).toContain(
+        'Some recent-activity entries could not be read and were left out.',
+      );
+      expect(r.value.doc.data.activity.some((a) => a.text === 'नोट')).toBe(false);
+    }
+  });
+
+  it('TXT-05: amount text with Devanagari digits is still accepted (amounts are unchanged)', () => {
+    const doc = JSON.parse(VALID);
+    const line = doc.data.pages[0].lines[0];
+    line.amountText = '४५०';
+    // keep the money consistent: the parsed value is what the editor stored
+    expect(typeof line.amountPaise).toBe('number');
+    expect(inspectBackupText(JSON.stringify(doc)).ok).toBe(true);
   });
 
   it('a restore over the money limit is refused', () => {

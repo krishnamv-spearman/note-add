@@ -5,3 +5,4 @@ export * from './chain';
 export * from './dates';
 export * from './search';
 export * from './contrast';
+export * from './text';

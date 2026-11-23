@@ -95,9 +95,9 @@ describe('file names (P5.6)', () => {
     expect(exportFileName(model('Trip', 'Airport'), 'jpg')).toBe('Trip-Airport-20-11-2026.jpg');
   });
 
-  it('NB-04: unsafe characters become "-"; emoji and spaces are kept', () => {
-    expect(exportFileName(model('a/b\\c:d*e?f"g<h>i|j', 'Taxi 🚕'), 'pdf')).toBe(
-      'a-b-c-d-e-f-g-h-i-j-Taxi 🚕-20-11-2026.pdf',
+  it('NB-04: unsafe characters become "-"; accented letters and spaces are kept', () => {
+    expect(exportFileName(model('a/b\\c:d*e?f"g<h>i|j', 'Taxi Łódź'), 'pdf')).toBe(
+      'a-b-c-d-e-f-g-h-i-j-Taxi Łódź-20-11-2026.pdf',
     );
   });
 

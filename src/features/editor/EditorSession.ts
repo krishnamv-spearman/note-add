@@ -1,4 +1,4 @@
-import { chainErrorMessage, type Line, type Paise } from '@/engine';
+import { chainErrorMessage, type Line, type Paise, UNSUPPORTED_TEXT_MESSAGE } from '@/engine';
 import type { LinePatch, RepoResult } from '@/db';
 import { requestPersistenceOnce } from '@/platform/storage';
 import {
@@ -131,9 +131,9 @@ export class EditorSession {
 
   setDescription(i: number, text: string): void {
     if (this.readOnly) return;
-    const { text: clean, cut } = cleanDescription(text);
+    const { text: clean, cut, removed } = cleanDescription(text);
     this.setLine(i, { ...(this.snap.lines[i] as LocalLine), description: clean });
-    this.setMessage(i, cut ? 'Cut to 120 characters' : null);
+    this.setMessage(i, removed ? UNSUPPORTED_TEXT_MESSAGE : cut ? 'Cut to 120 characters' : null);
   }
 
   setAmount(i: number, text: string): void {

@@ -47,18 +47,34 @@ test('LOOK-04: dark mode keeps paper-coloured slips and light form controls', as
   await expect(amount(page, 1)).toHaveCSS('color-scheme', 'light');
 });
 
-test('EDT-08: Hindi, emoji and Arabic descriptions display and survive a reload', async ({
+test('TXT-01 / TXT-02: other scripts and emoji are removed from descriptions, titles and names, with a message', async ({
   page,
 }) => {
-  await createNotebookViaUi(page, 'Scripts');
-  await description(page, 1).fill('दूध और ब्रेड');
-  await description(page, 2).fill('Taxi 🚕');
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Add a new book' }).click();
+  await page.getByRole('textbox', { name: 'Name' }).fill('Trip 🚕');
+  await expect(page.getByText('Only English text is supported for now')).toBeVisible();
+  await expect(page.getByRole('textbox', { name: 'Name' })).toHaveValue('Trip ');
+  await page.getByRole('button', { name: 'Create' }).click();
+  await expect(page.getByRole('heading', { name: 'Page 1 of 1' })).toBeVisible();
+
+  // Typed character by character (keyboard) and pasted (fill).
+  await description(page, 1).focus();
+  await page.keyboard.type('Tea चाय');
+  await expect(description(page, 1)).toHaveValue('Tea ');
+  await expect(page.getByText('Only English text is supported for now')).toBeVisible();
+  await description(page, 2).fill('Café ₹50 — Łódź');
   await description(page, 3).fill('قهوة');
-  await description(page, 3).blur();
+  await expect(description(page, 3)).toHaveValue('');
+  await page.getByRole('textbox', { name: 'Title' }).fill('Airport 🛫 run');
+  await expect(page.getByRole('textbox', { name: 'Title' })).toHaveValue('Airport  run');
+  await description(page, 4).focus();
   await expect(page.getByText('Saved')).toBeVisible();
+
   await page.reload();
-  await expect(description(page, 1)).toHaveValue('दूध और ब्रेड');
-  await expect(description(page, 2)).toHaveValue('Taxi 🚕');
-  await expect(description(page, 3)).toHaveValue('قهوة');
-  await expect(description(page, 3)).toHaveAttribute('dir', 'auto');
+  await expect(description(page, 1)).toHaveValue('Tea '); // descriptions are not trimmed (EDT-07)
+  await expect(description(page, 2)).toHaveValue('Café ₹50 — Łódź');
+  await expect(description(page, 3)).toHaveValue('');
+  await expect(page.getByRole('textbox', { name: 'Title' })).toHaveValue('Airport run');
+  await expect(page.getByRole('link', { name: '‹ Trip' })).toBeVisible();
 });

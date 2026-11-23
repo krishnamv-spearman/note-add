@@ -1,4 +1,4 @@
-import { type Paise, ZERO } from '@/engine';
+import { filterSupportedText, type Paise, ZERO } from '@/engine';
 import { newId, now } from '../clock';
 import { db } from '../schema';
 import { type ColourId, DEFAULT_COLOUR, type Notebook, NOTEBOOK_NAME_MAX } from '../types';
@@ -6,7 +6,7 @@ import { appendActivity } from './activity';
 import { loadPages, newPage, type RepoResult } from './pages';
 
 export function cleanNotebookName(name: string): string {
-  return name.replace(/\s+/g, ' ').trim().slice(0, NOTEBOOK_NAME_MAX);
+  return filterSupportedText(name).text.replace(/\s+/g, ' ').trim().slice(0, NOTEBOOK_NAME_MAX);
 }
 
 /** Creates a notebook with page 1, so the user lands on a usable page (arch §6.2). */

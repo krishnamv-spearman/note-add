@@ -4,6 +4,7 @@ import {
   countFlagged,
   displayTitle,
   emptyLine,
+  filterSupportedText,
   emptyLines,
   isValidIso,
   type IsoDate,
@@ -167,7 +168,10 @@ export async function updateLines(
   }
   return editPage(pageId, (page) => {
     const lines = [...page.lines];
-    for (const { index, line } of patches) lines[index] = { ...line };
+    // English-only descriptions (decided 23/11/2026), enforced here too.
+    for (const { index, line } of patches) {
+      lines[index] = { ...line, description: filterSupportedText(line.description).text };
+    }
     return { ...page, lines };
   });
 }
@@ -190,7 +194,10 @@ export async function updatePageHeader(pageId: string, patch: HeaderPatch): Prom
     const next = { ...page };
     if (patch.date !== undefined) next.date = patch.date;
     if (patch.title !== undefined) {
-      const title = (patch.title ?? '').replace(/\s+/g, ' ').trim().slice(0, TITLE_MAX);
+      const title = filterSupportedText(patch.title ?? '')
+        .text.replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, TITLE_MAX);
       next.title = title === '' ? null : title;
     }
     if (patch.colour !== undefined) next.colour = patch.colour;

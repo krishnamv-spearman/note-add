@@ -191,7 +191,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | EDT-05 | Description longer than 120 characters (typed or pasted) | Cut at 120 with a short notice | P2.5 | C | ✅ |
 | EDT-06 | Pasting multi-line or tab-separated text (from a spreadsheet) into a description | Newlines and tabs become single spaces | P2.5 | C | ✅ |
 | EDT-07 | Description with only spaces | Trimmed to empty on save | P2.8 | C | ✅ |
-| EDT-08 | Emoji, Hindi, Tamil, Urdu or Arabic text in a description | Displayed with system font fallback; right-to-left text uses `dir="auto"` | P2.5, P4.3 | E | ✅ |
+| EDT-08 | Emoji, Hindi, Tamil, Urdu or Arabic text typed or pasted into a description | **Changed 23/11/2026 (v1 is English only):** the characters are removed and "Only English text is supported for now" is shown under the field; see TXT-01–02 | P2.5, P4.3 | C, E | ✅ |
 | EDT-09 | Date field format | Shown and typed as DD/MM/YYYY on every device. A native `<input type="date">` shows the device's locale format (MM/DD/YYYY on US-English phones), so use a text field with a DD/MM/YYYY mask plus an optional picker button | P2.5 | E | ✅ |
 | EDT-10 | Invalid date typed (`31/02/2026`, `00/01/2026`, `1/1/26`) | Message under the field; previous date kept | P2.5 | C | ✅ |
 | EDT-11 | Date cleared | Reverts to the previous date (a page always has a date) | P2.5 | C | ✅ |
@@ -203,6 +203,19 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | EDT-17 | Browser autofill suggests values in amount fields | `autocomplete="off"`; no autocorrect or autocapitalise on amounts | P2.5 | C | ✅ |
 | EDT-18 | Page colour overridden, then notebook colour changed | Page keeps its override | P4.7 | R | ✅ |
 | EDT-19 | Final page | Inputs `readOnly` (text selectable, read by screen readers); Reopen visible; no editing bar | P3.8 | C | ✅ |
+
+### 6.1 English-only text (decided 23/11/2026)
+
+| ID | Scenario | Expected | Task | Test | Status |
+|---|---|---|---|---|---|
+| TXT-01 | Latin text with accents, `₹` and common punctuation (`Café ₹50 — Łódź`, curly quotes, …) | Kept unchanged; no message | engine/text.ts | U, C, E | ✅ |
+| TXT-02 | Devanagari, Arabic, emoji, CJK, Cyrillic or Greek typed or pasted into a description, page title or notebook name | Those characters are removed; "Only English text is supported for now" under the field; the rest is kept and saved | editor, title, name dialog, repository | U, R, C, E | ✅ |
+| TXT-03 | Invisible or unsupported marks (zero-width space, soft hyphen, `ŉ`, Unicode hyphens) | Removed | engine/text.ts | U | ✅ |
+| TXT-04 | A letter typed with a combining accent (`e` + U+0301) | Composed to `é` and kept; no message | engine/text.ts | U | ✅ |
+| TXT-05 | Restore a backup whose notebook name, page title or description has unsupported characters | **Refused** with a message naming where ("Only English text is supported for now, so nothing was restored"); activity entries with such text are left out with a note. Amount text with Devanagari digits stays accepted | P6.3 | R, C | ✅ |
+| TXT-06 | Export after characters were removed | PDF text equals the field text exactly, no `?`, only the slip font and Work Sans embedded; JPEG draws the text | P5.5 | U, E | ✅ |
+| TXT-07 | Glyph coverage | Every allowed character has a glyph in each export font chain (each slip font, regular and bold, then Work Sans) | P5.5 | U | ✅ |
+| TXT-08 | Amount fields | Unchanged: Devanagari and full-width digits accepted and mapped to ASCII (MON-25) | P1.2 | U, C | ✅ |
 
 ## 7. Keyboard navigation and new pages
 
@@ -254,7 +267,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | NB-01 | Name empty or only spaces | Rejected: "Give the notebook a name" | P3.1 | U, C | ✅ |
 | NB-02 | Name over 60 characters | Cut at 60 | P3.1 | C | ✅ |
 | NB-03 | Two notebooks with the same name | Allowed (colour tells them apart) | P3.1 | R | ✅ |
-| NB-04 | Name with emoji or characters unsafe in file names (`/ \ : * ?`) | Allowed; sanitised only in export file names | P3.1, P5.6 | U | ✅ |
+| NB-04 | Name with characters unsafe in file names (`/ \ : * ?`) | Allowed; sanitised only in export file names. Emoji and other scripts are removed (TXT-02) | P3.1, P5.6 | U | ✅ |
 | NB-05 | No notebooks yet | Library shows only "Add a new book" and a one-line hint; bottom-nav New page opens the create dialog | P3.4, P3.5 | E | ✅ |
 | NB-06 | "New page" when the last opened notebook has been deleted | Falls back to the most recently updated notebook; if none, the create dialog | P3.4 | C | ✅ |
 | NB-07 | Delete a notebook that has Final pages | Second explicit confirmation naming the number of Final pages | P3.1 | E | ✅ |
@@ -267,7 +280,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | SRC-04 | Search for an amount (`450`) | Not matched (spec: names, titles, descriptions only); empty-state text says what is searched | P3.6 | C | ✅ |
 | SRC-05 | Default title "Page 3" | Matches "page 3" | P1.9 | U | ✅ |
 | SRC-06 | Matches on Archived (Final) pages | Included, with a Final badge | P3.6 | E | ✅ |
-| SRC-07 | Hindi or other non-Latin text | Matches after Unicode normalisation | P1.9 | U | ✅ |
+| SRC-07 | Latin Extended-A text (`Łódź`) in any case | Matches (non-Latin scripts cannot be stored in v1, TXT-02) | P1.9 | U | ✅ |
 | ACT-01 | Fewer than 5 entries, or none | Shows what exists; none → section hidden | P3.5 | C | ✅ |
 | ACT-02 | Line edits | Do not create activity entries (only lifecycle events) | P3.2 | R | ✅ |
 | ACT-03 | Notebook renamed after an entry was written | Old entry keeps the old name (pre-rendered text) | P3.2 | R | ✅ |
@@ -293,7 +306,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 |---|---|---|---|---|---|
 | EXP-01 | Page with all lines empty | Exports normally | P5.3 | E | ✅ |
 | EXP-02 | Long descriptions | Ellipsis, same rule as on screen | P5.3 | U, E | ✅ |
-| EXP-03 | Hindi, emoji, right-to-left text | Rendered with browser fallback fonts | P5.3 | E | ✅ |
+| EXP-03 | Text that had other scripts or emoji removed | Exports show exactly what the fields show; no `?`, no fallback font (TXT-06) | P5.3 | E | ✅ |
 | EXP-04 | Draft page exported | Shows a small "Draft" label so a recipient does not mistake it for final | P5.3 | E | ✅ |
 | EXP-05 | Final page with "Reopened on" or "Total updated…" notes | Notes included in a small line under the header | P5.3 | E | ✅ |
 | EXP-06 | Page colour override and chosen font | Export uses the page's effective colour and the chosen font | P5.2 | U | ✅ |
@@ -302,7 +315,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | EXP-09 | Canvas size limits on older iPhones | 2160 × 2700 PDF render (5.8 MP) stays under the iOS limit (~16.7 MP); tested on the oldest supported iPhone | P5.5 | M | ➕ |
 | EXP-10 | Fonts not loaded at draw time | `document.fonts.load` awaited before drawing | P5.3 | E | ✅ |
 | EXP-11 | PDF text | Real, selectable text drawn with pdf-lib, the bundled slip font and Work Sans embedded (subset). Extracted text matches the on-screen strings exactly (decided 22/11/2026) | P5.5 | U, E | ✅ |
-| EXP-12 | PDF text in a script the bundled slip fonts do not cover (Hindi) | Drawn with a bundled Noto Sans Devanagari fallback, embedded the same way; characters no bundled font covers (emoji) are replaced by `?` in the PDF only, never dropped silently from the JPEG | P5.5 | U | ✅ |
+| EXP-12 | A character the slip font lacks (`₹` in Atkinson Hyperlegible or Caladea, some Latin Extended-A letters) | Drawn with bundled Work Sans in the same PDF; with the English-only rule nothing becomes `?` (TXT-07). Changed 23/11/2026: no Devanagari fallback font | P5.5 | U | ✅ |
 | FN-01 | No title | File name uses "Page 3" | P5.6 | U | ✅ |
 | FN-02 | Name/title made only of unsafe characters | Falls back to `note-add-page-<DD-MM-YYYY>` | P5.6 | U | ✅ |
 | FN-03 | Windows reserved names (`CON`, `NUL`, `COM1`), trailing dots or spaces | Prefixed or trimmed so the file saves on Windows | P5.6 | U | ✅ |
@@ -434,6 +447,7 @@ All proposed defaults below were **accepted by the owner on 22/11/2026**, with t
 
 - **MON-25:** Devanagari digits are accepted and converted to ASCII. (Full-width digits keep the proposed default and are also accepted.)
 - **PST-07:** the "only" suffix `450/-` is accepted and stripped (`450/-` → 45000, `₹ 450/-` → 45000).
+- **English-only text (decided 23/11/2026, ADR 002):** descriptions, titles and notebook names accept Latin-script text only; see §6.1 (TXT-*). This supersedes the Hindi/emoji behaviour of EDT-08, SRC-07, EXP-03 and EXP-12.
 - **LIF-18 (changed from the proposed default):** a page **cannot** be marked Final while any amount on it is invalid (flagged). The Mark as Final button explains why and names how many amounts need fixing; the repository refuses it too.
 
 | ID | Question | Decision |

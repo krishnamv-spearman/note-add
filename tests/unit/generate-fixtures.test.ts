@@ -118,6 +118,16 @@ it.skipIf(!process.env.GENERATE_FIXTURES)('generate backup fixtures', async () =
   (cosmetic.data.settings as { font: string }).font = 'comic-sans';
   (cosmetic.data.pages[0] as unknown as Record<string, unknown>).sparkles = true;
   write('unknown-cosmetic-fields.json', cosmetic);
+  // TXT-05 (decided 23/11/2026): text outside the English-only set is refused on restore.
+  const badDescription = clone();
+  badDescription.data.pages[0]!.lines[4]!.description = 'दूध और ब्रेड';
+  write('unsupported-text-description.json', badDescription);
+  const badName = clone();
+  badName.data.notebooks[1]!.name = 'Trip 🚕';
+  write('unsupported-text-notebook-name.json', badName);
+  const badTitle = clone();
+  badTitle.data.pages[2]!.title = 'قهوة';
+  write('unsupported-text-title.json', badTitle);
   write(
     'proto-keys.json',
     valid.replace(

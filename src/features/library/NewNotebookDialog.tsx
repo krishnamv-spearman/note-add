@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { filterSupportedText, UNSUPPORTED_TEXT_MESSAGE } from '@/engine';
 import { type ColourId, DEFAULT_COLOUR, NOTEBOOK_NAME_MAX } from '@/db';
 import { ColourPicker } from '@/ui/ColourPicker';
 import { Dialog } from '@/ui/Dialog';
@@ -28,6 +29,7 @@ export function NotebookDialog({
   onClose,
 }: Props) {
   const [name, setName] = useState(initialName);
+  const [nameRemoved, setNameRemoved] = useState(false);
   const [colour, setColour] = useState<ColourId>(initialColour);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,12 +62,21 @@ export function NotebookDialog({
             type="text"
             value={name}
             maxLength={NOTEBOOK_NAME_MAX}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              const { text, removed } = filterSupportedText(e.target.value);
+              setNameRemoved(removed);
+              setName(text);
+            }}
             aria-invalid={error ? true : undefined}
             // eslint-disable-next-line jsx-a11y/no-autofocus -- the dialog's first field
             autoFocus
           />
         </label>
+      )}
+      {nameRemoved && (
+        <p className="field-message" role="alert">
+          {UNSUPPORTED_TEXT_MESSAGE}
+        </p>
       )}
       {error && (
         <p className="field-message" role="alert">

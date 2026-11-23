@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {
   epochToDisplay,
+  isSupportedText,
   isoFromDate,
   isValidIso,
   isWithinLimit,
@@ -61,6 +62,8 @@ export const NOT_A_BACKUP = 'This is not a Note-Add backup file.';
 export const NEWER_VERSION =
   'This backup was made by a newer version of Note-Add. Update the app and try again.';
 export const UNSUPPORTED_VERSION = 'This file is not a supported Note-Add backup.';
+export const UNSUPPORTED_TEXT = (where: string): string =>
+  `This backup contains text Note-Add can't show yet (${where}). Only English text is supported for now, so nothing was restored.`;
 
 function summarise(data: Pick<BackupData, 'notebooks' | 'pages'>): BackupSummary {
   const latest = Math.max(
@@ -292,6 +295,22 @@ export function inspectBackupText(text: string): InspectResult {
     rawNotebooks.some((n) => Object.keys(n).some((k) => !KNOWN_NOTEBOOK_KEYS.has(k)));
   if (extra) notes.push('Unknown fields in the file were ignored.');
 
+  // TXT-05 (decided 23/11/2026): text fields are strict, like money. One bad name, title or
+  // description refuses the whole file.
+  for (const n of input.data.notebooks) {
+    if (!isSupportedText(n.name)) return fail(UNSUPPORTED_TEXT(`notebook name “${n.name}”`));
+  }
+  for (const p of input.data.pages) {
+    const nbName = input.data.notebooks.find((n) => n.id === p.notebookId)?.name ?? 'a notebook';
+    if (p.title !== null && !isSupportedText(p.title)) {
+      return fail(UNSUPPORTED_TEXT(`title of page ${p.number} in “${nbName}”`));
+    }
+    const line = p.lines.findIndex((l) => !isSupportedText(l.description));
+    if (line !== -1) {
+      return fail(UNSUPPORTED_TEXT(`line ${line + 1} of page ${p.number} in “${nbName}”`));
+    }
+  }
+
   // Duplicate IDs (RES-08)
   const nbIds = new Set<string>();
   for (const n of input.data.notebooks) {
@@ -343,7 +362,8 @@ export function inspectBackupText(text: string): InspectResult {
   let droppedActivity = false;
   for (const a of input.data.activity ?? []) {
     const r = activitySchema.safeParse(a);
-    if (r.success) {
+    // Activity text is cosmetic: entries with unsupported text are left out, with a note.
+    if (r.success && isSupportedText(r.data.text)) {
       const { id: _id, ...entry } = r.data;
       activity.push(entry);
     } else droppedActivity = true;

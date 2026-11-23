@@ -3,7 +3,8 @@ import type { FontId } from '@/db';
 /**
  * WOFF files embedded into PDFs (subset). Keys are Fontsource file stems; the browser loader
  * maps them to bundled URLs and tests read them from node_modules. Each chain is ordered:
- * the first font that has a glyph draws it (EXP-12).
+ * the first font that has a glyph draws it. Every character allowed by the English-only rule
+ * (decided 23/11/2026) is covered by the slip font or Work Sans (TXT-07).
  */
 export type FontKey = keyof typeof FONT_PACKAGES;
 
@@ -28,8 +29,6 @@ export const FONT_PACKAGES = {
   'work-sans-latin-ext-400': 'work-sans',
   'work-sans-latin-600': 'work-sans',
   'work-sans-latin-ext-600': 'work-sans',
-  'noto-sans-devanagari-devanagari-400': 'noto-sans-devanagari',
-  'noto-sans-devanagari-devanagari-700': 'noto-sans-devanagari',
 } as const;
 
 const SLIP_STEM: Record<FontId, string> = {
@@ -53,21 +52,17 @@ export function fontChains(fontId: FontId): FontChains {
     body: [
       k(`${s}-latin-400`),
       k(`${s}-latin-ext-400`),
-      'noto-sans-devanagari-devanagari-400',
+      'work-sans-latin-400',
       'work-sans-latin-ext-400',
     ],
     bold: [
       k(`${s}-latin-700`),
       k(`${s}-latin-ext-700`),
-      'noto-sans-devanagari-devanagari-700',
-      'work-sans-latin-ext-600',
-    ],
-    ui: ['work-sans-latin-400', 'work-sans-latin-ext-400', 'noto-sans-devanagari-devanagari-400'],
-    uiBold: [
       'work-sans-latin-600',
       'work-sans-latin-ext-600',
-      'noto-sans-devanagari-devanagari-700',
     ],
+    ui: ['work-sans-latin-400', 'work-sans-latin-ext-400'],
+    uiBold: ['work-sans-latin-600', 'work-sans-latin-ext-600'],
   };
 }
 

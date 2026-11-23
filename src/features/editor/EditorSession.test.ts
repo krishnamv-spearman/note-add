@@ -202,9 +202,42 @@ describe('amounts', () => {
   });
 });
 
+describe('English-only descriptions (decided 23/11/2026)', () => {
+  it('TXT-01 / TXT-02: typed or pasted Devanagari, Arabic and emoji are removed with the message', async () => {
+    const { session, calls } = setup();
+    session.setDescription(0, 'Milk दूध 🚕 قهوة');
+    expect(session.getSnapshot().lines[0]?.description).toBe('Milk   ');
+    expect(session.getSnapshot().messages[0]).toBe('Only English text is supported for now');
+    await session.flush();
+    expect(calls[0]?.patches[0]?.line.description).toBe('Milk   ');
+  });
+
+  it('TXT-01: accented Latin and ₹ are kept and show no message', () => {
+    const { session } = setup();
+    session.setDescription(0, 'Café ₹50 — Łódź');
+    expect(session.getSnapshot().lines[0]?.description).toBe('Café ₹50 — Łódź');
+    expect(session.getSnapshot().messages[0]).toBeUndefined();
+  });
+
+  it('the message clears on the next valid edit; removal wins over "Cut to 120"', () => {
+    const { session } = setup();
+    session.setDescription(0, 'x'.repeat(125) + '🚕');
+    expect(session.getSnapshot().messages[0]).toBe('Only English text is supported for now');
+    expect(session.getSnapshot().lines[0]?.description).toHaveLength(120);
+    session.setDescription(0, 'Tea');
+    expect(session.getSnapshot().messages[0]).toBeUndefined();
+  });
+
+  it('MON-25 unchanged: amount fields still accept Devanagari digits', () => {
+    const { session } = setup();
+    session.setAmount(0, '४५०');
+    expect(session.effectivePaise(0)).toBe(45000);
+  });
+});
+
 describe('descriptions', () => {
   it('EDT-05 / EDT-06: newlines and tabs become spaces; cut at 120 with a notice', () => {
-    expect(cleanDescription('a\r\nb\tc')).toEqual({ text: 'a b c', cut: false });
+    expect(cleanDescription('a\r\nb\tc')).toEqual({ text: 'a b c', cut: false, removed: false });
     const { session } = setup();
     session.setDescription(0, 'x'.repeat(130));
     expect(session.getSnapshot().lines[0]?.description).toHaveLength(120);

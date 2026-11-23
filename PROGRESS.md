@@ -14,6 +14,7 @@ Run started 22/11/2026. Owner decisions of 22/11/2026 applied to the docs first:
 | 4 Look | ✅ done | 338 | 67 (+38 skipped) |
 | 5 Export | ✅ done | 362 | 73 (+62 skipped) |
 | 6 Backup | ✅ done | 407 (+1 opt-in generator) | 82 (+80 skipped) |
+| English-only (23/11) | ✅ done | 429 (+1 opt-in generator) | 82 (+80 skipped) |
 
 (Counts are cumulative totals after the phase. E2E counts are tests × projects.)
 
@@ -161,6 +162,35 @@ Run started 22/11/2026. Owner decisions of 22/11/2026 applied to the docs first:
 
 ---
 
+## Change of 23/11/2026 — English-only text for v1 (ADR 002)
+
+Owner decision: version 1 is English only. One commit on `build/phases-0-6`: "English-only text for v1".
+
+**Built**
+- `src/engine/text.ts`: `filterSupportedText` (NFC, then keeps Basic Latin, Latin-1 Supplement, Latin Extended-A, `₹` and common punctuation; excludes the soft hyphen and `ŉ`), `isSupportedText`, `UNSUPPORTED_TEXT_MESSAGE` = "Only English text is supported for now". Engine coverage stays 100%.
+- Descriptions (editor session), the page title field and the notebook name dialog remove other characters as they are typed or pasted and show the message under the field. The repository applies the same filter as a backstop (`updateLines`, `updatePageHeader`, `createNotebook`, `renameNotebook`). **Amount fields unchanged** (Devanagari and full-width digits still accepted).
+- Export: **Noto Sans Devanagari and the `regenerator-runtime` workaround removed** (packages uninstalled, licence file and Settings link removed). PDF font chains are now *slip font latin → latin-ext → Work Sans latin → latin-ext*. Screen font stacks put bundled Work Sans before system fonts, so a letter a slip font lacks looks the same on screen and in exports.
+- Restore: a notebook name, page title or description with unsupported characters **refuses the file** ("This backup contains text Note-Add can't show yet (line 5 of page 6 in “Pune trip claims”). Only English text is supported for now, so nothing was restored."). Activity entries with such text are left out with a note. Three new fixtures: `unsupported-text-description.json`, `unsupported-text-notebook-name.json`, `unsupported-text-title.json` (derived from the committed v1 file; the generator was updated to write them too).
+- Docs: problem statement §1 and §5, architecture §4.1, §5.8 (new), §8.1–8.2, §9.2, §15, §16, edge cases (EDT-08, NB-04, SRC-07, EXP-03, EXP-12 rewritten; new §6.1 TXT-01–08), test plan, implementation plan, README, `docs/decisions/002-english-only-text-v1.md`.
+
+**Tests replaced, not deleted**
+| Old test | Replaced by |
+|---|---|
+| `search.test.ts` SRC-07 "Hindi text matches" | SRC-07 Latin Extended-A text matches in any case |
+| `lifecycle.repo.test.ts` NB-04 "emoji allowed" | NB-04 with file-name-unsafe characters and Latin Extended-A; new TXT-02 test: emoji and Devanagari removed from names (create and rename) |
+| `model.test.ts` NB-04 file name with emoji | the same check with accented Latin |
+| `pdf.test.ts` EXP-12 "Hindi uses the Devanagari fallback; emoji become ?" | TXT-06 (× 4 fonts): accented Latin, `₹` and punctuation export exactly, no `?`, only the slip font and Work Sans embedded, no Noto; TXT-07: every allowed character has a glyph in every export font chain |
+| `export.spec.ts` EXP-03 "Hindi, emoji and Arabic render in the JPEG" | TXT-06: mixed-script input is filtered in the fields with the message; the PDF text equals the field text with no `?`, no Noto font; the JPEG draws lines 1–3 |
+| `layout-small.spec.ts` EDT-08 "Hindi, emoji and Arabic display and survive a reload" | TXT-01 / TXT-02: typed and pasted text in descriptions, the title and the notebook name dialog is filtered with the message; what remains survives a reload |
+
+Also fixed a test race the full run exposed on WebKit: `settings-font.spec.ts` reloaded the page before the optimistic font choice was stored; it now waits until IndexedDB holds the new font (no assertion changed; passed 3× on every project).
+
+New tests: `text.test.ts` (6), `EditorSession.test.ts` (4: removal + message, Latin kept, message clears and wins over "Cut to 120", Devanagari digits still work in amounts), `pages.repo.test.ts` (repository backstop), `backup.repo.test.ts` (3 refused fixtures, activity dropped with a note, Devanagari amount text still accepted), `RestoreFlow.test.tsx` (refusal message, no dialog).
+
+**Results:** lint clean, type check clean, **429 unit/repository/component tests pass** (+1 opt-in fixture generator skipped; engine coverage 100%), **82 e2e tests pass** on chromium-desktop, pixel-7 and iphone-14 (80 skipped by design, as before). The build contains no Noto or Devanagari font files.
+
+---
+
 ## Summary at the end of phase 6
 
 All seven phases (0–6) are built and committed on `build/phases-0-6`. Final local gate: `npm run lint` clean, `npm run typecheck` clean, **407 unit/repository/component tests pass** (1 opt-in fixture generator skipped), **82 e2e tests pass** across chromium-desktop, pixel-7 and iphone-14 (80 skipped by design: CI-Linux-only visual baselines and specs the test plan runs on one project). Nothing was pushed or deployed. Phase 7 has not been started.
@@ -208,11 +238,15 @@ Open items carried forward: D37 (bundle budgets), D32 (LOOK-02 metric fallbacks)
 | D35 | 4 | P4.11 (minus-sign style) skipped: the §0.4 default "brackets only" stands. | Plan says skip unless decided yes. |
 | **D36** | **5** | **PDF fonts are embedded from the WOFF files with `subset: true`.** WOFF2 subsetting crashes fontkit for several of the fonts, and non-subset embedding would put WOFF bytes into the PDF (invalid). The WOFF files are separate assets fetched only at export time. | Tested every font × format × subset combination. |
 | **D37** | **5** | **Bundle budgets are exceeded (for phase 7 to fix):** initial JS is 152 KB gzip (budget 150 KB) and the lazy export chunk is 515 KB gzip (budget 250 KB) — fontkit brings its Unicode and shaping data. Options for phase 7: move the font registry's CSS imports out of the entry, trim React Router, or swap to a lighter subsetting path. | Not a phase 5 exit criterion; arch §14 makes it a phase 7 CI check. |
-| D38 | 5 | `regenerator-runtime` is loaded in the export chunk because fontkit's Indic shaper (Hindi text in PDFs) expects a global `regeneratorRuntime`; without it a Hindi description crashed the PDF export. | Found by the EXP-12 unit test. |
-| D39 | 5 | pdf-lib does not shape complex scripts fully: Hindi in the PDF is drawn with the Devanagari fallback font but conjuncts and vowel-sign positions may be simplified (the text stays selectable). The JPEG uses the browser's shaping. | Documented in arch §8.2. |
+| D38 | 5 | ~~`regenerator-runtime` loaded in the export chunk for fontkit's Indic shaper.~~ **Superseded 23/11/2026 (D50): removed.** | v1 is English only. |
+| D39 | 5 | ~~Hindi in the PDF drawn with a Devanagari fallback font, simplified shaping.~~ **Superseded 23/11/2026 (D50): no Devanagari font; other scripts cannot be entered.** | v1 is English only. |
 | D40 | 5 | Header text (notebook name, title, date line, notes, footer) uses Work Sans and the lines/BF/total use the slip font, as on screen. Final pages also show "Final since DD/MM/YYYY" among the notes. | Matches the screen. |
 | D41 | 5 | Three or more notes wrap onto two lines; anything still too long gets an ellipsis. | Found by test: three notes did not fit one line. |
 | D42 | 5 | EXP-09 (canvas size limits on old iPhones) no longer applies: the PDF is vector, not a 2× raster; the JPEG canvas is 1.5 MP. Left ➕ for a manual check on an old iPhone. | Decision of 22/11/2026 removed the large PDF canvas. |
+| **D50** | **23/11** | **English-only text for v1 (owner decision, ADR 002).** Allowed: Basic Latin, Latin-1 Supplement, Latin Extended-A, `₹`, and the punctuation – — ‘ ’ ‚ “ ” „ • … ′ ″ ‹ ›. I left out the soft hyphen U+00AD (invisible), `ŉ` U+0149 (deprecated; no bundled font draws it) and the Unicode hyphens U+2010/U+2011 (no bundled glyph), and did not add € or ™ ("common punctuation" read narrowly). | Every allowed character then has a glyph in every export font chain (tested, TXT-07). |
+| D51 | 23/11 | The message shows on the edit that removed characters and clears on the next clean edit; when both apply, "Only English text…" wins over "Cut to 120 characters". Text that is only composed (letter + combining accent → `é`) shows no message. | Clear, low-noise feedback. |
+| D52 | 23/11 | Restore refuses names, titles and descriptions with unsupported characters (strict); recent-activity entries are treated as cosmetic and dropped with a note; typed amount text keeps any characters (Devanagari digits are valid amounts). | As instructed for text fields; activity text is generated, not user data. |
+| D53 | 23/11 | The repository also filters names, titles and descriptions, so no code path can store unsupported text. | Same rule as money: enforced below the UI. |
 | D44 | 6 | The safety backup is written **inside the same transaction** as the replacement, so a failed restore also leaves no stray safety copy. | Simplest guarantee that a failure changes nothing. |
 | D45 | 6 | Undo deletes the safety copy it used; the restore it runs saves the current data as a new one, so "Undo last restore" always means "go back one step". | RES-14 (undo is undoable) without ping-pong confusion. |
 | D46 | 6 | A notebook with no pages, unreadable activity entries and an unknown `lastOpenedNotebookId` are handled as: refused / left out with a note / reset to none. Invalid dates and statuses are refused (strict). | Pages are needed for a usable notebook; activity and the last-opened pointer are cosmetic. |
@@ -248,4 +282,4 @@ Open items carried forward: D37 (bundle budgets), D32 (LOOK-02 metric fallbacks)
 | M6.2 | 6 | B2–B4: clear the site data (or reinstall), restore that file → every notebook, page, colour and the font are back; restore a photo or a PDF → clear message, nothing changed; Undo last restore → previous data back. |
 | M6.3 | 6 | B5–B6: back up on Android, restore on iPhone, totals identical; restore `tests/fixtures/backups/v1/valid-3-notebooks-21-pages.json` on each device. |
 | M6.4 | 6 | With two tabs open, restore in one: the other reloads by itself and shows the restored notes. |
-| **M5.5** | **5** | Side by side, the export and the on-screen page for each of the 4 fonts and two colours (E4). Also a page with a Hindi description in the PDF (D39) and the oldest available iPhone (EXP-09). |
+| **M5.5** | **5** | Side by side, the export and the on-screen page for each of the 4 fonts and two colours (E4), including a description with accented letters and `₹` (e.g. `Café ₹50 — Łódź`), and the oldest available iPhone (EXP-09). |

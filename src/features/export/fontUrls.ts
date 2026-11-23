@@ -19,8 +19,6 @@ import workSansLatin400 from '@fontsource/work-sans/files/work-sans-latin-400-no
 import workSansLatinExt400 from '@fontsource/work-sans/files/work-sans-latin-ext-400-normal.woff?url';
 import workSansLatin600 from '@fontsource/work-sans/files/work-sans-latin-600-normal.woff?url';
 import workSansLatinExt600 from '@fontsource/work-sans/files/work-sans-latin-ext-600-normal.woff?url';
-import notoSansDevanagariDevanagari400 from '@fontsource/noto-sans-devanagari/files/noto-sans-devanagari-devanagari-400-normal.woff?url';
-import notoSansDevanagariDevanagari700 from '@fontsource/noto-sans-devanagari/files/noto-sans-devanagari-devanagari-700-normal.woff?url';
 import type { FontKey } from './fontFiles';
 
 export const FONT_URLS: Record<FontKey, string> = {
@@ -44,8 +42,6 @@ export const FONT_URLS: Record<FontKey, string> = {
   'work-sans-latin-ext-400': workSansLatinExt400,
   'work-sans-latin-600': workSansLatin600,
   'work-sans-latin-ext-600': workSansLatinExt600,
-  'noto-sans-devanagari-devanagari-400': notoSansDevanagariDevanagari400,
-  'noto-sans-devanagari-devanagari-700': notoSansDevanagariDevanagari700,
 };
 
 const cache = new Map<FontKey, Promise<Uint8Array>>();

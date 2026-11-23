@@ -195,13 +195,23 @@ describe('deleteDraftPage', () => {
 });
 
 describe('notebooks', () => {
-  it('NB-02 / NB-03 / NB-04: cut at 60; duplicates and emoji allowed', async () => {
+  it('NB-02 / NB-03 / NB-04: cut at 60; duplicates and file-name-unsafe characters allowed', async () => {
     await createNotebook('n'.repeat(80));
-    await createNotebook('Trip 🚕 / a:b');
-    await createNotebook('Trip 🚕 / a:b');
+    await createNotebook('Łódź trip / a:b');
+    await createNotebook('Łódź trip / a:b');
     const names = (await db.notebooks.toArray()).map((n) => n.name);
     expect(names.filter((n) => n.length === 60)).toHaveLength(1);
-    expect(names.filter((n) => n === 'Trip 🚕 / a:b')).toHaveLength(2);
+    expect(names.filter((n) => n === 'Łódź trip / a:b')).toHaveLength(2);
+  });
+
+  it('TXT-02: notebook names keep English-only text; other characters are removed', async () => {
+    await createNotebook('Trip 🚕 / a:b');
+    await createNotebook('दूध');
+    const names = (await db.notebooks.toArray()).map((n) => n.name);
+    expect(names).toEqual(['Trip / a:b']);
+    const r = await renameNotebook((await db.notebooks.toArray())[0]!.id, 'Café قهوة');
+    expect(r.ok).toBe(true);
+    expect((await db.notebooks.toArray())[0]?.name).toBe('Café');
   });
 
   it('ACT-03: rename keeps old entries as written', async () => {

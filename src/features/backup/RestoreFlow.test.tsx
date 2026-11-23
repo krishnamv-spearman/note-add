@@ -25,6 +25,20 @@ async function openSettings() {
 }
 
 describe('RestoreFlow', () => {
+  it('TXT-05: a backup with unsupported text is refused with a clear message; no dialog', async () => {
+    const user = userEvent.setup();
+    await openSettings();
+    await user.upload(
+      screen.getByLabelText('Restore from a backup file'),
+      file('unsupported-text-description.json'),
+    );
+    expect(
+      await screen.findByText(/Only English text is supported for now, so nothing was restored\./),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Restore this backup?' })).toBeNull();
+    expect(await db.notebooks.count()).toBe(0);
+  });
+
   it('BAK-01: with no notebooks, Back up is disabled with a reason; last backup "Never"', async () => {
     await openSettings();
     expect(await screen.findByText('Nothing to back up yet.')).toBeInTheDocument();

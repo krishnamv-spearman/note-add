@@ -25,7 +25,7 @@ Build a small, free, offline-first **Progressive Web App (PWA)** that works like
 
 **User:** one person on their own phone or computer. No sign-in, no server, no sharing between users.
 
-**Out of scope for version 1:** user accounts, cloud sync, Google Play or App Store listing, currencies other than INR, claim statuses or approval workflows, receipt scanning, handwriting fonts, ads, analytics or tracking of any kind.
+**Out of scope for version 1:** text in scripts other than Latin (decided 23/11/2026), user accounts, cloud sync, Google Play or App Store listing, currencies other than INR, claim statuses or approval workflows, receipt scanning, handwriting fonts, ads, analytics or tracking of any kind.
 
 ## 2. Screens and flow
 
@@ -116,6 +116,7 @@ The calculation logic lives in one pure module with no user-interface code, so i
 - **Limits:** any single amount and any total must stay within ±99,99,99,999.99 (₹99.99 crore). Larger values are rejected with a message.
 - **Empty or non-numeric amounts** count as zero and are flagged with a subtle mark; a description with no amount is allowed. A page **cannot be marked Final** while any amount on it is non-numeric (decided 22/11/2026).
 - **Pasted forms accepted** (decided 22/11/2026): Devanagari digits (`४५०`) are converted to ASCII, and the Indian "only" suffix (`450/-`) is stripped.
+- **English-only text in version 1** (decided 23/11/2026): descriptions, page titles and notebook names accept Latin-script text only (Basic Latin, Latin-1 Supplement and Latin Extended-A, plus ₹ and common punctuation). Other characters (Devanagari, Arabic, emoji and so on) are removed with the message "Only English text is supported for now". Amount fields still accept Devanagari digits.
 - **Page total** = brought forward + the sum of that page's 10 amounts.
 - **Brought forward** on page N = total of page N−1 in the same notebook. Page 1 = 0.
 - **Recalculation:** any change to a page immediately recalculates every later page's brought-forward and total in that notebook, including Final pages (their amounts cannot change, but their brought-forward can, and a Final page whose total changes this way shows "Total updated from earlier page on DD/MM/YYYY").

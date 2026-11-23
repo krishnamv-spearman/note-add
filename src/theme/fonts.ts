@@ -29,7 +29,7 @@ export interface SlipFont {
   label: string;
   family: string;
   note: string;
-  /** CSS stack with similar system fallbacks (LOOK-02) and scripts the font lacks (EDT-08). */
+  /** CSS stack: the font, then bundled Work Sans for letters it lacks, then system fallbacks. */
   stack: string;
   /** Latin regular WOFF2, preloaded when this font is selected (arch §14). */
   preload: string;
@@ -46,7 +46,7 @@ export const SLIP_FONTS: readonly SlipFont[] = [
     label: 'Calibri-style',
     family: 'Carlito',
     note: 'Metric-compatible with Calibri; familiar to office users',
-    stack: `Carlito, Calibri, ${FALLBACK_SANS}`,
+    stack: `Carlito, "Work Sans", Calibri, ${FALLBACK_SANS}`,
     preload: carlitoPreload,
     hasRupee: true,
   },
@@ -55,7 +55,7 @@ export const SLIP_FONTS: readonly SlipFont[] = [
     label: 'Verdana-style',
     family: 'Atkinson Hyperlegible',
     note: 'Wide, open spacing; 1/l/I and 0/O always distinct',
-    stack: `"Atkinson Hyperlegible", Verdana, ${FALLBACK_SANS}`,
+    stack: `"Atkinson Hyperlegible", "Work Sans", Verdana, ${FALLBACK_SANS}`,
     preload: atkinsonPreload,
     hasRupee: false,
   },
@@ -64,7 +64,7 @@ export const SLIP_FONTS: readonly SlipFont[] = [
     label: 'Cambria-style',
     family: 'Caladea',
     note: 'Metric-compatible with Cambria',
-    stack: `Caladea, Cambria, ${FALLBACK_SERIF}`,
+    stack: `Caladea, "Work Sans", Cambria, ${FALLBACK_SERIF}`,
     preload: caladeaPreload,
     hasRupee: false,
   },
@@ -73,7 +73,7 @@ export const SLIP_FONTS: readonly SlipFont[] = [
     label: 'Classic serif',
     family: 'Merriweather',
     note: 'Serif designed for screens',
-    stack: `Merriweather, ${FALLBACK_SERIF}`,
+    stack: `Merriweather, "Work Sans", ${FALLBACK_SERIF}`,
     preload: merriweatherPreload,
     hasRupee: true,
   },

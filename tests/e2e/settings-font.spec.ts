@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 import { amount, createNotebookViaUi } from './helpers';
 
 const FONTS = [
@@ -7,6 +7,29 @@ const FONTS = [
   ['Cambria-style', 'Caladea'],
   ['Classic serif', 'Merriweather'],
 ] as const;
+
+const FONT_IDS = {
+  Carlito: 'carlito',
+  'Atkinson Hyperlegible': 'atkinson',
+  Caladea: 'caladea',
+  Merriweather: 'merriweather',
+} as const;
+
+/** The font stored in IndexedDB's settings row. */
+const storedFont = (page: Page) =>
+  page.evaluate(
+    () =>
+      new Promise<string | null>((resolve) => {
+        const open = indexedDB.open('note-add');
+        open.onsuccess = () => {
+          const req = open.result.transaction('settings').objectStore('settings').get('settings');
+          req.onsuccess = () => {
+            resolve((req.result as { font?: string } | undefined)?.font ?? null);
+            open.result.close();
+          };
+        };
+      }),
+  );
 
 test('LOOK-08: each font applies to the editor and persists after reload', async ({ page }) => {
   await createNotebookViaUi(page, 'Fonts');
@@ -17,6 +40,9 @@ test('LOOK-08: each font applies to the editor and persists after reload', async
   for (const [label, family] of FONTS) {
     await page.goto('/settings');
     await page.getByRole('radio', { name: new RegExp(`^${label}`) }).check();
+    // The radio updates at once (optimistic); wait until the setting is stored before the
+    // test reloads the page, as a full reload can otherwise interrupt the write.
+    await expect.poll(() => storedFont(page)).toBe(FONT_IDS[family]);
     await expect(page.getByTestId('font-preview')).toHaveCSS(
       'font-family',
       new RegExp(`^"?${family}"?`),

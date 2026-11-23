@@ -1,4 +1,4 @@
-import { type Line, type Paise, parseAmount, REJECT_MESSAGES } from '@/engine';
+import { filterSupportedText, type Line, type Paise, parseAmount, REJECT_MESSAGES } from '@/engine';
 import { AMOUNT_TEXT_MAX, DESCRIPTION_MAX } from '@/db';
 
 /** What the user currently sees in a line (raw text). */
@@ -8,11 +8,12 @@ export interface LocalLine {
 }
 
 /** EDT-05 / EDT-06: newlines and tabs become single spaces; cut at 120 characters. */
-export function cleanDescription(text: string): { text: string; cut: boolean } {
-  const flat = text.replace(/[\r\n\t]+/g, ' ');
-  return flat.length > DESCRIPTION_MAX
-    ? { text: flat.slice(0, DESCRIPTION_MAX), cut: true }
-    : { text: flat, cut: false };
+export function cleanDescription(text: string): { text: string; cut: boolean; removed: boolean } {
+  // TXT-01/02 (decided 23/11/2026): English-only text; other characters are removed.
+  const { text: latin, removed } = filterSupportedText(text.replace(/[\r\n\t]+/g, ' '));
+  return latin.length > DESCRIPTION_MAX
+    ? { text: latin.slice(0, DESCRIPTION_MAX), cut: true, removed }
+    : { text: latin, cut: false, removed };
 }
 
 /** EDT-07: a description of only spaces is saved as empty. */

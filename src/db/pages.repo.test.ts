@@ -155,6 +155,17 @@ describe('mutatePages', () => {
 });
 
 describe('updateLines / updatePageHeader', () => {
+  it('TXT-02: the repository also keeps only English-only descriptions and titles', async () => {
+    const id = await notebookWith(1, []);
+    const [page] = await loadPages(id);
+    await updateLine(page!.id, 0, aLine('5', 'Tea चाय ☕'));
+    await updatePageHeader(page!.id, { title: 'Airport 🛫 run' });
+    const after = await db.pages.get(page!.id);
+    expect(after?.lines[0]?.description).toBe('Tea  ');
+    expect(after?.title).toBe('Airport run');
+    expect(after?.lines[0]?.amountPaise).toBe(500);
+  });
+
   it('MTB-02: writes are per line — another line written meanwhile is kept', async () => {
     const id = await notebookWith(1, []);
     const [page] = await loadPages(id);

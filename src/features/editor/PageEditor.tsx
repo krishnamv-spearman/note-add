@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import {
   countFlagged,
+  filterSupportedText,
   defaultTitle,
   formatPaise,
   isPageEmpty,
@@ -9,6 +10,7 @@ import {
   pageTotal,
   spokenPaise,
   toDisplay,
+  UNSUPPORTED_TEXT_MESSAGE,
 } from '@/engine';
 import {
   appendPage,
@@ -60,6 +62,7 @@ export function PageEditor({ notebook, page, pageCount }: Props) {
   const lastAmount = useRef(1);
   const [hint, setHint] = useState<string | null>(null);
   const [titleDraft, setTitleDraft] = useState<string | null>(null);
+  const [titleRemoved, setTitleRemoved] = useState(false);
   const [announced, setAnnounced] = useState(navState.announce ?? '');
   const [dialog, setDialog] = useState<'final' | 'delete' | 'colour' | null>(null);
   const effectiveColour = page.colour ?? notebook.colour;
@@ -275,7 +278,12 @@ export function PageEditor({ notebook, page, pageCount }: Props) {
               maxLength={TITLE_MAX}
               readOnly={readOnly}
               value={titleDraft ?? page.title ?? ''}
-              onChange={(e) => setTitleDraft(e.target.value)}
+              aria-describedby={titleRemoved ? 'title-msg' : undefined}
+              onChange={(e) => {
+                const { text, removed } = filterSupportedText(e.target.value);
+                setTitleRemoved(removed);
+                setTitleDraft(text);
+              }}
               onBlur={saveTitle}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -284,6 +292,11 @@ export function PageEditor({ notebook, page, pageCount }: Props) {
                 }
               }}
             />
+            {titleRemoved && (
+              <p id="title-msg" className="field-message" role="alert">
+                {UNSUPPORTED_TEXT_MESSAGE}
+              </p>
+            )}
           </div>
         </div>
         <ul className="page-notes">

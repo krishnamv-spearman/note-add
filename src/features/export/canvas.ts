@@ -39,7 +39,7 @@ export async function loadExportFonts(model: SlipModel): Promise<void> {
 
 /**
  * P5.3: draws the slip at 1080 × 1350 logical px with Canvas 2D. Scripts the bundled fonts do
- * not cover (Hindi, emoji) use the browser's font fallback, like the screen (EXP-03).
+ * Only English-only text reaches it (decided 23/11/2026), all drawn with bundled fonts.
  */
 export function renderSlipCanvas(model: SlipModel, scale = 1): HTMLCanvasElement {
   const canvas = document.createElement('canvas');

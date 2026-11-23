@@ -30,7 +30,7 @@ async function downloadFrom(page: Page, button: string) {
   return { name: download.suggestedFilename(), bytes: new Uint8Array(readFileSync(path)) };
 }
 
-async function pdfStrings(bytes: Uint8Array): Promise<string[]> {
+async function pdfStrings(bytes: Uint8Array, keepSpaces = false): Promise<string[]> {
   const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
   const task = pdfjs.getDocument({
     data: bytes.slice(), // pdfjs detaches the buffer it is given
@@ -40,7 +40,9 @@ async function pdfStrings(bytes: Uint8Array): Promise<string[]> {
   const doc = await task.promise;
   const content = await (await doc.getPage(1)).getTextContent();
   await task.destroy();
-  return content.items.map((i) => ('str' in i ? i.str : '')).filter((s) => s.trim() !== '');
+  return content.items
+    .map((i) => ('str' in i ? i.str : ''))
+    .filter((s) => keepSpaces || s.trim() !== '');
 }
 
 function jpegSize(bytes: Uint8Array): { width: number; height: number } {
@@ -132,14 +134,28 @@ test('P5.4 / FN-01: JPEG downloads at 1080 × 1350', async ({ page }) => {
   expect(jpegSize(bytes)).toEqual({ width: 1080, height: 1350 });
 });
 
-test('EXP-03: Hindi, emoji and Arabic descriptions render in the JPEG (not blank)', async ({
+test('TXT-06: exports contain only supported text — what the fields show, no "?" and no fallback font', async ({
   page,
 }) => {
   await withoutShare(page);
   await createNotebookViaUi(page, 'Scripts');
-  await description(page, 1).fill('दूध और ब्रेड');
-  await description(page, 2).fill('🚕🚕🚕');
-  await description(page, 3).fill('قهوة وشاي');
+  await description(page, 1).fill('Milkदूध');
+  await expect(page.getByText('Only English text is supported for now')).toBeVisible();
+  await description(page, 2).fill('Taxi ₹450🚕');
+  await description(page, 3).fill('Caféقهوة, Łódź');
+  await expect(description(page, 1)).toHaveValue('Milk');
+  await expect(description(page, 2)).toHaveValue('Taxi ₹450');
+  await expect(description(page, 3)).toHaveValue('Café, Łódź');
+
+  const pdf = await downloadFrom(page, 'Export PDF');
+  const joined = (await pdfStrings(pdf.bytes, true)).join('');
+  for (const d of ['Milk', 'Taxi ₹450', 'Café, Łódź']) expect(joined).toContain(d);
+  expect(joined).not.toContain('?');
+  expect(joined).not.toMatch(/[\u0900-\u097F\u0600-\u06FF]/);
+  const raw = new TextDecoder('latin1').decode(pdf.bytes);
+  expect(raw).not.toMatch(/Noto|Devanagari/);
+
+  // The JPEG draws the remaining text on lines 1–3.
   const { bytes } = await downloadFrom(page, 'Export JPEG');
   const inked = await page.evaluate(async (b64) => {
     const img = new Image();
@@ -160,12 +176,7 @@ test('EXP-03: Hindi, emoji and Arabic descriptions render in the JPEG (not blank
       return dark;
     });
   }, Buffer.from(bytes).toString('base64'));
-  for (const n of inked) expect(n).toBeGreaterThan(200);
-
-  // The PDF builds too (Devanagari fallback font; emoji become "?").
-  const pdf = await downloadFrom(page, 'Export PDF');
-  const text = (await pdfStrings(pdf.bytes)).join('|');
-  expect(text).toContain('???');
+  for (const n of inked) expect(n).toBeGreaterThan(100);
 });
 
 test('P5.9: page cards export too; Preparing… shows while building', async ({ page }) => {

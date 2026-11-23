@@ -1,5 +1,3 @@
-// fontkit's Indic shaper (Hindi in PDFs, EXP-12) expects a global regeneratorRuntime.
-import 'regenerator-runtime/runtime';
 import fontkit from '@pdf-lib/fontkit';
 import { PDFDocument, type PDFFont, type PDFPage, rgb } from 'pdf-lib';
 import { parseHex } from '@/engine';
@@ -54,7 +52,7 @@ const colour = (hex: string) => {
 
 /**
  * A fallback chain of fonts. Characters go to the first font that has them; characters no
- * font has become "?" (EXP-12). Fonts are embedded (subset) only when a run needs them.
+ * font has become "?" (a safeguard; the English-only rule means it does not happen, TXT-07). Fonts are embedded (subset) only when a run needs them.
  */
 class Chain {
   constructor(

@@ -168,7 +168,7 @@ interface Notebook {
 }
 
 interface Line {
-  description: string;   // free text, up to 120 chars
+  description: string;   // English-only text (§5.8), up to 120 chars
   amountText: string;    // exactly what the user typed, kept for display/editing
   amountPaise: Paise | null; // null = empty or not a number (counts as 0, flagged)
 }
@@ -320,6 +320,10 @@ recalculateChain(pages: ChainInput[], today: IsoDate): ChainResult
 
 `normalise(s)` lower-cases, removes diacritics (`NFKD`), and collapses spaces. `matches(query, notebook, pages)` checks notebook name, page titles (including the "Page N" default) and line descriptions. Search runs in memory over all records loaded with one query; at personal scale (a few thousand pages at most) this is instant and needs no index.
 
+### 5.8 English-only text (`text.ts`, decided 23/11/2026)
+
+Descriptions, page titles and notebook names accept Latin-script text only: Basic Latin (printable), Latin-1 Supplement and Latin Extended-A, plus `₹` and common punctuation (– — ‘ ’ ‚ “ ” „ • … ′ ″ ‹ ›). The soft hyphen (U+00AD) and the deprecated `ŉ` (U+0149) are excluded. `filterSupportedText(text)` composes the text (NFC), keeps only allowed characters and reports whether anything was removed; the editor, the title field and the notebook name dialog then show "Only English text is supported for now". The repository applies the same filter as a backstop. **Amounts are not affected** (Devanagari and full-width digits are still mapped to ASCII, §5.2). On restore, any notebook name, title or description with unsupported characters refuses the file (§9.2).
+
 ### 5.7 Contrast (`contrast.ts`)
 
 `contrastRatio(hexA, hexB)` per WCAG 2.x relative luminance. The test iterates every slip colour × {ink, secondary ink} and asserts ≥ 4.5. It reads colours from `src/theme/colours.ts`, the same file the CSS variables are generated from, so the test checks what is actually shipped.
@@ -470,7 +474,7 @@ interface SlipModel {
 - Layout constants (margins, line height, column widths) live in one file shared by the CSS (as custom properties) and the renderer, so the export and the screen use the same proportions.
 - Before drawing, `await document.fonts.load('16px "<font>"')` for the slip font and Work Sans, so the font is always present.
 - Long descriptions are truncated with an ellipsis using `measureText`, the same rule the screen applies with CSS `text-overflow`.
-- Text in scripts the bundled fonts do not cover (for example Hindi descriptions) still renders, because the canvas uses the browser's font fallback like the screen does.
+- Only English-only text (§5.8) reaches the renderers; every allowed character has a glyph in the bundled slip fonts or Work Sans, so screen, JPEG and PDF use the same fonts (decided 23/11/2026).
 
 Rendering at a fixed logical size (for example 1080 × 1350 px, portrait slip) means output does not depend on the device's screen size.
 
@@ -478,7 +482,7 @@ Rendering at a fixed logical size (for example 1080 × 1350 px, portrait slip) m
 
 - **JPEG:** `canvas.toBlob(cb, 'image/jpeg', 0.92)`.
 - **PDF (decided 22/11/2026):** drawn directly with pdf-lib as **real, selectable text**, not an image. `renderSlipPdf(model, fonts)` uses the same `SlipModel` and the same layout constants as the canvas renderer, scaled to a page with the slip's aspect ratio (4:5, 108 × 135 mm). Fonts: the chosen slip font (regular + bold) and Work Sans are **embedded** from the bundled font files with `@pdf-lib/fontkit` (`subset: true`), so the PDF looks the same on any viewer and needs no installed fonts. The paper colour, ruled lines and rules are vector shapes.
-  - **Scripts the slip fonts do not cover** (Hindi descriptions): each text run is split by glyph coverage and drawn with a bundled **Noto Sans Devanagari** fallback (OFL, embedded the same way, loaded only for export). Characters no bundled font covers (for example emoji) are replaced with `?` in the PDF only; the JPEG keeps them (browser fallback). pdf-lib does not shape complex scripts, so conjunct-heavy Hindi may render with simplified shaping in the PDF; the text remains selectable and searchable.
+  - **Fonts per text run:** each run is drawn with the first font in the chain *slip font latin → slip font latin-ext → Work Sans latin → Work Sans latin-ext* that has the glyph (Atkinson Hyperlegible and Caladea have no `₹`, for example). With the English-only rule (§5.8, decided 23/11/2026) every allowed character is covered; a test checks this for every font. A character no bundled font covers would become `?`, as a safeguard only. No other-script fallback font and no `regenerator-runtime` workaround are bundled (both removed 23/11/2026).
   - Long descriptions are truncated with an ellipsis using the embedded font's own widths, the same rule as the canvas.
   - pdf-lib needs no `eval` and runs under the CSP.
 - File name: `<notebook>-<page title>-<DD-MM-YYYY>.pdf|.jpg`, with characters unsafe in file names (`/\:*?"<>|`) replaced by `-`, spaces kept, and length capped at 100 characters.
@@ -531,7 +535,7 @@ The same function is used for backups (§9).
 1. User picks a file (`<input type="file" accept="application/json,.json">`). Files of 0 bytes or over 20 MB are refused before reading.
 2. Strip a leading byte-order mark (a file opened and saved in Notepad has one). Parse JSON; reject if not valid JSON ("This is not a Note-Add backup file").
 3. Check `format === 'note-add-backup'`. If `version` is newer than the app supports: "This backup was made by a newer version of Note-Add. Update the app and try again." Older versions run through `migrateBackup(vN → current)` functions (§9.4).
-4. Validate with a Zod schema. **Money fields are strict:** every paise value must be a safe integer within the limit (a decimal like `450.5` or a string like `"45050"` is refused), `lines.length === 10`, page numbers contiguous from 1 per notebook, no duplicate IDs, every page's `notebookId` exists, string lengths within limits. **Cosmetic fields are forgiving:** an unknown colour or font falls back to the default and unknown extra fields are dropped, with a note in the summary.
+4. Validate with a Zod schema. **Text fields are strict too** (decided 23/11/2026): a notebook name, page title or line description with characters outside the English-only set (§5.8) refuses the file with a message naming where; recent-activity entries with such text are dropped with a note. **Money fields are strict:** every paise value must be a safe integer within the limit (a decimal like `450.5` or a string like `"45050"` is refused), `lines.length === 10`, page numbers contiguous from 1 per notebook, no duplicate IDs, every page's `notebookId` exists, string lengths within limits. **Cosmetic fields are forgiving:** an unknown colour or font falls back to the default and unknown extra fields are dropped, with a note in the summary.
 5. **Recompute every chain** with the engine and compare to the stored totals. A mismatch means the file was edited or corrupted: refuse with a message rather than silently "fixing" someone's money.
 6. Show the summary ("3 notebooks, 21 pages, last changed 20/11/2026") and a confirmation that says current data will be replaced.
 7. On confirm: write a safety backup of current data (§6.4), then in **one transaction** clear `notebooks`, `pages`, `activity`, `settings` and bulk-insert the backup. If anything fails, the transaction rolls back and current data is untouched.
@@ -698,6 +702,7 @@ These are this document's proposed defaults. Each is cheap to change because the
 | PDF text selectable? | **Yes (decided 22/11/2026):** real text drawn with pdf-lib, bundled fonts embedded. | `renderSlipPdf` |
 | Final page with invalid amounts? | **Refused (decided 22/11/2026)** until every amount is valid or empty. | `finalisePage` |
 | Devanagari digits, `450/-` suffix | **Accepted (decided 22/11/2026)**: digits mapped to ASCII, suffix stripped. | `parseAmount` |
+| Text in other scripts | **Not in v1 (decided 23/11/2026)**: English-only descriptions, titles and names; other characters removed with a message; restore refuses such files. | `engine/text.ts` |
 
 ---
 
@@ -708,7 +713,7 @@ These are this document's proposed defaults. Each is cheap to change because the
 | iPhone decimal keypad lacks minus and Next | Users cannot enter refunds or move by keyboard | Editing bar with ± and Next (§7.3); tested on a real iPhone in phase 2 |
 | iPhone evicts data of non-installed sites after weeks of non-use | Data loss | Install hint, `persist()`, 30-day backup reminder, Settings shows storage status |
 | `navigator.share` rejected after slow file generation on iPhone | Export seems to do nothing | Second-tap "Share" fallback (§8.3) |
-| Bundled fonts lack glyphs for non-Latin descriptions | Tofu boxes | Screen and canvas fall back to system fonts; the PDF falls back to a bundled Noto Sans Devanagari, and replaces characters no bundled font covers with `?` (§8.2) |
+| Users need text in other scripts (Hindi, Tamil…) | Text removed from descriptions | v1 is English only (§5.8, decided 23/11/2026); the message explains it. Adding scripts later needs a PDF font and shaping strategy |
 | User edits a backup by hand | Wrong totals restored | Restore recomputes chains and refuses mismatches (§9.2) |
 | Long notebooks make every edit rewrite many pages | Slow typing | Only changed pages are written; edits are debounced; budget tested with 200 pages |
 | Service worker serves a stale version | Bug fixes don't reach users | Update prompt; `no-cache` on the service worker file |
