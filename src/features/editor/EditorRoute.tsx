@@ -2,7 +2,8 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect } from 'react';
 import { Navigate, useParams } from 'react-router';
 import { db, updateSettings, verifyNotebook } from '@/db';
-import { editorPath, PageEditor } from './PageEditor';
+import { editorPath } from '../paths';
+import { PageEditor } from './PageEditor';
 
 /** Loads the notebook and page live; redirects for missing or malformed URLs (P2.4, NB-09/10). */
 export function EditorRoute() {

@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { appendPage, newPageTarget } from '@/db';
-import { editorPath } from './editor/PageEditor';
+import { editorPath } from './paths';
 
 /**
  * Bottom-nav "New page" (arch §7.1): append to the last opened notebook (or the most recently

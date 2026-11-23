@@ -77,7 +77,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['**/*.js'],
+    files: ['**/*.{js,mjs}'],
     ...tseslint.configs.disableTypeChecked,
   },
   {
@@ -152,6 +152,8 @@ export default tseslint.config(
       ],
     },
   },
+  // Build and CI scripts report on the console.
+  { files: ['scripts/**'], rules: { 'no-console': 'off' } },
   {
     files: ['tests/**/*.{ts,tsx}', '**/*.test.{ts,tsx}'],
     rules: {

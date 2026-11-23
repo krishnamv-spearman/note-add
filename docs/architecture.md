@@ -60,7 +60,7 @@ Three rules shape everything else:
 | Validation | **Zod** | Validates backup files on restore and settings on read. Gives clear error messages. |
 | Service worker | **vite-plugin-pwa** (Workbox `generateSW`) | As suggested. Precaches the app shell and fonts; generates the manifest. |
 | JPEG export | **Our own Canvas 2D renderer** (no library) | *Departure from spec.* See §8.1. html-to-image depends on SVG `foreignObject`, which on iPhone Safari often renders web fonts missing or late. Drawing directly to a canvas is deterministic and has no dependency. |
-| PDF export | **pdf-lib** + **@pdf-lib/fontkit** | Draws the slip as **real, selectable vector text** with the bundled fonts embedded (subset), from the same layout constants and `SlipModel` as the canvas renderer (decided 22/11/2026; see §8.2). Small, no runtime dependencies, works without the DOM so it is testable in Node. |
+| PDF export | **pdf-lib** + a small in-house TrueType toolkit (`export/ttf.ts`) | Draws the slip as **real, selectable vector text** with the bundled fonts embedded (subset), from the same layout constants and `SlipModel` as the canvas renderer (decided 22/11/2026; see §8.2). fontkit was replaced in phase 7 (D37): it was half of the export chunk and its shaping is not needed for English-only text. Works without the DOM, so it is testable in Node. |
 | Fonts | **Self-hosted WOFF2 files** in the bundle (from Fontsource packages or vendored, with `OFL.txt` for each) | Must work offline and be identical everywhere (§4). |
 | Unit tests | **Vitest** + **fast-check** (property tests) + **fake-indexeddb** | Vitest as suggested. Property tests prove the engine against a reference implementation; fake-indexeddb lets repositories be tested without a browser. |
 | E2E tests | **Playwright** (Chromium desktop, Pixel 7 emulation, iPhone 14 WebKit emulation) | As suggested. WebKit project catches most Safari-specific breakage before device testing. |
@@ -481,7 +481,7 @@ Rendering at a fixed logical size (for example 1080 × 1350 px, portrait slip) m
 ### 8.2 Formats
 
 - **JPEG:** `canvas.toBlob(cb, 'image/jpeg', 0.92)`.
-- **PDF (decided 22/11/2026):** drawn directly with pdf-lib as **real, selectable text**, not an image. `renderSlipPdf(model, fonts)` uses the same `SlipModel` and the same layout constants as the canvas renderer, scaled to a page with the slip's aspect ratio (4:5, 108 × 135 mm). Fonts: the chosen slip font (regular + bold) and Work Sans are **embedded** from the bundled font files with `@pdf-lib/fontkit` (`subset: true`), so the PDF looks the same on any viewer and needs no installed fonts. The paper colour, ruled lines and rules are vector shapes.
+- **PDF (decided 22/11/2026):** drawn directly with pdf-lib as **real, selectable text**, not an image. `renderSlipPdf(model, fonts)` uses the same `SlipModel` and the same layout constants as the canvas renderer, scaled to a page with the slip's aspect ratio (4:5, 108 × 135 mm). Fonts: the chosen slip font (regular + bold) and Work Sans are **embedded** from the bundled WOFF files as TrueType subsets made by `export/ttf.ts` (WOFF → TrueType, then only the glyphs the page uses, **glyph IDs unchanged**, plus composite-glyph components, the hinting tables, and tiny cmap/name/post tables), so the PDF looks the same on any viewer and needs no installed fonts. There is no kerning or shaping: Latin text and amounts only. `@pdf-lib/fontkit` stays a dev dependency, used by tests to prove the subsets have identical outlines and widths. The paper colour, ruled lines and rules are vector shapes.
   - **Fonts per text run:** each run is drawn with the first font in the chain *slip font latin → slip font latin-ext → Work Sans latin → Work Sans latin-ext* that has the glyph (Atkinson Hyperlegible and Caladea have no `₹`, for example). With the English-only rule (§5.8, decided 23/11/2026) every allowed character is covered; a test checks this for every font. A character no bundled font covers would become `?`, as a safeguard only. No other-script fallback font and no `regenerator-runtime` workaround are bundled (both removed 23/11/2026).
   - Long descriptions are truncated with an ellipsis using the embedded font's own widths, the same rule as the canvas.
   - pdf-lib needs no `eval` and runs under the CSP.
@@ -673,9 +673,9 @@ Vercel project linked to the GitHub repo: preview deployments for every branch, 
 
 | Item | Budget |
 |---|---|
-| Initial JS (gzip) | ≤ 150 KB (React + router + Dexie + app) |
+| Initial JS (gzip) | ≤ 150 KB (React + router + Dexie + the library screen), **achieved: 143 KB**. The editor, pages list and Settings are route-split; `npm run size` enforces both budgets |
 | Fonts on first load | Only Work Sans + the selected slip font are preloaded; the other three are precached by the service worker after load |
-| Export chunk (pdf-lib + fontkit + renderer) | Lazy; ≤ 250 KB gzip (font files for PDF embedding are fetched from the app's own origin at export time and are not counted) |
+| Export chunk (pdf-lib + `ttf.ts` + renderer) | Lazy; ≤ 250 KB gzip, **achieved: 77 KB** (D37). pdf-lib's unused standard-font metrics and PNG codec are stubbed at build time (`export/stubs/`). Font files for PDF embedding are fetched from the app's own origin at export time and are not counted |
 | Time to interactive, mid-range Android, 4G, first visit | < 2 s |
 | Repeat visit (from service worker) | < 1 s |
 | Recalculation of a 200-page notebook | < 50 ms including the IndexedDB write |

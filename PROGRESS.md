@@ -15,6 +15,7 @@ Run started 22/11/2026. Owner decisions of 22/11/2026 applied to the docs first:
 | 5 Export | ✅ done | 362 | 73 (+62 skipped) |
 | 6 Backup | ✅ done | 407 (+1 opt-in generator) | 82 (+80 skipped) |
 | English-only (23/11) | ✅ done | 429 (+1 opt-in generator) | 82 (+80 skipped) |
+| 7 PWA (branch `build/phase-7`) | in progress | see Phase 7 section | see Phase 7 section |
 
 (Counts are cumulative totals after the phase. E2E counts are tests × projects.)
 
@@ -199,6 +200,25 @@ Open items carried forward: D37 (bundle budgets), D32 (LOOK-02 metric fallbacks)
 
 ---
 
+## Phase 7 — PWA, offline, accessibility and performance (branch `build/phase-7`)
+
+Branch created from `build/phases-0-6`. Never pushed, never deployed. Steps are committed one at a time.
+
+### Step 1 — Bundle budgets (D37) ✅
+
+**Result:** initial JS **143.1 KB gzip** (budget 150) and export chunk **76.6 KB gzip** (budget 250). Both budgets are met, not just approached. `npm run size` (`scripts/check-bundle.mjs`) enforces them and runs in CI after the build.
+
+**How**
+- **Export chunk 515 KB → 77 KB.** fontkit was half of it, and its shaping and Unicode data are not needed for English-only text. Replaced by `src/features/export/ttf.ts`: reads the bundled WOFF files, subsets each font to the characters a page uses while **keeping glyph IDs**, and exposes the small font object pdf-lib's non-subset embedder needs. pdf-lib's unused standard-font metrics (about 100 KB) and PNG codec are stubbed at build time (`src/features/export/stubs/`, aliases in `vite.config.ts`). `@pdf-lib/fontkit` is now a dev dependency, used only by tests.
+- **Initial chunk 154.5 KB → 143.1 KB.** The editor, the pages list and Settings are route-split (`lazy` routes with a loading fallback); the library screen stays in the first chunk. Path helpers moved to `src/features/paths.ts` so screens can link without importing each other.
+- Checked the result **visually**: sample PDFs (Carlito and Merriweather, with accents, `₹`, ellipsis, notes and the flag dot) rendered with pdf.js in Chromium look correct.
+
+**Tests (all pass, none weakened):** the 11 existing PDF tests (real text extraction, fonts embedded, glyph coverage for every allowed character, no `?`) pass unchanged on the new engine. New `tests/unit/ttf.test.ts` (20 tests): WOFF read agrees with fontkit on metrics, cmap and widths for 7 font files; subsets have **identical glyph outlines and widths** (compared with fontkit, per font); composite (accented) glyph components are kept; table set and checksum adjustment are valid; unmapped characters become `.notdef`; CFF and non-fonts are rejected.
+
+**A flaky test, found and fixed (not an app bug).** Route-splitting exposed a race: about 1 run in 40 on the iPhone (WebKit) project lost an amount typed straight after creating a page. Playwright's `fill()` focuses the amount field and then inserts text into whatever is focused; the app's documented behaviour (KBD-03) moves focus to line 1 of the new page right after navigation, so occasionally the text went into the description. Proven with a temporary trace of the save path (removed). The `newPageFromEditor` / `newPageFromNav` helpers now wait for that focus (which also strengthens the check of KBD-03). 360 runs (10 repeats × 5 specs × 3 projects): 0 failures. I also tightened the amount field's focus handler so it never overwrites text that already changed (it was not the cause; it is harmless and kept).
+
+---
+
 ## Decisions to review
 
 | # | Phase | Decision | Why |
@@ -247,6 +267,9 @@ Open items carried forward: D37 (bundle budgets), D32 (LOOK-02 metric fallbacks)
 | D51 | 23/11 | The message shows on the edit that removed characters and clears on the next clean edit; when both apply, "Only English text…" wins over "Cut to 120 characters". Text that is only composed (letter + combining accent → `é`) shows no message. | Clear, low-noise feedback. |
 | D52 | 23/11 | Restore refuses names, titles and descriptions with unsupported characters (strict); recent-activity entries are treated as cosmetic and dropped with a note; typed amount text keeps any characters (Devanagari digits are valid amounts). | As instructed for text fields; activity text is generated, not user data. |
 | D53 | 23/11 | The repository also filters names, titles and descriptions, so no code path can store unsupported text. | Same rule as money: enforced below the UI. |
+| **D54** | **7** | **D37 resolved: budgets met.** Initial JS 143 KB, export chunk 77 KB (see Phase 7 step 1). The export chunk got there by replacing fontkit with an in-house TrueType subsetter (`export/ttf.ts`) and stubbing pdf-lib's unused standard-font and PNG data. | Closest figure was not needed. Trade-off: no kerning or shaping in the PDF (fine for Latin text and amounts; the PDF is 100% consistent with ADR 002). |
+| D55 | 7 | The first chunk now holds only the library screen; the editor, pages list and Settings are separate chunks fetched on first navigation (precached once the service worker is active). A cold start directly on an editor URL costs one extra request. | The only way to keep React + router + Dexie + app under 150 KB with room for the PWA code. |
+| D56 | 7 | Sizes use zlib's default gzip level (what Vite reports), which is slightly larger than level 9, so the check is conservative. | Same figure as the build report. |
 | D44 | 6 | The safety backup is written **inside the same transaction** as the replacement, so a failed restore also leaves no stray safety copy. | Simplest guarantee that a failure changes nothing. |
 | D45 | 6 | Undo deletes the safety copy it used; the restore it runs saves the current data as a new one, so "Undo last restore" always means "go back one step". | RES-14 (undo is undoable) without ping-pong confusion. |
 | D46 | 6 | A notebook with no pages, unreadable activity entries and an unknown `lastOpenedNotebookId` are handled as: refused / left out with a note / reset to none. Invalid dates and statuses are refused (strict). | Pages are needed for a usable notebook; activity and the last-opened pointer are cosmetic. |

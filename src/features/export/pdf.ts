@@ -1,7 +1,6 @@
-import fontkit from '@pdf-lib/fontkit';
 import { PDFDocument, type PDFFont, type PDFPage, rgb } from 'pdf-lib';
 import { parseHex } from '@/engine';
-import { type FontChains, type FontKey, fontChains } from './fontFiles';
+import { type FontKey, fontChains } from './fontFiles';
 import {
   AMOUNT_COL_W,
   COL_GAP,
@@ -9,6 +8,7 @@ import {
   fitText,
   LINE_H,
   MARGIN_X,
+  NOTES_LINE_H,
   PDF_H,
   PDF_SCALE,
   PDF_W,
@@ -21,103 +21,76 @@ import {
   SIZE_NOTES,
   SIZE_TITLE,
   SLIP_W,
+  wrapNotes,
   Y_FOOTER,
   Y_META,
   Y_NOTEBOOK,
   Y_NOTES,
-  NOTES_LINE_H,
-  wrapNotes,
   Y_TITLE,
 } from './layout';
 import type { SlipModel } from './model';
+import { miniFontkit, type ParsedFont, parseFont, readFontTables, subsetFont } from './ttf';
 
 export type LoadFont = (key: FontKey) => Promise<Uint8Array>;
-
-interface ChainFont {
-  key: FontKey;
-  has: (codePoint: number) => boolean;
-  embedded: PDFFont | null;
-  bytes: Uint8Array;
-}
-
-interface Run {
-  font: ChainFont;
-  text: string;
-}
 
 const colour = (hex: string) => {
   const [r, g, b] = parseHex(hex);
   return rgb(r / 255, g / 255, b / 255);
 };
 
+interface Run {
+  key: FontKey;
+  text: string;
+}
+
 /**
- * A fallback chain of fonts. Characters go to the first font that has them; characters no
- * font has become "?" (a safeguard; the English-only rule means it does not happen, TXT-07). Fonts are embedded (subset) only when a run needs them.
+ * A fallback chain of fonts: characters go to the first font that has them; a character no
+ * font has becomes "?" (a safeguard; the English-only rule means it does not happen, TXT-07).
  */
 class Chain {
-  constructor(
-    private readonly doc: PDFDocument,
-    private readonly fonts: ChainFont[],
-  ) {}
+  /** The font that draws the "?" for a character nobody has (the chain's first font). */
+  private readonly fallback: FontKey;
 
-  static async create(doc: PDFDocument, keys: FontKey[], load: LoadFont): Promise<Chain> {
-    const fonts = await Promise.all(
-      keys.map(async (key) => {
-        const bytes = await load(key);
-        const fk = fontkit.create(bytes);
-        return { key, bytes, embedded: null, has: (cp: number) => fk.hasGlyphForCodePoint(cp) };
-      }),
-    );
-    return new Chain(doc, fonts);
+  constructor(
+    private readonly keys: FontKey[],
+    private readonly parsed: Map<FontKey, ParsedFont>,
+    private readonly embedded: Map<FontKey, PDFFont>,
+  ) {
+    this.fallback = keys[0] ?? 'work-sans-latin-400';
   }
 
   runs(text: string): Run[] {
     const runs: Run[] = [];
-    const primary = this.fonts[0] as ChainFont;
     for (const ch of text) {
       const cp = ch.codePointAt(0) as number;
-      const font = this.fonts.find((f) => f.has(cp));
-      const piece = font ? ch : '?';
-      const use = font ?? primary;
+      const key = this.keys.find((k) => this.parsed.get(k)?.cmap.has(cp));
+      const use = key ?? this.fallback;
+      const piece = key ? ch : '?';
       const last = runs.at(-1);
-      if (last?.font === use) last.text += piece;
-      else runs.push({ font: use, text: piece });
+      if (last?.key === use) last.text += piece;
+      else runs.push({ key: use, text: piece });
     }
     return runs;
   }
 
-  async embed(runs: Run[]): Promise<void> {
-    for (const r of runs) {
-      r.font.embedded ??= await this.doc.embedFont(r.font.bytes, { subset: true });
-    }
+  private font(key: FontKey): PDFFont {
+    return this.embedded.get(key) as PDFFont;
   }
 
-  async width(text: string, size: number): Promise<number> {
-    const runs = this.runs(text);
-    await this.embed(runs);
-    return runs.reduce(
-      (w, r) => w + (r.font.embedded as PDFFont).widthOfTextAtSize(r.text, size),
+  width(text: string, size: number): number {
+    return this.runs(text).reduce(
+      (w, r) => w + this.font(r.key).widthOfTextAtSize(r.text, size),
       0,
     );
   }
 
-  async draw(
-    page: PDFPage,
-    text: string,
-    x: number,
-    y: number,
-    size: number,
-    hex: string,
-  ): Promise<number> {
-    const runs = this.runs(text);
-    await this.embed(runs);
+  draw(page: PDFPage, text: string, x: number, y: number, size: number, hex: string): void {
     let cx = x;
-    for (const r of runs) {
-      const font = r.font.embedded as PDFFont;
+    for (const r of this.runs(text)) {
+      const font = this.font(r.key);
       page.drawText(r.text, { x: cx, y, size, font, color: colour(hex) });
       cx += font.widthOfTextAtSize(r.text, size);
     }
-    return cx - x;
   }
 }
 
@@ -126,25 +99,66 @@ const px = (x: number) => x * PDF_SCALE;
 const py = (y: number) => PDF_H - y * PDF_SCALE;
 const ps = (size: number) => size * PDF_SCALE;
 
+/** Every string a page can draw, plus the ellipsis and "?" that fitting and fallback add. */
+function allStrings(model: SlipModel): string[] {
+  return [
+    model.notebookName,
+    model.pageTitle,
+    `${model.dateDisplay} · ${model.pageLabel} · ${model.statusLabel}`,
+    ...model.notes,
+    'Brought forward',
+    'Total',
+    model.broughtForward,
+    model.total,
+    model.footer,
+    ...model.lines.flatMap((l) => [l.description, l.amount]),
+    '…?',
+  ];
+}
+
 /**
  * P5.5 (decided 22/11/2026): the slip as real, selectable text with the bundled fonts
- * embedded. Same model and layout constants as the canvas renderer.
+ * embedded (as TrueType subsets made by ./ttf, glyph IDs unchanged). Same model and layout
+ * constants as the canvas renderer.
  */
 export async function renderSlipPdf(model: SlipModel, load: LoadFont): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
-  doc.registerFontkit(fontkit);
+  doc.registerFontkit(miniFontkit as never);
   doc.setTitle(`${model.notebookName} – ${model.pageTitle}`);
   doc.setSubject(`${model.pageLabel}, ${model.dateDisplay}`);
   doc.setCreator('Note-Add');
   doc.setProducer('Note-Add');
 
-  const chains: FontChains = fontChains(model.fontId);
-  const [body, bold, ui, uiBold] = await Promise.all([
-    Chain.create(doc, chains.body, load),
-    Chain.create(doc, chains.bold, load),
-    Chain.create(doc, chains.ui, load),
-    Chain.create(doc, chains.uiBold, load),
-  ]);
+  const chains = fontChains(model.fontId);
+  const keys = [...new Set([...chains.body, ...chains.bold, ...chains.ui, ...chains.uiBold])];
+  const parsed = new Map<FontKey, ParsedFont>(
+    await Promise.all(
+      keys.map(async (k) => [k, parseFont(await readFontTables(await load(k)))] as const),
+    ),
+  );
+
+  // Which characters does each font draw? Subset each used font once, then embed it.
+  const strings = allStrings(model);
+  const usage = new Map<FontKey, Set<number>>();
+  for (const list of [chains.body, chains.bold, chains.ui, chains.uiBold]) {
+    const probe = new Chain(list, parsed, new Map());
+    for (const s of strings) {
+      for (const run of probe.runs(s)) {
+        const set = usage.get(run.key) ?? new Set<number>();
+        for (const ch of run.text) set.add(ch.codePointAt(0) as number);
+        usage.set(run.key, set);
+      }
+    }
+  }
+  const embedded = new Map<FontKey, PDFFont>();
+  for (const [key, codePoints] of usage) {
+    const font = parsed.get(key) as ParsedFont;
+    embedded.set(key, await doc.embedFont(subsetFont(font, codePoints)));
+  }
+  const body = new Chain(chains.body, parsed, embedded);
+  const bold = new Chain(chains.bold, parsed, embedded);
+  const ui = new Chain(chains.ui, parsed, embedded);
+  const uiBold = new Chain(chains.uiBold, parsed, embedded);
 
   const page = doc.addPage([PDF_W, PDF_H]);
   page.drawRectangle({ x: 0, y: 0, width: PDF_W, height: PDF_H, color: colour(model.paper) });
@@ -153,18 +167,12 @@ export async function renderSlipPdf(model: SlipModel, load: LoadFont): Promise<U
   const right = SLIP_W - MARGIN_X;
   const text = (c: Chain, s: string, x: number, y: number, size: number, hex: string) =>
     c.draw(page, s, px(x), py(y), ps(size), hex);
-  const fitted = async (c: Chain, s: string, max: number, size: number) => {
-    // Measure in slip units so the ellipsis rule matches the canvas renderer.
-    const widths = new Map<string, number>();
-    const measure = (t: string) => widths.get(t) ?? 0;
-    const candidates = [s, ...[...s].map((_, i) => [...s].slice(0, i).join('').trimEnd() + '…')];
-    for (const t of candidates) widths.set(t, (await c.width(t, ps(size))) / PDF_SCALE);
-    return fitText(s, max, measure);
-  };
-  const rightAligned = async (c: Chain, s: string, y: number, size: number, hex: string) => {
-    const w = (await c.width(s, ps(size))) / PDF_SCALE;
-    await text(c, s, right - w, y, size, hex);
-  };
+  // Measure in slip units so the ellipsis rule matches the canvas renderer.
+  const measure = (c: Chain, size: number) => (t: string) => c.width(t, ps(size)) / PDF_SCALE;
+  const fitted = (c: Chain, s: string, max: number, size: number) =>
+    fitText(s, max, measure(c, size));
+  const rightAligned = (c: Chain, s: string, y: number, size: number, hex: string) =>
+    text(c, s, right - measure(c, size)(s), y, size, hex);
   const rule = (y: number, hex: string, thickness = 2) =>
     page.drawLine({
       start: { x: px(left), y: py(y) },
@@ -174,23 +182,23 @@ export async function renderSlipPdf(model: SlipModel, load: LoadFont): Promise<U
     });
 
   // Header
-  await text(
+  text(
     ui,
-    await fitted(ui, model.notebookName, right - left, SIZE_NOTEBOOK),
+    fitted(ui, model.notebookName, right - left, SIZE_NOTEBOOK),
     left,
     Y_NOTEBOOK,
     SIZE_NOTEBOOK,
     model.ink2,
   );
-  await text(
+  text(
     uiBold,
-    await fitted(uiBold, model.pageTitle, right - left, SIZE_TITLE),
+    fitted(uiBold, model.pageTitle, right - left, SIZE_TITLE),
     left,
     Y_TITLE,
     SIZE_TITLE,
     model.ink,
   );
-  await text(
+  text(
     ui,
     `${model.dateDisplay} · ${model.pageLabel} · ${model.statusLabel}`,
     left,
@@ -198,46 +206,27 @@ export async function renderSlipPdf(model: SlipModel, load: LoadFont): Promise<U
     SIZE_META,
     model.ink2,
   );
-  if (model.notes.length > 0) {
-    const size = ps(SIZE_NOTES);
-    const widths = new Map<string, number>();
-    const all = model.notes.join(' · ');
-    const candidates = new Set<string>();
-    for (let a = 0; a < model.notes.length; a++) {
-      for (let b = a + 1; b <= model.notes.length; b++)
-        candidates.add(model.notes.slice(a, b).join(' · '));
-    }
-    for (const c of [...candidates]) {
-      for (let k = 0; k <= [...c].length; k++)
-        candidates.add([...c].slice(0, k).join('').trimEnd() + '…');
-    }
-    candidates.add(all);
-    for (const c of candidates) widths.set(c, (await ui.width(c, size)) / PDF_SCALE);
-    const lines = wrapNotes(model.notes, right - left, (t) => widths.get(t) ?? 0);
-    for (const [k, line] of lines.entries()) {
-      await text(ui, line, left, Y_NOTES + k * NOTES_LINE_H, SIZE_NOTES, model.ink2);
-    }
-  }
+  wrapNotes(model.notes, right - left, measure(ui, SIZE_NOTES)).forEach((line, k) =>
+    text(ui, line, left, Y_NOTES + k * NOTES_LINE_H, SIZE_NOTES, model.ink2),
+  );
 
   // Brought forward, ten lines, total
-  await text(bold, 'Brought forward', left, rowBaseline(0), SIZE_LINE, model.ink);
-  await rightAligned(body, model.broughtForward, rowBaseline(0), SIZE_LINE, model.ink);
+  text(bold, 'Brought forward', left, rowBaseline(0), SIZE_LINE, model.ink);
+  rightAligned(body, model.broughtForward, rowBaseline(0), SIZE_LINE, model.ink);
   rule(rowBottom(0), model.rule);
   for (const [i, line] of model.lines.entries()) {
     const y = rowBaseline(i + 1);
     if (line.description) {
-      await text(
+      text(body, fitted(body, line.description, DESC_W, SIZE_LINE), left, y, SIZE_LINE, model.ink);
+    }
+    if (line.amount) {
+      rightAligned(
         body,
-        await fitted(body, line.description, DESC_W, SIZE_LINE),
-        left,
+        fitted(body, line.amount, AMOUNT_COL_W, SIZE_LINE),
         y,
         SIZE_LINE,
         model.ink,
       );
-    }
-    if (line.amount) {
-      const amount = await fitted(body, line.amount, AMOUNT_COL_W, SIZE_LINE);
-      await rightAligned(body, amount, y, SIZE_LINE, model.ink);
       if (line.flagged) {
         page.drawCircle({
           x: px(right - AMOUNT_COL_W - COL_GAP / 2),
@@ -251,12 +240,12 @@ export async function renderSlipPdf(model: SlipModel, load: LoadFont): Promise<U
   }
   const totalY = rowBaseline(model.lines.length + 1);
   rule(totalY - LINE_H + 12, model.ink2, 3);
-  await text(bold, 'Total', left, totalY, SIZE_LINE, model.ink);
-  await rightAligned(bold, model.total, totalY, SIZE_LINE, model.ink);
+  text(bold, 'Total', left, totalY, SIZE_LINE, model.ink);
+  rightAligned(bold, model.total, totalY, SIZE_LINE, model.ink);
 
   // Footer
-  const fw = (await ui.width(model.footer, ps(SIZE_FOOTER))) / PDF_SCALE;
-  await text(ui, model.footer, (SLIP_W - fw) / 2, Y_FOOTER, SIZE_FOOTER, model.ink2);
+  const fw = measure(ui, SIZE_FOOTER)(model.footer);
+  text(ui, model.footer, (SLIP_W - fw) / 2, Y_FOOTER, SIZE_FOOTER, model.ink2);
 
   return doc.save({ useObjectStreams: false });
 }

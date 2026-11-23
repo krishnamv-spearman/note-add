@@ -18,7 +18,7 @@ import { slipColour } from '@/theme/colours';
 import { StatusBadge } from '@/ui/bits';
 import { Slip } from '@/ui/Slip';
 import { ConfirmDialog } from '@/ui/Dialog';
-import { editorPath } from '../editor/PageEditor';
+import { editorPath } from '../paths';
 import { ExportControls } from '../export/ExportControls';
 import { NotebookDialog } from '../library/NewNotebookDialog';
 

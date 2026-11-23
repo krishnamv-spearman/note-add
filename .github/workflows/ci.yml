@@ -24,6 +24,7 @@ jobs:
       - run: npm run format:check
       - run: npm test
       - run: npm run build
+      - run: npm run size # bundle budgets (arch §14, D37)
 
   time-zones:
     # test-plan §3: date suites under other zones catch local-vs-UTC mistakes.

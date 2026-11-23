@@ -5,10 +5,8 @@ import { displayTitle, formatPaise, normalise, search } from '@/engine';
 import { createNotebook, db, notebookSummaries, recentActivity, repoErrorMessage } from '@/db';
 import { AddBookTile, NotebookStack, StatusBadge } from '@/ui/bits';
 import { ReminderBanner } from '../backup/ReminderBanner';
-import { editorPath } from '../editor/PageEditor';
+import { editorPath, notebookPath } from '../paths';
 import { NotebookDialog } from './NewNotebookDialog';
-
-export const notebookPath = (id: string): string => `/n/${id}`;
 
 function SearchResults({ query }: { query: string }) {
   const data = useLiveQuery(async () => {

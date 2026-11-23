@@ -65,6 +65,9 @@ export async function newPageFromEditor(page: Page, expectNumber: number): Promi
   await expect(
     page.getByRole('heading', { name: `Page ${expectNumber} of ${expectNumber}` }),
   ).toBeVisible();
+  // KBD-03: the app moves focus to line 1 of the new page. Wait for it, or a following
+  // fill() can race that move and type into the description instead of the amount.
+  await expect(description(page, 1)).toBeFocused();
 }
 
 /** Mark the open page Final through the confirmation dialog. */
@@ -101,4 +104,7 @@ export async function newPageFromNav(page: Page, expectNumber: number): Promise<
   await expect(
     page.getByRole('heading', { name: `Page ${expectNumber} of ${expectNumber}` }),
   ).toBeVisible();
+  // KBD-03: the app moves focus to line 1 of the new page. Wait for it, or a following
+  // fill() can race that move and type into the description instead of the amount.
+  await expect(description(page, 1)).toBeFocused();
 }

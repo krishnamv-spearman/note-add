@@ -29,15 +29,13 @@ import { ConfirmDialog, Dialog } from '@/ui/Dialog';
 import { ExportControls } from '../export/ExportControls';
 import { Slip } from '@/ui/Slip';
 import { slipColour } from '@/theme/colours';
+import { editorPath } from '../paths';
 import { DateField } from './DateField';
 import { EditingBar } from './EditingBar';
 import { EditorSession } from './EditorSession';
 import { amountState, fieldIndex } from './editorModel';
 
 const displayTitleOf = (page: Page): string => page.title ?? defaultTitle(page.number);
-
-export const editorPath = (notebookId: string, pageNumber: number): string =>
-  `/n/${notebookId}/p/${pageNumber}`;
 
 interface Props {
   notebook: Notebook;
@@ -403,7 +401,10 @@ export function PageEditor({ notebook, page, pageCount }: Props) {
                       // FMT-06: show the raw text while focused. Swap it synchronously so the
                       // value never changes under the user's caret or selection.
                       // If the text changed (formatted → raw), select it all so typing replaces it.
-                      if (e.currentTarget.value !== line.amountText) {
+                      // Only when the field still holds exactly the formatted text we rendered:
+                      // if something already changed it (a fast fill, autofill, an IME), the
+                      // user's text must never be overwritten by a late focus event.
+                      if (shown !== line.amountText && e.currentTarget.value === shown) {
                         e.currentTarget.value = line.amountText;
                         e.currentTarget.select();
                       }

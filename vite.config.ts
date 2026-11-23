@@ -25,7 +25,16 @@ export default defineConfig({
   base: process.env.VITE_BASE ?? '/',
   plugins: [react()],
   resolve: {
-    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      // Bundle budget (D37): pdf-lib's unused standard-font metrics and PNG codec are stubbed.
+      '@pdf-lib/standard-fonts': fileURLToPath(
+        new URL('./src/features/export/stubs/standard-fonts.ts', import.meta.url),
+      ),
+      '@pdf-lib/upng': fileURLToPath(
+        new URL('./src/features/export/stubs/upng.ts', import.meta.url),
+      ),
+    },
   },
   define: {
     __APP_VERSION__: JSON.stringify(process.env.npm_package_version ?? '0.0.0'),
