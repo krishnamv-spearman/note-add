@@ -367,8 +367,8 @@ Phase 6 can be built in parallel with phase 5 once phase 4's Settings screen exi
 - [x] **P7.5a Data-loss banners** (arch §10.5): in-app browser (SHR-07) and private window (STO-02).
 - [x] **P7.6 Vercel headers check**: service worker served with `Cache-Control: no-cache`; hashed assets cached long-term; CSP still passes with the service worker registered.
 - [x] **P7.7 Accessibility pass** (automated parts done; the TalkBack and VoiceOver spot checks are manual tests M7.10–M7.12 in PROGRESS.md): axe checks in Playwright on every screen (`@axe-core/playwright`), keyboard-only walkthrough, screen reader spot checks (TalkBack and VoiceOver) on the editor, focus management in dialogs, `prefers-reduced-motion` respected.
-- [ ] **P7.8 Performance pass** (step 1 done: budgets met, see D37 in PROGRESS.md) (arch §14): bundle size limit in CI (initial ≤ 150 KB gzip; export chunk ≤ 250 KB), font preloading as planned, no layout shift when fonts load. Test the 200-page recalculation timing in a repository benchmark test.
-- [ ] **P7.9 Lighthouse CI** (`@lhci/cli`) on `main` with the mobile preset: accessibility ≥ 95, performance ≥ 90, best practices ≥ 90.
+- [x] **P7.8 Performance pass** (done: budgets met, D37; benchmark, font preloads, CLS test, D75) (arch §14): bundle size limit in CI (initial ≤ 150 KB gzip; export chunk ≤ 250 KB), font preloading as planned, no layout shift when fonts load. Test the 200-page recalculation timing in a repository benchmark test.
+- [x] **P7.9 Lighthouse CI** (`@lhci/cli`) on `main` with the mobile preset: accessibility ≥ 95, performance ≥ 90, best practices ≥ 90.
 
 ### Tests
 

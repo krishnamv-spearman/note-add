@@ -105,6 +105,10 @@ export function applySlipFont(id: string | null | undefined): void {
   const font = slipFont(id);
   preload(CHROME_FONT.preload);
   preload(font.preload);
+  // The build preloads the default slip font from the HTML; drop it if another one is in use.
+  if (font.id !== SLIP_FONTS[0]?.id) {
+    document.head.querySelectorAll('link[data-default-slip]').forEach((l) => l.remove());
+  }
   document.documentElement.style.setProperty('--slip-font', font.stack);
   document.documentElement.dataset.slipFont = font.id;
 }

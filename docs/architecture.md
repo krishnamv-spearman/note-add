@@ -678,11 +678,12 @@ Vercel project linked to the GitHub repo: preview deployments for every branch, 
 | Item | Budget |
 |---|---|
 | Initial JS (gzip) | ≤ 150 KB (React + router + Dexie + the library screen), **achieved: 143 KB**. The editor, pages list and Settings are route-split; `npm run size` enforces both budgets |
-| Fonts on first load | Only Work Sans + the selected slip font are preloaded; the other three are precached by the service worker after load |
+| Fonts on first load | Work Sans 400/600 and the default slip font (Carlito) are preloaded by `<link rel="preload">` tags the build injects into `index.html` (`fontPreloads` in `vite.config.ts`); `applySlipFont` adds the chosen font's preload and removes the default's if another font is selected. Latin subsets only; the rest are precached by the service worker after load |
 | Export chunk (pdf-lib + `ttf.ts` + renderer) | Lazy; ≤ 250 KB gzip, **achieved: 77 KB** (D37). pdf-lib's unused standard-font metrics and PNG codec are stubbed at build time (`export/stubs/`). Font files for PDF embedding are fetched from the app's own origin at export time and are not counted |
-| Time to interactive, mid-range Android, 4G, first visit | < 2 s |
-| Repeat visit (from service worker) | < 1 s |
-| Recalculation of a 200-page notebook | < 50 ms including the IndexedDB write |
+| Time to interactive, mid-range Android, 4G, first visit | < 2 s. Lighthouse (mobile preset, simulated slow 4G, 4× CPU): FCP 0.75 s, TBT 0 ms; LCP 2.7 s library, 3.5 s Settings (LCP there is bound by script and database start-up, not by fonts; the preloads did not change it) |
+| Repeat visit (from service worker) | < 1 s: `domInteractive` asserted in `tests/e2e/perf.spec.ts` |
+| Layout shift | CLS < 0.1 asserted per screen on cold load (`perf.spec.ts`); Lighthouse 0.00–0.02 |
+| Recalculation of a 200-page notebook | < 50 ms including the IndexedDB write (×2 on CI). **Measured: median 5.7 ms** (`src/db/perf.repo.test.ts`, fake-indexeddb); 1,000 pages edits in well under 1 s; a 1,000-page backup is a few MB |
 
 Vite's bundle report is checked in CI with a size-limit step that fails if the initial bundle exceeds the budget.
 

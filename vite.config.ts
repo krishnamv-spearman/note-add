@@ -94,9 +94,45 @@ const pwa = VitePWA({
 
 const testTz = process.env.TEST_TZ ?? 'Asia/Kolkata';
 
+/** P7.8: preload the first-paint fonts from the HTML itself, so the downloads start with the
+ *  page instead of after the JavaScript and the database open (arch §14). The default slip font
+ *  is marked so applySlipFont can drop it when the user chose another one. */
+function fontPreloads(): Plugin {
+  const wanted: [RegExp, boolean][] = [
+    [/work-sans-latin-400-normal[^/]*.woff2$/, false],
+    [/work-sans-latin-600-normal[^/]*.woff2$/, false],
+    [/carlito-latin-400-normal[^/]*.woff2$/, true],
+  ];
+  return {
+    name: 'font-preloads',
+    apply: 'build',
+    transformIndexHtml(_html, ctx) {
+      const names = Object.keys(ctx.bundle ?? {});
+      return wanted.flatMap(([re, slip]) => {
+        const file = names.find((n) => re.test(n));
+        if (!file) return [];
+        return [
+          {
+            tag: 'link',
+            injectTo: 'head' as const,
+            attrs: {
+              rel: 'preload',
+              as: 'font',
+              type: 'font/woff2',
+              crossorigin: 'anonymous',
+              href: `${base}${file}`,
+              ...(slip ? { 'data-default-slip': '' } : {}),
+            },
+          },
+        ];
+      });
+    },
+  };
+}
+
 export default defineConfig({
   base,
-  plugins: [react(), vercelHeaders(base), ...(process.env.VITEST ? [] : [pwa])],
+  plugins: [react(), vercelHeaders(base), fontPreloads(), ...(process.env.VITEST ? [] : [pwa])],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
