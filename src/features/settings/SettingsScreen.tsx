@@ -6,8 +6,8 @@ import { type FontId, getSettings, updateSettings } from '@/db';
 import { SLIP_FONTS, slipFont } from '@/theme/fonts';
 import { Slip } from '@/ui/Slip';
 import { InstallButton } from '../pwa/InstallButton';
-import { StorageStatus } from '../pwa/StorageStatus';
-import { BackupSection } from '../backup/BackupSection';
+import { StorageStatusView, useStorageStatus } from '../pwa/StorageStatus';
+import { BackupSection, useBackupData } from '../backup/BackupSection';
 
 export const PRIVACY_STATEMENT =
   'Note-Add stores your notes only on your device. Nothing is sent to Spearman or anyone else. Backups and exports go only where you choose to send them.';
@@ -54,17 +54,34 @@ function FontPreview({ fontId }: { fontId: FontId }) {
 /** Spec §3.4: Font · Backup · Restore · About and privacy. */
 export function SettingsScreen() {
   const settings = useLiveQuery(getSettings, []);
+  const backup = useBackupData();
+  const storage = useStorageStatus();
   const name = useId();
   // Optimistic: the radio follows the tap at once; the stored setting catches up.
   const [choice, setChoice] = useState<FontId | null>(null);
-  const current = choice ?? settings?.font ?? 'carlito';
 
-  return (
-    <section className="settings" aria-labelledby="settings-heading">
+  const header = (
+    <>
       <Link to="/" className="back-link">
         ‹ Notebooks
       </Link>
       <h1 id="settings-heading">Settings</h1>
+    </>
+  );
+  // Show the page once everything it needs has been read, all at once: sections that pop in
+  // one by one shift the layout (D73).
+  if (!settings || !backup || storage === undefined) {
+    return (
+      <section className="settings" aria-labelledby="settings-heading">
+        {header}
+      </section>
+    );
+  }
+  const current = choice ?? settings.font;
+
+  return (
+    <section className="settings" aria-labelledby="settings-heading">
+      {header}
 
       <section aria-labelledby="font-heading">
         <h2 id="font-heading">Font</h2>
@@ -96,13 +113,13 @@ export function SettingsScreen() {
         <FontPreview fontId={current} />
       </section>
 
-      <BackupSection />
+      <BackupSection data={backup} />
 
       <section aria-labelledby="about-heading">
         <h2 id="about-heading">About and privacy</h2>
         <InstallButton />
         <p>Note-Add version {__APP_VERSION__}</p>
-        <StorageStatus />
+        <StorageStatusView status={storage} />
         <p>
           Made by Spearman ·{' '}
           <a

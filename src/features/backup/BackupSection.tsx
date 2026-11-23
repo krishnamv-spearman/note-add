@@ -22,11 +22,16 @@ interface Pending {
   currentLastChanged: string | null;
 }
 
-/** P6.6: Backup, Restore (file → summary → confirm → done) and Undo last restore. */
-export function BackupSection() {
-  const inputId = useId();
-  const fileInput = useRef<HTMLInputElement>(null);
-  const data = useLiveQuery(async () => {
+export interface BackupData {
+  lastBackupAt: number | null;
+  notebooks: number;
+  /** Safety copies kept for "Undo last restore". */
+  safety: number;
+}
+
+/** What the section shows; `undefined` while it is being read (the screen waits for it). */
+export function useBackupData(): BackupData | undefined {
+  return useLiveQuery(async () => {
     const [settings, notebooks, safety] = await Promise.all([
       getSettings(),
       db.notebooks.count(),
@@ -34,6 +39,12 @@ export function BackupSection() {
     ]);
     return { lastBackupAt: settings.lastBackupAt, notebooks, safety };
   }, []);
+}
+
+/** P6.6: Backup, Restore (file → summary → confirm → done) and Undo last restore. */
+export function BackupSection({ data }: { data: BackupData }) {
+  const inputId = useId();
+  const fileInput = useRef<HTMLInputElement>(null);
   const [pending, setPending] = useState<Pending | null>(null);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
   const [confirmUndo, setConfirmUndo] = useState(false);
@@ -89,7 +100,7 @@ export function BackupSection() {
     pending.inspection.summary.lastChanged < pending.currentLastChanged
       ? pending.currentLastChanged
       : null;
-  const empty = data?.notebooks === 0;
+  const empty = data.notebooks === 0;
 
   return (
     <section aria-labelledby="backup-heading">
@@ -97,7 +108,7 @@ export function BackupSection() {
       <p>
         Last backup:{' '}
         <strong data-testid="last-backup">
-          {data?.lastBackupAt ? epochToDisplay(data.lastBackupAt) : 'Never'}
+          {data.lastBackupAt ? epochToDisplay(data.lastBackupAt) : 'Never'}
         </strong>
       </p>
       <BackupButton label="Back up" disabled={empty} />
@@ -117,7 +128,7 @@ export function BackupSection() {
         />
       </div>
 
-      {data && data.safety > 0 && (
+      {data.safety > 0 && (
         <div className="toolbar">
           <button type="button" className="button" onClick={() => setConfirmUndo(true)}>
             Undo last restore

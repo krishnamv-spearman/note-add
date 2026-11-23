@@ -36,16 +36,20 @@ export function Layout() {
       <header className="app-bar">
         <span className="brand">Note-Add</span>
       </header>
-      <DataLossBanners />
-      <UpdatePrompt />
-      {updated && (
-        <div className="banner" role="alert">
-          <span>Note-Add was updated — reload</span>
-          <button type="button" onClick={() => window.location.reload()}>
-            Reload
-          </button>
-        </div>
-      )}
+      {/* Transient notices float above the bottom navigation: they can appear at any moment
+          (service worker, storage checks) and must never push the page down under a tap (D73). */}
+      <div className="toast-layer">
+        <DataLossBanners />
+        <UpdatePrompt />
+        {updated && (
+          <div className="banner" role="alert">
+            <span>Note-Add was updated — reload</span>
+            <button type="button" onClick={() => window.location.reload()}>
+              Reload
+            </button>
+          </div>
+        )}
+      </div>
       {notice && (
         <p className="banner" role="status">
           {notice}

@@ -445,6 +445,10 @@ Final pages render inputs as `readOnly` (not `disabled`, so text stays selectabl
 - `StatusBadge` — Draft / Final.
 - `ConfirmDialog` — native `<dialog>` element for delete, restore and Final confirmations.
 
+### 7.6 Accessibility (phase 7)
+
+Checked automatically with axe on every screen and dialog state (zero violations of any impact) and by keyboard-only, focus-trap, focus-ring, reduced-motion and large-text tests (`tests/e2e/a11y.spec.ts`); Lighthouse accessibility is 1.00. Rules the code follows: native `<dialog>` (focus moves in, is trapped, returns to the trigger, Escape closes); every control has a visible focus ring and a 44 × 44 px target; status is text, never colour alone; the live total is announced politely and throttled; `prefers-reduced-motion: reduce` turns every transition and animation off; at very large text the layout reflows (one column of notebooks, a wrapping bottom navigation, an amount column that never exceeds the slip) instead of scrolling sideways. Content never pops in above something the user is about to tap: the library and Settings render only when everything they need has been read (D73), and transient notices (offline-ready, update available, in-app browser, private window) float in a fixed layer above the bottom navigation (D74). Lighthouse CLS is 0.005 to 0.03.
+
 ### 7.5 Theme
 
 `src/theme/colours.ts` holds the seven slip colours and two ink colours from §4 of the spec. CSS custom properties (`--paper`, `--rule`, `--ink`, `--ink-2`) are set on the `Slip` element from it. The chrome (navigation, buttons) uses Work Sans on a neutral off-white; slips use the chosen font set on `--slip-font`.

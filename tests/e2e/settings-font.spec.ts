@@ -42,7 +42,9 @@ test('LOOK-08: each font applies to the editor and persists after reload', async
     await page.getByRole('radio', { name: new RegExp(`^${label}`) }).check();
     // The radio updates at once (optimistic); wait until the setting is stored before the
     // test reloads the page, as a full reload can otherwise interrupt the write.
-    await expect.poll(() => storedFont(page)).toBe(FONT_IDS[family]);
+    // No stored row at all means the default font (Calibri-style, "carlito"): choosing the
+    // default needs no write, so the row may not exist yet.
+    await expect.poll(async () => (await storedFont(page)) ?? 'carlito').toBe(FONT_IDS[family]);
     await expect(page.getByTestId('font-preview')).toHaveCSS(
       'font-family',
       new RegExp(`^"?${family}"?`),

@@ -208,7 +208,8 @@ span.nav-link {
 
 .row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(9.75rem, 42%);
+  /* The amount column keeps room for a full amount, but never more than the slip allows. */
+  grid-template-columns: minmax(0, 1fr) minmax(min(9.75rem, 60%), 42%);
   gap: 0.5rem;
   align-items: center;
   min-height: 44px;
@@ -767,4 +768,77 @@ span.nav-link {
 
 .install-hint p {
   margin: 0;
+}
+
+/* LOOK-05: at very large text a single column must still fit a 320 px screen. */
+.stacks {
+  grid-template-columns: repeat(auto-fill, minmax(min(9.5rem, 100%), 1fr));
+}
+
+.stack-name,
+.stack-meta,
+.activity a,
+.search-results a,
+.page-card-title,
+.page-card-line,
+.banner,
+.empty,
+.hint {
+  overflow-wrap: anywhere;
+}
+
+/* A11Y-06: nothing animates or scrolls smoothly when reduced motion is requested. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* LOOK-05: at very large text the three navigation items wrap onto a second row. */
+.bottom-nav {
+  flex-wrap: wrap;
+}
+
+.bottom-nav a,
+.bottom-nav button {
+  flex: 1 1 5rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+/* Transient notices (offline-ready, update available, in-app browser, private window) float in
+   a layer above the bottom navigation, so they never push the page down when they appear (D73). */
+.toast-layer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom) + 3.5rem);
+  z-index: 6;
+  display: grid;
+  gap: 0.5rem;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+  pointer-events: none;
+}
+
+.toast-layer:empty {
+  display: none;
+}
+
+.toast-layer .banner {
+  margin: 0;
+  pointer-events: auto;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 0.2);
+}
+
+/* Keep the last lines reachable above a notice. */
+body:has(.toast-layer > *) .app {
+  padding-bottom: 14rem;
 }

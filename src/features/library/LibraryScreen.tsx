@@ -4,8 +4,8 @@ import { Link, useNavigate, useSearchParams } from 'react-router';
 import { displayTitle, formatPaise, normalise, search } from '@/engine';
 import { createNotebook, db, notebookSummaries, recentActivity, repoErrorMessage } from '@/db';
 import { AddBookTile, NotebookStack, StatusBadge } from '@/ui/bits';
-import { ReminderBanner } from '../backup/ReminderBanner';
-import { InstallHint } from '../pwa/InstallHint';
+import { ReminderView, useReminder } from '../backup/ReminderBanner';
+import { InstallHintView, useInstallHint } from '../pwa/InstallHint';
 import { editorPath, notebookPath } from '../paths';
 import { NotebookDialog } from './NewNotebookDialog';
 
@@ -73,6 +73,16 @@ export function LibraryScreen() {
     return { entries, notebookIds: new Set(notebooks.map((n) => n.id)), pages };
   }, []);
 
+  const hint = useInstallHint();
+  const reminder = useReminder();
+  // Show the page only when everything it needs has been read, all at once. Banners and
+  // notebooks that appear one by one push the buttons down just as the user taps them.
+  const ready =
+    summaries !== undefined &&
+    activity !== undefined &&
+    hint !== undefined &&
+    reminder !== undefined;
+
   const openCreate = () => setParams({ new: '1' });
   const closeCreate = () => setParams({}, { replace: true });
   const searching = normalise(query) !== '';
@@ -80,19 +90,21 @@ export function LibraryScreen() {
   return (
     <section className="library" aria-labelledby="library-heading">
       <h1 id="library-heading">Notebooks</h1>
-      <InstallHint />
-      <ReminderBanner />
-      <label className="search">
-        <span className="visually-hidden">Search</span>
-        <input
-          type="search"
-          placeholder="Find a notebook or page…"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-      </label>
+      {ready && hint.visible && <InstallHintView hasData={hint.hasData} />}
+      {ready && reminder && <ReminderView />}
+      {ready && (
+        <label className="search">
+          <span className="visually-hidden">Search</span>
+          <input
+            type="search"
+            placeholder="Find a notebook or page…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </label>
+      )}
 
-      {searching ? (
+      {!ready ? null : searching ? (
         <SearchResults query={query} />
       ) : (
         <>

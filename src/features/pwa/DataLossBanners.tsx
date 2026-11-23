@@ -36,9 +36,13 @@ export function DataLossBanners() {
     rerender((n) => n + 1);
   };
 
+  const showInApp = inApp && !dismissed.inApp;
+  const showPrivate = priv && !dismissed.priv;
+  if (!showInApp && !showPrivate) return null;
+
   return (
     <>
-      {inApp && !dismissed.inApp && (
+      {showInApp && (
         <div className="banner banner-warning" role="status">
           <span>
             <strong>{IN_APP_BANNER}</strong> {IN_APP_DETAIL}
@@ -48,7 +52,7 @@ export function DataLossBanners() {
           </button>
         </div>
       )}
-      {priv && !dismissed.priv && (
+      {showPrivate && (
         <div className="banner banner-warning" role="status">
           <span>{PRIVATE_BANNER}</span>
           <button type="button" onClick={() => hide('priv')}>
