@@ -5,6 +5,8 @@ import { addPaise, formatPaise, type Paise, parseAmount, ZERO } from '@/engine';
 import { type FontId, getSettings, updateSettings } from '@/db';
 import { SLIP_FONTS, slipFont } from '@/theme/fonts';
 import { Slip } from '@/ui/Slip';
+import { InstallButton } from '../pwa/InstallButton';
+import { StorageStatus } from '../pwa/StorageStatus';
 import { BackupSection } from '../backup/BackupSection';
 
 export const PRIVACY_STATEMENT =
@@ -98,7 +100,9 @@ export function SettingsScreen() {
 
       <section aria-labelledby="about-heading">
         <h2 id="about-heading">About and privacy</h2>
+        <InstallButton />
         <p>Note-Add version {__APP_VERSION__}</p>
+        <StorageStatus />
         <p>
           Made by Spearman ·{' '}
           <a

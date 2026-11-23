@@ -1,6 +1,10 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { listenForInstallPrompt } from '@/platform/install';
 import { App } from './App';
+
+// The browser can offer installation before the UI exists; keep the event for Settings.
+listenForInstallPrompt();
 
 const root = document.getElementById('root');
 if (root) {

@@ -5,6 +5,7 @@ import { displayTitle, formatPaise, normalise, search } from '@/engine';
 import { createNotebook, db, notebookSummaries, recentActivity, repoErrorMessage } from '@/db';
 import { AddBookTile, NotebookStack, StatusBadge } from '@/ui/bits';
 import { ReminderBanner } from '../backup/ReminderBanner';
+import { InstallHint } from '../pwa/InstallHint';
 import { editorPath, notebookPath } from '../paths';
 import { NotebookDialog } from './NewNotebookDialog';
 
@@ -79,6 +80,7 @@ export function LibraryScreen() {
   return (
     <section className="library" aria-labelledby="library-heading">
       <h1 id="library-heading">Notebooks</h1>
+      <InstallHint />
       <ReminderBanner />
       <label className="search">
         <span className="visually-hidden">Search</span>

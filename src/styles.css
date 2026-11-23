@@ -753,3 +753,18 @@ span.nav-link {
   flex-direction: column;
   align-items: stretch;
 }
+
+.banner-warning {
+  border-color: #7a4b00;
+  background: #fff8e6;
+}
+
+.install-hint,
+.reminder {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.install-hint p {
+  margin: 0;
+}

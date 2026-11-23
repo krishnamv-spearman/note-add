@@ -332,7 +332,7 @@ People paste amounts from WhatsApp messages, bank SMS, emails, PDFs and spreadsh
 | SHR-04 | Firefox for Android, desktop Firefox, older browsers | Download | P5.7 | M | ✅ |
 | SHR-05 | Desktop Safari or Edge on Windows with share support | Share sheet is used (acceptable); download fallback still available | P5.7 | M | ➕ |
 | SHR-06 | Installed app on iPhone (standalone), where downloads are unreliable | Share sheet always used | P5.7 | M | ➕ |
-| SHR-07 | Opened inside an in-app browser (WhatsApp, Instagram, Gmail link preview) | Downloads often fail there, **and its storage is separate from Chrome/Safari**, so notes appear "lost" later. Show a banner: "Open in Chrome/Safari to keep your notes" | P7.5 | M | ➕ |
+| SHR-07 | Opened inside an in-app browser (WhatsApp, Instagram, Gmail link preview) | Downloads often fail there, **and its storage is separate from Chrome/Safari**, so notes appear "lost" later. Show a banner: "Open in Chrome/Safari to keep your notes" | P7.5 | M | ✅ |
 
 ## 14. Backup and restore
 
@@ -389,10 +389,10 @@ A backup made today may be restored years from now by a much newer app. arch §9
 | ID | Scenario | Expected | Task | Test | Status |
 |---|---|---|---|---|---|
 | STO-01 | IndexedDB unavailable or blocked (some private modes, locked-down browsers) | Full-screen message "This browser can't store notes. Open Note-Add in a normal Chrome or Safari window." | P2.1 | E (mocked) | ✅ |
-| STO-02 | Private or incognito window (storage wiped when closed) | Best-effort banner: "Notes in a private window are deleted when it closes" | P7.5 | M | ➕ |
+| STO-02 | Private or incognito window (storage wiped when closed) | Best-effort banner: "Notes in a private window are deleted when it closes" | P7.5 | M | ✅ |
 | STO-03 | Storage quota exceeded on write | See SAV-04 | P2.8 | R | ✅ |
 | STO-04 | `navigator.storage.persist()` denied or unsupported | Information only (Settings shows "may be cleared"); no nagging | P7.4 | U | ✅ |
-| STO-05 | **iPhone: notes typed in Safari do not appear after installing to the home screen** (installed web apps get separate storage) | Install hint shown early, before data is entered; if Safari already has data, the hint says "Back up first, then restore inside the installed app" | P7.5 | M | ➕ |
+| STO-05 | **iPhone: notes typed in Safari do not appear after installing to the home screen** (installed web apps get separate storage) | Install hint shown early, before data is entered; if Safari already has data, the hint says "Back up first, then restore inside the installed app" | P7.5 | M | ✅ |
 | STO-06 | iPhone home-screen app removed | Its data is deleted; README warns; backup reminder covers it | P8.4 | — | ➕ (doc) |
 | STO-07 | User clears browser site data | Notes gone; README and About section say backups are the only protection | P8.4 | — | ➕ (doc) |
 | STO-08 | `crypto.randomUUID` or the service worker unavailable because the app is opened over plain `http://` on a LAN IP during phone testing | Test on phones through the Vercel preview (HTTPS) only; add a fallback ID generator anyway | P0.16, P2.3 | U | ✅ |

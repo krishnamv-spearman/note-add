@@ -5,6 +5,7 @@ import { getSettings, onDbEvent } from '@/db';
 import { applySlipFont } from '@/theme/fonts';
 import { onTabMessage } from '@/platform/broadcast';
 import { BottomNav } from '@/ui/bits';
+import { DataLossBanners } from './features/pwa/DataLossBanners';
 import { UpdatePrompt } from './features/pwa/UpdatePrompt';
 import { useNewPage } from './features/newPage';
 
@@ -35,6 +36,7 @@ export function Layout() {
       <header className="app-bar">
         <span className="brand">Note-Add</span>
       </header>
+      <DataLossBanners />
       <UpdatePrompt />
       {updated && (
         <div className="banner" role="alert">

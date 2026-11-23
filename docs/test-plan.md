@@ -181,6 +181,7 @@ Run against the **production build** served by `vite preview` with the **same he
 | `offline.spec.ts` | Load once → offline → reload → create, edit, export | chromium, pixel-7 | PWA-02, EXP-08 | 7 |
 | `privacy.spec.ts` | Full journey; any request to another origin fails the test; no cookies set | all | SEC-01 | 7 |
 | `csp.spec.ts` | No CSP violation reported during a full journey (catches `eval`, inline scripts) | chromium | SEC-02–04 | 7 |
+| `install.spec.ts` | iPhone hint before data / with notes in Safari ("back up first" + Back up now) / dismissed / installed; "Install app" via `beforeinstallprompt`; standalone hides it; private-window and in-app-browser banners; Settings storage status | iphone-14 (hint), chromium, pixel-7 | STO-02, 04, 05, SHR-07, PWA-07 | 7 |
 | `base-path.spec.ts` | Build with `VITE_BASE=/note-add/`; app, router, manifest and service worker work under the path | chromium | PWA-09 | 7 |
 | `a11y.spec.ts` | axe on every screen: zero serious or critical violations | all | A11Y-* | 7 |
 

@@ -575,18 +575,18 @@ If the app is hosted at `spearman.in/note-add` instead of a subdomain, `base`, `
 
 ### 10.3 Persistent storage
 
-On first data write, call `navigator.storage.persist()` once (Chrome grants it to installed or frequently used apps; Safari decides on its own). Store the result. Settings › About shows "Storage: protected" or "Storage: may be cleared by the browser — keep backups".
+On first data write, call `navigator.storage.persist()` once (Chrome grants it to installed or frequently used apps; Safari decides on its own). Store the result. Settings › About shows "Storage: protected" or "Storage: may be cleared by the browser — keep backups" (or, where the browser cannot say, "this browser cannot protect it — keep backups"). The status is read with `navigator.storage.persisted()` and never prompts; a refusal is information only, with no nagging (STO-04).
 
 ### 10.4 iPhone install hint
 
-Shown when: iOS/iPadOS Safari (user-agent plus `'ontouchend' in document` for iPadOS), **not** standalone (`navigator.standalone !== true` and not `matchMedia('(display-mode: standalone)')`), and not dismissed recently. Text: "Install to keep your notes safe: tap Share, then Add to Home Screen." Android/desktop Chrome use the `beforeinstallprompt` event to show an "Install app" button in Settings.
+Shown when: iOS/iPadOS Safari (user-agent plus `'ontouchend' in document` for iPadOS), **not** standalone (`navigator.standalone !== true` and not `matchMedia('(display-mode: standalone)')`), and not dismissed recently. Text: "Install to keep your notes safe: tap Share, then Add to Home Screen." Hidden for 30 days after "Got it" (a clock moved backwards keeps it hidden). iPadOS in desktop mode is found by touch support (PWA-08); Chrome, Firefox and in-app web views on iOS are not offered it (they cannot add to the home screen the same way). Android/desktop Chrome use the `beforeinstallprompt` event (kept from start-up) to show an "Install app" button in Settings, hidden once installed (PWA-07).
 
-**iPhone gives the installed app its own storage, separate from Safari.** Notes typed in Safari do not appear in the installed app. So the hint is shown on first visit, before any data is entered; if Safari already has notes, it says "Back up first, then restore inside the installed app."
+**iPhone gives the installed app its own storage, separate from Safari.** Notes typed in Safari do not appear in the installed app. So the hint is shown on first visit, before any data is entered; if Safari already has notes, it says "Back up first, then restore inside the installed app: the installed app starts with its own empty storage" and offers a **Back up now** button (STO-05).
 
 ### 10.5 Browsers that lose data
 
-- **In-app browsers** (a link opened inside WhatsApp, Instagram or Gmail) have their own storage and often block downloads. Detected by user agent; a banner says "Open in Chrome or Safari to keep your notes."
-- **Private windows** delete storage on close. Best-effort banner: "Notes in a private window are deleted when it closes."
+- **In-app browsers** (a link opened inside WhatsApp, Instagram, Facebook or Gmail) have their own storage and often block downloads. Detected by user-agent tokens, Android WebView (`; wv)`) and, on iOS, a web view with no `Safari/` token; a banner on every screen says "Open in Chrome or Safari to keep your notes." with the reason (SHR-07). Dismissed for the page visit only, because the risk remains.
+- **Private windows** delete storage on close. Best-effort banner: "Notes in a private window are deleted when it closes." Detection is a heuristic (a storage quota under 120 MB, as Chromium incognito reports); no method works in every browser, and Safari and Firefox private windows are mostly not detected (STO-02).
 - **IndexedDB unavailable** (blocked by policy, very old browser): full-screen message instead of the app.
 
 ---

@@ -26,6 +26,30 @@ export function persistenceStatus(): PersistenceStatus {
   return status;
 }
 
+/**
+ * What Settings › About shows (P7.4, arch §10.3). Asks the browser whether storage is
+ * persistent without prompting. Denied or unsupported is information only (STO-04).
+ */
+export async function getPersistenceStatus(
+  storage: Pick<StorageManager, 'persisted'> | undefined = (
+    globalThis.navigator as Navigator | undefined
+  )?.storage,
+): Promise<PersistenceStatus> {
+  if (!storage || typeof storage.persisted !== 'function') return 'unsupported';
+  try {
+    return (await storage.persisted()) ? 'protected' : 'may-be-cleared';
+  } catch {
+    return 'may-be-cleared';
+  }
+}
+
+export const PERSISTENCE_TEXT: Record<PersistenceStatus, string> = {
+  unknown: 'Storage: checking…',
+  protected: 'Storage: protected',
+  'may-be-cleared': 'Storage: may be cleared by the browser — keep backups',
+  unsupported: 'Storage: this browser cannot protect it — keep backups',
+};
+
 /** Tests only. */
 export function resetPersistenceForTests(): void {
   status = 'unknown';
