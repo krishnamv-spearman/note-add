@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { beginBusy } from '@/platform/pwa';
 import { type BackupRun, runBackup, shareBackupAgain } from './backupActions';
 
 type State =
@@ -21,6 +22,7 @@ export function BackupButton({ label = 'Back up now', disabled = false, onDone }
   const start = async () => {
     if (busy.current) return;
     busy.current = true;
+    const release = beginBusy();
     setState({ kind: 'working' });
     try {
       const run = await runBackup();
@@ -35,6 +37,7 @@ export function BackupButton({ label = 'Back up now', disabled = false, onDone }
       });
     } finally {
       busy.current = false;
+      release();
     }
   };
 

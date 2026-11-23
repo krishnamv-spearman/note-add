@@ -1,5 +1,6 @@
 node_modules/
 dist/
+dist-base/
 .env*
 coverage/
 playwright-report/
@@ -7,3 +8,4 @@ test-results/
 blob-report/
 .vercel/
 *.log
+.lighthouseci/

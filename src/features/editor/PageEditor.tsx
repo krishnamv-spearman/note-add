@@ -29,6 +29,7 @@ import { ConfirmDialog, Dialog } from '@/ui/Dialog';
 import { ExportControls } from '../export/ExportControls';
 import { Slip } from '@/ui/Slip';
 import { slipColour } from '@/theme/colours';
+import { registerFlush } from '@/platform/pwa';
 import { editorPath } from '../paths';
 import { DateField } from './DateField';
 import { EditingBar } from './EditingBar';
@@ -86,6 +87,9 @@ export function PageEditor({ notebook, page, pageCount }: Props) {
       void session.dispose();
     };
   }, [session]);
+
+  // PWA-03: an app update flushes this editor's pending typing before it reloads.
+  useEffect(() => registerFlush(() => session.flush()), [session]);
 
   // Focus requested by the previous page (Enter on line 10) or the New page button.
   useEffect(() => {

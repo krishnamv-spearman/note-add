@@ -405,16 +405,16 @@ A backup made today may be restored years from now by a much newer app. arch §9
 
 | ID | Scenario | Expected | Task | Test | Status |
 |---|---|---|---|---|---|
-| PWA-01 | First ever visit while offline | Impossible to load; nothing to do (browser error) | — | — | ➕ (note) |
+| PWA-01 | First ever visit while offline | Impossible to load; nothing to do (browser error) | — | — | ✅ |
 | PWA-02 | Offline after one visit: open, create, edit, export | All work | P7.1 | E | ✅ |
-| PWA-03 | New version deployed while the user is typing | Prompt only; on Reload, pending saves flush first | P7.2 | E | ✅ (flush ➕) |
-| PWA-04 | Update while a page is mid-export | Reload prompt waits until export finishes | P7.2 | C | ➕ |
+| PWA-03 | New version deployed while the user is typing | Prompt only; on Reload, pending saves flush first | P7.2 | E | ✅ |
+| PWA-04 | Update while a page is mid-export | Reload prompt waits until export finishes | P7.2 | C | ✅ |
 | PWA-05 | No browser back button in installed mode (iPhone standalone) | Every screen except the library has an in-app back control | P3.7, P3.8 | E | ✅ |
 | PWA-06 | spearman.in link in About, while installed | Opens in the browser (`target="_blank" rel="noopener"`), not inside the app | P4.9 | M | ✅ |
 | PWA-07 | Already installed | "Install app" button hidden; iPhone hint not shown | P7.5 | E | ✅ |
 | PWA-08 | iPad reports itself as a Mac | Detected through touch support as well as the user agent | P7.5 | U | ✅ |
-| PWA-09 | Hosted under `/note-add/` instead of a subdomain | Manifest scope, start URL, service worker scope and router base all follow `VITE_BASE`; e2e run once with the base set | P7.3 | E | ➕ |
-| PWA-10 | Service worker install fails (storage full) | App still works online; no error shown to the user | P7.1 | — | ➕ (note) |
+| PWA-09 | Hosted under `/note-add/` instead of a subdomain | Manifest scope, start URL, service worker scope and router base all follow `VITE_BASE`; e2e run once with the base set | P7.3 | E | ✅ |
+| PWA-10 | Service worker install fails (storage full) | App still works online; no error shown to the user | P7.1 | — | ✅ |
 | A11Y-01 | Screen reader reads `(300.00)` | Accessible label "minus 300 rupees" | P2.12 | C | ✅ |
 | A11Y-02 | Live total | Announced politely, throttled (not on every keystroke) | P2.12 | C | ✅ |
 | A11Y-03 | New page created by Enter | Announced: "Page 4 started, brought forward 1,280.75" | P2.12 | C | ✅ |

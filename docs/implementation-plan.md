@@ -359,13 +359,13 @@ Phase 6 can be built in parallel with phase 5 once phase 4's Settings screen exi
 
 ### Tasks
 
-- [ ] **P7.1 vite-plugin-pwa** (arch §10.1): `generateSW`, precache all build output including fonts and the lazy export chunk, `navigateFallback: index.html`, `registerType: 'prompt'`, registration through the plugin's virtual module (not an inline script, because of the phase 0 CSP).
-- [ ] **P7.2 Update prompt**: "New version available — Reload" toast; never reloads by itself.
-- [ ] **P7.3 Manifest and icons** (arch §10.2): name, short name, standalone, start URL and scope from `VITE_BASE`, theme and background colours, icons 192/512, maskable 512, `apple-touch-icon` 180, iOS meta tags. Generate icons from one source SVG.
+- [x] **P7.1 vite-plugin-pwa** (arch §10.1): `generateSW`, precache all build output including fonts and the lazy export chunk, `navigateFallback: index.html`, `registerType: 'prompt'`, registration through the plugin's virtual module (not an inline script, because of the phase 0 CSP).
+- [x] **P7.2 Update prompt**: "New version available — Reload" toast; never reloads by itself.
+- [x] **P7.3 Manifest and icons** (arch §10.2): name, short name, standalone, start URL and scope from `VITE_BASE`, theme and background colours, icons 192/512, maskable 512, `apple-touch-icon` 180, iOS meta tags. Generate icons from one source SVG.
 - [ ] **P7.4 Persistent storage status** (arch §10.3): result shown in Settings › About ("Storage: protected" / "may be cleared by the browser — keep backups").
 - [ ] **P7.5 iPhone install hint** (arch §10.4) on the library when iOS Safari and not standalone, shown on first visit before data is entered, with the "back up first, then restore inside the installed app" variant when Safari already has notes (STO-05); dismissible. `beforeinstallprompt` "Install app" button in Settings for Chromium browsers.
 - [ ] **P7.5a Data-loss banners** (arch §10.5): in-app browser (SHR-07) and private window (STO-02).
-- [ ] **P7.6 Vercel headers check**: service worker served with `Cache-Control: no-cache`; hashed assets cached long-term; CSP still passes with the service worker registered.
+- [x] **P7.6 Vercel headers check**: service worker served with `Cache-Control: no-cache`; hashed assets cached long-term; CSP still passes with the service worker registered.
 - [ ] **P7.7 Accessibility pass**: axe checks in Playwright on every screen (`@axe-core/playwright`), keyboard-only walkthrough, screen reader spot checks (TalkBack and VoiceOver) on the editor, focus management in dialogs, `prefers-reduced-motion` respected.
 - [ ] **P7.8 Performance pass** (step 1 done: budgets met, see D37 in PROGRESS.md) (arch §14): bundle size limit in CI (initial ≤ 150 KB gzip; export chunk ≤ 250 KB), font preloading as planned, no layout shift when fonts load. Test the 200-page recalculation timing in a repository benchmark test.
 - [ ] **P7.9 Lighthouse CI** (`@lhci/cli`) on `main` with the mobile preset: accessibility ≥ 95, performance ≥ 90, best practices ≥ 90.

@@ -45,6 +45,8 @@ export default tseslint.config(
   {
     ignores: [
       'dist',
+      'dist-base',
+      '.lighthouseci',
       'coverage',
       'playwright-report',
       'test-results',
@@ -77,7 +79,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['**/*.{js,mjs}'],
+    files: ['**/*.{js,mjs,cjs}'],
     ...tseslint.configs.disableTypeChecked,
   },
   {
@@ -152,6 +154,8 @@ export default tseslint.config(
       ],
     },
   },
+  // CommonJS config files (Lighthouse CI) use require().
+  { files: ['**/*.cjs'], rules: { '@typescript-eslint/no-require-imports': 'off' } },
   // Build and CI scripts report on the console.
   { files: ['scripts/**'], rules: { 'no-console': 'off' } },
   {

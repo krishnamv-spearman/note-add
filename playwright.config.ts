@@ -4,6 +4,7 @@ const port = 4173;
 
 export default defineConfig({
   testDir: './tests/e2e',
+  testIgnore: '**/base-path.spec.ts', // built and served separately: npm run test:e2e:base
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
@@ -16,6 +17,9 @@ export default defineConfig({
     trace: 'retain-on-failure',
     timezoneId: 'Asia/Kolkata',
     locale: 'en-IN',
+    // The service worker is exercised only by pwa/offline/privacy/csp specs (they opt in with
+    // test.use({ serviceWorkers: 'allow' })); elsewhere it would cache and bypass page.route.
+    serviceWorkers: 'block',
   },
   projects: [
     { name: 'chromium-desktop', use: { ...devices['Desktop Chrome'] } },

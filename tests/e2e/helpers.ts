@@ -108,3 +108,38 @@ export async function newPageFromNav(page: Page, expectNumber: number): Promise<
   // fill() can race that move and type into the description instead of the amount.
   await expect(description(page, 1)).toBeFocused();
 }
+
+/**
+ * Registers the service worker and waits until it controls the page (precache finished and
+ * active, then one reload, as on a real second visit). Specs using it must opt in with
+ * `test.use({ serviceWorkers: 'allow' })`.
+ */
+export async function activateServiceWorker(page: Page): Promise<void> {
+  await page.goto('/');
+  await page.evaluate(() => navigator.serviceWorker.ready); // installed and activated
+  await page.reload();
+  await expect
+    .poll(() => page.evaluate(() => navigator.serviceWorker.controller !== null))
+    .toBe(true);
+}
+
+/** A desktop without the Web Share API, so exports and backups download. */
+export async function withoutShare(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
+    Object.defineProperty(navigator, 'canShare', { value: undefined, configurable: true });
+  });
+}
+
+/** Click a button and return the file it downloads. */
+export async function downloadVia(
+  page: Page,
+  click: () => Promise<void>,
+): Promise<{ name: string; bytes: Uint8Array }> {
+  const [download] = await Promise.all([page.waitForEvent('download'), click()]);
+  const { readFileSync } = await import('node:fs');
+  return {
+    name: download.suggestedFilename(),
+    bytes: new Uint8Array(readFileSync(await download.path())),
+  };
+}

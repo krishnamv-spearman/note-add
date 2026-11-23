@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { beginBusy } from '@/platform/pwa';
 import { shareAgain, shareOrDownload } from '@/platform/share';
 import type { ExportFormat } from './exporter';
 
@@ -24,6 +25,7 @@ export function ExportControls({ pageId, beforeExport }: Props) {
   const run = async (format: ExportFormat) => {
     if (busy.current) return;
     busy.current = true;
+    const release = beginBusy(); // PWA-04: an update waits for the export
     setState({ kind: 'preparing', format });
     try {
       await beforeExport?.();
@@ -42,6 +44,7 @@ export function ExportControls({ pageId, beforeExport }: Props) {
       });
     } finally {
       busy.current = false;
+      release();
     }
   };
 

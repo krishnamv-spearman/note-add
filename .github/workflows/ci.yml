@@ -43,6 +43,36 @@ jobs:
         env:
           TEST_TZ: ${{ matrix.tz }}
 
+  e2e-base-path:
+    # PWA-09: the app built and served under /note-add/
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e:base
+        env:
+          CI: true
+
+  lighthouse:
+    # P7.9: Lighthouse CI on main only (mobile preset; accessibility >= 95, performance >= 90)
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - run: npm run lhci
+
   e2e:
     runs-on: ubuntu-latest
     steps:

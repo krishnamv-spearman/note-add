@@ -4,6 +4,7 @@ import { epochToDisplay, toDisplay } from '@/engine';
 import { db, getSettings } from '@/db';
 import type { Inspection } from '@/db/repo/backup';
 import { postToOtherTabs } from '@/platform/broadcast';
+import { beginBusy } from '@/platform/pwa';
 import { ConfirmDialog } from '@/ui/Dialog';
 import { backupModule, downloadSafetyCopy } from './backupActions';
 import { BackupButton } from './BackupButton';
@@ -54,6 +55,7 @@ export function BackupSection() {
     if (!pending) return;
     const { doc } = pending.inspection;
     setPending(null);
+    const release = beginBusy(); // an update never interrupts a restore
     try {
       await (await backupModule()).restoreBackup(doc);
       postToOtherTabs({ type: 'reload', reason: 'restore' }); // MTB-03 / RES-17
@@ -66,12 +68,15 @@ export function BackupSection() {
         kind: 'error',
         text: 'The restore failed. Your current notes were not changed.',
       });
+    } finally {
+      release();
     }
   };
 
   const undo = async () => {
     setConfirmUndo(false);
-    const r = await (await backupModule()).undoLastRestore();
+    const release = beginBusy();
+    const r = await (await backupModule()).undoLastRestore().finally(release);
     if (r.ok) {
       postToOtherTabs({ type: 'reload', reason: 'undo-restore' });
       setMessage({ kind: 'ok', text: 'The last restore was undone.' });

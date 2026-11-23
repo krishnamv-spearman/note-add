@@ -1,29 +1,102 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import react from '@vitejs/plugin-react';
+import type { Plugin } from 'vite';
+import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig } from 'vitest/config';
 
-interface VercelHeaders {
-  headers: { source: string; headers: { key: string; value: string }[] }[];
+interface VercelRule {
+  source: string;
+  headers: { key: string; value: string }[];
 }
 
 /**
- * SEC-02: `vite preview` does not read vercel.json, so the same headers (CSP included)
- * are applied here. E2E tests therefore run under the real production CSP.
+ * SEC-02 / P7.6: `vite preview` does not read vercel.json, so its header rules (CSP, and the
+ * per-path cache rules for the service worker and hashed assets) are applied here. E2E tests
+ * therefore run under the real production headers.
  */
-function productionHeaders(): Record<string, string> {
-  const vercel = JSON.parse(
-    readFileSync(new URL('./vercel.json', import.meta.url), 'utf8'),
-  ) as VercelHeaders;
-  const all = vercel.headers.find((h) => h.source === '/(.*)');
-  return Object.fromEntries((all?.headers ?? []).map((h) => [h.key, h.value]));
+function vercelHeaders(base: string): Plugin {
+  const rules = (
+    JSON.parse(readFileSync(new URL('./vercel.json', import.meta.url), 'utf8')) as {
+      headers: VercelRule[];
+    }
+  ).headers.map((r) => ({
+    // Vercel path patterns: "/(.*)" and "/assets/(.*)" → regular expressions.
+    re: new RegExp(
+      '^' +
+        r.source
+          .split('(.*)')
+          .map((part) => part.replace(/[.+?^${}|[\]\\]/g, '\\$&'))
+          .join('.*') +
+        '$',
+    ),
+    headers: r.headers,
+  }));
+  return {
+    name: 'note-add-vercel-headers',
+    configurePreviewServer(server) {
+      server.middlewares.use((req, res, next) => {
+        let path = (req.url ?? '/').split('?')[0] ?? '/';
+        if (base !== '/' && path.startsWith(base)) path = '/' + path.slice(base.length);
+        for (const rule of rules) {
+          if (rule.re.test(path)) for (const h of rule.headers) res.setHeader(h.key, h.value);
+        }
+        next();
+      });
+    },
+  };
 }
+
+const base = process.env.VITE_BASE ?? '/';
+
+/** Arch §10: precache the whole build, but only the latin and latin-ext font subsets (D30). */
+const pwa = VitePWA({
+  registerType: 'prompt',
+  injectRegister: false, // registered from src/features/pwa/register.ts (a script file, CSP)
+  manifest: {
+    id: base,
+    name: 'Note-Add',
+    short_name: 'Note-Add',
+    description: 'Sticky-note expense pages that add themselves up. Made by Spearman.',
+    lang: 'en-IN',
+    display: 'standalone',
+    start_url: base,
+    scope: base,
+    theme_color: '#FFF4A3',
+    background_color: '#FAFAF7',
+    categories: ['finance', 'productivity'],
+    icons: [
+      { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+      {
+        src: 'icons/icon-maskable-512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'maskable',
+      },
+    ],
+  },
+  workbox: {
+    // HTML, JS (including the lazy export chunk, so export works offline), CSS, icons, licences.
+    globPatterns: [
+      '**/*.{html,js,css,svg,png,webmanifest}',
+      'fonts/LICENSES/*.txt',
+      'assets/*-latin-*-normal-*.{woff2,woff}',
+    ],
+    // Fonts: latin and latin-ext only, as WOFF2 (screen) and WOFF (embedded into PDFs).
+    // No cyrillic, greek, vietnamese… subsets: English-only text cannot use them.
+    globIgnores: ['**/node_modules/**'],
+    navigateFallback: `${base}index.html`,
+    cleanupOutdatedCaches: true,
+    maximumFileSizeToCacheInBytes: 1_000_000,
+  },
+});
 
 const testTz = process.env.TEST_TZ ?? 'Asia/Kolkata';
 
 export default defineConfig({
-  base: process.env.VITE_BASE ?? '/',
-  plugins: [react()],
+  base,
+  plugins: [react(), vercelHeaders(base), ...(process.env.VITEST ? [] : [pwa])],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -38,9 +111,6 @@ export default defineConfig({
   },
   define: {
     __APP_VERSION__: JSON.stringify(process.env.npm_package_version ?? '0.0.0'),
-  },
-  preview: {
-    headers: productionHeaders(),
   },
   build: {
     target: 'es2022',

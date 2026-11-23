@@ -5,6 +5,7 @@ import { getSettings, onDbEvent } from '@/db';
 import { applySlipFont } from '@/theme/fonts';
 import { onTabMessage } from '@/platform/broadcast';
 import { BottomNav } from '@/ui/bits';
+import { UpdatePrompt } from './features/pwa/UpdatePrompt';
 import { useNewPage } from './features/newPage';
 
 /** App chrome: brand, notices passed through navigation, update and reload banners. */
@@ -34,6 +35,7 @@ export function Layout() {
       <header className="app-bar">
         <span className="brand">Note-Add</span>
       </header>
+      <UpdatePrompt />
       {updated && (
         <div className="banner" role="alert">
           <span>Note-Add was updated — reload</span>

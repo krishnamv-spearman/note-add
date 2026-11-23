@@ -10,3 +10,11 @@ if (root) {
     </StrictMode>,
   );
 }
+
+// Service worker: after the first paint, from a lazily loaded script file (arch §10.1).
+if (import.meta.env.PROD) {
+  const register = () =>
+    void import('./features/pwa/register').then((m) => m.registerServiceWorker());
+  if (document.readyState === 'complete') register();
+  else window.addEventListener('load', register, { once: true });
+}
