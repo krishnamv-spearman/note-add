@@ -8,9 +8,7 @@ import { Slip } from '@/ui/Slip';
 import { InstallButton } from '../pwa/InstallButton';
 import { StorageStatusView, useStorageStatus } from '../pwa/StorageStatus';
 import { BackupSection, useBackupData } from '../backup/BackupSection';
-
-export const PRIVACY_STATEMENT =
-  'Note-Add stores your notes only on your device. Nothing is sent to Spearman or anyone else. Backups and exports go only where you choose to send them.';
+import { PRIVACY_STATEMENT } from './privacyStatement';
 
 const LICENCES: [string, string][] = [
   ['Carlito-OFL.txt', 'Carlito'],
@@ -132,6 +130,11 @@ export function SettingsScreen() {
           </a>
         </p>
         <p className="privacy">{PRIVACY_STATEMENT}</p>
+        <p>
+          <Link to="/privacy" className="text-link">
+            Read the full privacy page
+          </Link>
+        </p>
         <h3>Font licences (SIL Open Font Licence)</h3>
         <ul className="licences">
           {LICENCES.map(([file, label]) => (

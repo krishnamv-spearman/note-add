@@ -15,7 +15,8 @@ Run started 22/11/2026. Owner decisions of 22/11/2026 applied to the docs first:
 | 5 Export | ✅ done | 362 | 73 (+62 skipped) |
 | 6 Backup | ✅ done | 407 (+1 opt-in generator) | 82 (+80 skipped) |
 | English-only (23/11) | ✅ done | 429 (+1 opt-in generator) | 82 (+80 skipped) |
-| 7 PWA (branch `build/phase-7`) | in progress | see Phase 7 section | see Phase 7 section |
+| 7 PWA, offline, a11y, performance (branch `build/phase-7`) | ✅ done (device checks are manual) | 508 (+1 opt-in generator) | 152 (+118 skipped) + 1 base-path |
+| 8 preparation (no accounts needed) | ✅ done: privacy page, README guide, release checklist | 508 | 152 (+118 skipped) |
 
 (Counts are cumulative totals after the phase. E2E counts are tests × projects.)
 
@@ -276,6 +277,18 @@ Branch created from `build/phases-0-6`. Never pushed, never deployed. Steps are 
 
 ---
 
+### Phase 8 preparation (items that need no accounts) ✅
+
+- **Privacy page** at `/privacy` (`src/features/privacy/PrivacyScreen.tsx`, lazy route so the initial bundle stays 145.3 KB): the spec §7 statement word for word (shared constant, also used in Settings), what is stored and where, what the app does not do, when something leaves the device, hosting, contact. Linked from Settings → About and privacy ("Read the full privacy page") and has a link back. spearman.in can link straight to `/privacy`. e2e (`privacy-page.spec.ts`, all 3 projects): reachable from Settings, opens directly, exact statement, no other-origin request, zero axe violations.
+- **README user guide** (spec §9.4): create a notebook, add lines (amount rules, brackets for refunds, Indian grouping), new page and Brought forward, Final and Reopen, export (PDF/JPEG, share sheet), back up and restore (replace warning, undo, old backups), install on Android, iPhone (Safari only) and desktop, change the look; privacy statement; links to the release checklist. Font licence credits were already in the README.
+- **Release checklist** [docs/release-checklist.md](docs/release-checklist.md): merge and green CI, name check, Vercel project, `notes.spearman.in` CNAME (and the `/note-add/` path option), **regenerating the v1.0 backup fixture from the real app (D47)**, production and phone checks (Android, iPhone, desktop, airplane mode), version 1.0.0 and the tag, GitHub release notes, the spearman.in card text, and the 3–5 person user test.
+- Plan: P8.4 ticked. P8.1–P8.3 and P8.5–P8.8 stay open on purpose: they need accounts, devices or people.
+- Gate: lint, typecheck, format check, 508 unit tests, 152 e2e on three projects, 1 base-path e2e, production build, bundle budgets 145.3 KB / 76.6 KB all pass. One run of `backup-restore` failed once under full-suite load on desktop Chromium and passed 25 of 25 repeats and the next full run; it is the known load sensitivity, not a code change.
+
+## Summary at the end of phase 7 and phase 8 preparation
+
+Everything in the plan that can be built and verified without accounts or devices is done. **What passes locally:** lint, typecheck, format, 508 unit/repository/component tests (engine coverage 100%), 152 e2e tests on desktop Chromium, Pixel 7 and iPhone 14 WebKit (plus the base-path run), axe with zero violations on every screen, Lighthouse (mobile preset): accessibility 1.00, best practices 1.00, performance 0.96 library / 0.91 Settings, CLS 0.00–0.02; bundle 145.3 KB initial JS (budget 150) and 76.6 KB export chunk (budget 250). **What only you can do** is in [docs/release-checklist.md](docs/release-checklist.md); the device checks (install on Android and iPhone, airplane mode, TalkBack/VoiceOver, speed on a real phone) are M7.1–M7.13 below. Nothing was pushed or deployed and `main` was not touched.
+
 ## Decisions to review
 
 | # | Phase | Decision | Why |
@@ -342,6 +355,7 @@ Branch created from `build/phases-0-6`. Never pushed, never deployed. Steps are 
 | D70 | 7 | The a11y gate is **zero axe violations of any impact**, stricter than the plan's "zero serious or critical". It passes, so there is no reason to allow minor or moderate ones. | Keeps the bar where it is. Relax it only with a recorded reason. |
 | D71 | 7 | Native `<dialog>` lets Tab move to the browser's own UI after the last control (focus lands on `<body>` in automation); the trap test therefore checks that focus never reaches the page behind, not that it cycles inside forever. | That is how modal dialogs behave in browsers. |
 | D72 | 7 | The bottom navigation wraps onto two rows at very large text instead of shrinking its labels. | Labels stay readable; the bar only grows when the user chose larger text. |
+| D76 | 8 | **The privacy page is a normal lazy app route (`/privacy`)** rather than a static HTML file, and its text is the spec §7 statement plus a plain-language list of what is stored and what is not. The Vercel hosting sentence (the host sees ordinary request data such as IP address) is an addition so the page is accurate. | spearman.in needs a URL to link to; a route reuses the app's styling, works offline and is covered by the existing CSP and a11y tests. Please read the wording and change it if you want something different. |
 | D75 | 7 | **Keep the font preloads although simulated LCP did not improve**, and record the Lighthouse figures as measured instead of tuning further. | The preloads are free and help real networks; more tuning of start-up would mean restructuring the data layer, out of scope for phase 7. |
 | D74 | 7 | **Transient notices float in a fixed layer above the bottom navigation** (`.toast-layer`) instead of sitting in the page flow: offline-ready, update available, "app was updated", in-app browser, private window. They overlay the bottom of the page until dismissed (the page adds bottom padding while one shows). The iPhone hint and the backup reminder stay in the flow on the library (they appear together with the rest of the page, D73). | A notice that appears seconds after load (service worker, storage check) otherwise pushes the page down under the user's finger; measured by Lighthouse CLS 0.12 → 0.03. |
 | D73 | 7 | The library shows only its heading until all its data is ready, then everything at once (a brief moment, typically tens of milliseconds). Banners and lists no longer pop in above buttons. The banners were split into a data hook plus a view; the self-fetching `InstallHint` and `ReminderBanner` remain for reuse and their tests. | Fixes mis-taps from layout shift and a flaky iPhone e2e suite; also removes CLS for Lighthouse (step 5). |

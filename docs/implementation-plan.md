@@ -404,8 +404,8 @@ Phase 6 can be built in parallel with phase 5 once phase 4's Settings screen exi
 - [ ] **P8.1 Name check**: search app stores, the web, and the Indian trademark register (ipindia.gov.in) for "Note-Add". If there is a conflict, choose a new name before anything below (it affects the manifest, domain and README).
 - [ ] **P8.2 Final address decision** (§0.4). For `notes.spearman.in`: add the domain in Vercel and create the DNS CNAME at the domain registrar. For `spearman.in/note-add`: build with `VITE_BASE=/note-add/` and set up the path on the spearman.in host.
 - [ ] **P8.3 Production check** at the final address: HTTPS, headers, install, offline, update prompt (repeat the phase 7 device table quickly).
-- [ ] **P8.4 README user guide** (spec §9.4): create a notebook, add lines, new page, Final and Reopen, export, back up and restore, install to the home screen (Android, iPhone, desktop). Include font licence credits and the privacy statement.
-- [ ] **P8.5 spearman.in card** in the Ventures section: short description, "Open the app" button, privacy statement.
+- [x] **P8.4 README user guide** (spec §9.4): create a notebook, add lines, new page, Final and Reopen, export, back up and restore, install to the home screen (Android, iPhone, desktop). Include font licence credits and the privacy statement.
+- [ ] **P8.5 spearman.in card** (the `/privacy` page it links to is built; the card itself needs you, see docs/release-checklist.md) in the Ventures section: short description, "Open the app" button, privacy statement.
 - [ ] **P8.6 Release**: tag `v1.0.0`, set `appVersion`, short release notes on GitHub.
 - [ ] **P8.7 User testing with 3–5 people** (no instructions given): task "create a notebook, fill two pages, export a PDF and send it to yourself". Time each person; note where they hesitate. At least one tester on iPhone and one on Android.
 - [ ] **P8.8 Fix round**: fix issues that block the 2-minute task; log everything else as GitHub issues for v1.1.

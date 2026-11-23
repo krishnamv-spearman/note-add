@@ -400,6 +400,7 @@ On load, pages are checked against the engine: a page whose line count is not 10
 | `/n/:notebookId` | Notebook pages list + Archive | §3.2 |
 | `/n/:notebookId/p/:pageNumber` | Page editor | §3.3 |
 | `/settings` | Settings | §3.4 |
+| `/privacy` | Privacy statement and what is stored (lazy route, no data needed; linked from Settings and from spearman.in) | spec §7 |
 
 Using the page **number** in the URL makes URLs readable ("page 3"); after a deletion the editor redirects if the number no longer exists.
 

@@ -30,6 +30,12 @@ export const routes: RouteObject[] = [
           Component: (await import('./features/settings/SettingsScreen')).SettingsScreen,
         }),
       },
+      {
+        path: '/privacy',
+        lazy: async () => ({
+          Component: (await import('./features/privacy/PrivacyScreen')).PrivacyScreen,
+        }),
+      },
       { path: '*', element: <Navigate to="/" replace /> },
     ],
   },
