@@ -31,9 +31,9 @@ const FIXTURES = join(import.meta.dirname, '../../tests/fixtures/backups');
 const fixture = (name: string) => readFileSync(join(FIXTURES, name), 'utf8');
 const VALID = fixture('v1/valid-3-notebooks-21-pages.json');
 
-let nowMs = new Date('2026-11-22T10:00:00+05:30').getTime();
+let nowMs = new Date(2026, 10, 22, 10, 0, 0).getTime();
 beforeEach(async () => {
-  nowMs = new Date('2026-11-22T10:00:00+05:30').getTime();
+  nowMs = new Date(2026, 10, 22, 10, 0, 0).getTime();
   setClock(() => new Date(nowMs));
   await resetDb();
 });
@@ -66,7 +66,20 @@ describe('OLD-01: the committed v1 fixture', () => {
     const r = inspectBackupText(VALID);
     expect(r.ok).toBe(true);
     if (r.ok) {
-      expect(r.value.summary).toEqual({ notebooks: 3, pages: 21, lastChanged: '2026-11-03' });
+      // The latest change is one instant; its calendar date depends on the zone the test runs in,
+      // so the expected date is worked out here from the raw timestamps with local getters.
+      const raw = JSON.parse(VALID) as {
+        data: { notebooks: { updatedAt: number }[]; pages: { updatedAt: number }[] };
+      };
+      const latest = new Date(
+        Math.max(
+          ...raw.data.notebooks.map((n) => n.updatedAt),
+          ...raw.data.pages.map((p) => p.updatedAt),
+        ),
+      );
+      const pad = (n: number) => String(n).padStart(2, '0');
+      const localDate = `${latest.getFullYear()}-${pad(latest.getMonth() + 1)}-${pad(latest.getDate())}`;
+      expect(r.value.summary).toEqual({ notebooks: 3, pages: 21, lastChanged: localDate });
       expect(r.value.notes).toEqual([]);
     }
   });

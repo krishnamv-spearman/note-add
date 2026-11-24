@@ -9,6 +9,8 @@ Never push to `main` or deploy until step 1 is clear. Nothing in the repo does t
 - [ ] Review the branches `build/phases-0-6` and `build/phase-7` (read [PROGRESS.md](../PROGRESS.md), especially **Decisions to review**). Merge them to `main` (pull request, wait for CI green).
 - [ ] CI must be green on `main`: lint, type check, format, unit tests (FC_RUNS=1000), build, bundle budgets, e2e on three projects, base-path e2e, Lighthouse.
 
+- [ ] **Visual baselines (Linux).** The 11 tests in `tests/e2e/visual.spec.ts` compare against reference images made on CI Linux, and none are committed yet. On GitHub: **Actions → "Update visual baselines" → Run workflow**, choose the branch, run. It regenerates only the visual tests, commits the new `*-linux.*` images in `tests/e2e/visual.spec.ts-snapshots/` to that branch as "Update Linux visual baselines" (nothing is committed if nothing changed), then re-run CI. Look at the committed images once; they become the reference. Run it again whenever you change the look on purpose.
+
 ## 1. Name check (P8.1) — before the domain
 
 - [ ] Search the Play Store, App Store, the web and the Indian trademark register (ipindia.gov.in) for "Note-Add".

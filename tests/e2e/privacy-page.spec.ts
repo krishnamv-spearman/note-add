@@ -16,6 +16,26 @@ test('P8.5: the privacy page shows the statement, is linked from Settings, and l
   await expect(page).toHaveURL(/\/settings$/);
 });
 
+test('P8.5: hosting wording and contact links', async ({ page }) => {
+  await page.goto('/privacy');
+  await expect(
+    page.getByText(
+      'After the first visit, the app only checks the host now and then for a newer version of itself. That check carries no notes.',
+    ),
+  ).toBeVisible();
+  await expect(page.getByTestId('privacy-contact')).toHaveText(
+    'Note-Add is made by Spearman (spearman.in). Questions about privacy: hello@spearman.in',
+  );
+  await expect(page.getByRole('link', { name: 'spearman.in', exact: true })).toHaveAttribute(
+    'href',
+    'https://spearman.in/',
+  );
+  await expect(page.getByRole('link', { name: 'hello@spearman.in' })).toHaveAttribute(
+    'href',
+    'mailto:hello@spearman.in',
+  );
+});
+
 test('P8.5: opening /privacy directly works, makes no other-origin request, and is accessible', async ({
   page,
 }) => {

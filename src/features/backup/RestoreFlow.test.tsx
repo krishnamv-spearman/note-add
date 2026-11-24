@@ -15,13 +15,28 @@ const file = (name: string) =>
   });
 
 beforeEach(async () => {
-  setClock(() => new Date('2026-11-22T10:00:00+05:30'));
+  setClock(() => new Date(2026, 10, 22, 10, 0, 0));
   await resetDb();
 });
 
 async function openSettings() {
   render(<App router={createMemoryRouter(routes, { initialEntries: ['/settings'] })} />);
   await screen.findByRole('heading', { name: 'Backup and restore' });
+}
+
+/** The fixture's latest change as DD/MM/YYYY in the zone the test runs in (it is one instant). */
+function fixtureLastChanged(): string {
+  const raw = JSON.parse(
+    readFileSync(join(FIXTURES, 'v1/valid-3-notebooks-21-pages.json'), 'utf8'),
+  ) as { data: { notebooks: { updatedAt: number }[]; pages: { updatedAt: number }[] } };
+  const d = new Date(
+    Math.max(
+      ...raw.data.notebooks.map((n) => n.updatedAt),
+      ...raw.data.pages.map((p) => p.updatedAt),
+    ),
+  );
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
 }
 
 describe('RestoreFlow', () => {
@@ -54,7 +69,7 @@ describe('RestoreFlow', () => {
       file('v1/valid-3-notebooks-21-pages.json'),
     );
     expect(await screen.findByTestId('restore-summary')).toHaveTextContent(
-      '3 notebooks, 21 pages, last changed 03/11/2026',
+      `3 notebooks, 21 pages, last changed ${fixtureLastChanged()}`,
     );
     const dialog = within(
       screen.getByRole('heading', { name: 'Restore this backup?' }).closest('form')!,

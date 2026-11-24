@@ -50,21 +50,25 @@ export function PrivacyScreen() {
       <p>
         The app is delivered as static files from Vercel. Like any web host, the host can see that
         your browser asked for the app files (for example your IP address and the time), but never
-        your notes, which are not sent. After the first visit the app does not need to ask again.
+        your notes, which are not sent. After the first visit, the app only checks the host now and
+        then for a newer version of itself. That check carries no notes.
       </p>
 
       <h2>Contact</h2>
-      <p>
-        Note-Add is made by{' '}
+      <p data-testid="privacy-contact">
+        Note-Add is made by Spearman (
         <a
-          href="https://spearman.in"
+          href="https://spearman.in/"
           target="_blank"
           rel="noopener noreferrer"
           className="text-link"
         >
-          Spearman
+          spearman.in
         </a>
-        . Questions about privacy can be sent through the contact details on that site.
+        ). Questions about privacy:{' '}
+        <a href="mailto:hello@spearman.in" className="text-link">
+          hello@spearman.in
+        </a>
       </p>
     </section>
   );
