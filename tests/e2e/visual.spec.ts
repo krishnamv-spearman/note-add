@@ -30,10 +30,20 @@ for (const colour of COLOURS) {
     await description(page, 2).fill('Refund');
     await amount(page, 2).fill('-300');
     await amount(page, 2).blur();
-    await expect(page.locator('.editor-slip')).toHaveScreenshot(
-      `slip-${colour.toLowerCase().replace(/\s+/g, '-')}.png`,
-      { maxDiffPixelRatio: 0.001 },
-    );
+    // An element screenshot captures what is on screen: scroll to the bottom first so the whole
+    // slip, including the Total row, sits above the fixed bottom navigation (phase 8 part 2).
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    const slip = page.locator('.editor-slip');
+    const nav = page.getByRole('navigation', { name: 'Main' });
+    await expect
+      .poll(async () => {
+        const [s, n] = [await slip.boundingBox(), await nav.boundingBox()];
+        return s && n ? n.y - (s.y + s.height) : -1;
+      })
+      .toBeGreaterThanOrEqual(0);
+    await expect(slip).toHaveScreenshot(`slip-${colour.toLowerCase().replace(/\s+/g, '-')}.png`, {
+      maxDiffPixelRatio: 0.001,
+    });
   });
 }
 
